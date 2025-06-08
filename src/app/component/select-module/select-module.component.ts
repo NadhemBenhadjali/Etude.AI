@@ -64,25 +64,13 @@ export class SelectModuleComponent implements OnInit {
 
   selectSubject(subject: SubjectOption) {
     this.selectedSubject = subject;
-
-    // If mode is 'summary', go to lesson page with first module
-    if (this.currentMode === 'summary') {
-      const firstModule = subject.modules[0];
-
-      this.router.navigate(['/lesson'], {
-        queryParams: {
-          subject: subject.value,
-          module: firstModule.value,
-          mode: this.currentMode
-        }
-      });
-    }
   }
 
   selectModule(module: ModuleOption) {
     if (!this.selectedSubject || !this.currentMode) return;
 
     if (this.currentMode === 'summary') {
+      // Navigate to the lesson-board page after both subject and module are selected
       this.router.navigate(['/lesson'], {
         queryParams: {
           subject: this.selectedSubject.value,
