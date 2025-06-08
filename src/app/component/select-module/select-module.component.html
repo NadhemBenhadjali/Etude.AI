@@ -8,9 +8,20 @@
 
 <div class="module-container" dir="rtl">
   <div class="module-box">
+
+    <!-- Loading overlay -->
+    <div *ngIf="loading" class="loading-overlay">
+      <div class="spinner"></div>
+    </div>
+
     <div class="module-header">
       <h2 *ngIf="!selectedSubject">اختر المادة</h2>
-      <h2 *ngIf="selectedSubject">اختر المحور في <span [style.color]="selectedSubject.color">{{selectedSubject.name}}</span></h2>
+      <h2 *ngIf="selectedSubject">
+        اختر المحور في 
+        <span [style.color]="selectedSubject.color">
+          {{selectedSubject.name}}
+        </span>
+      </h2>
       <div class="header-decoration">
         <span class="star">⭐</span>
         <span class="star">⭐</span>
@@ -19,7 +30,11 @@
     </div>
 
     <div *ngIf="!selectedSubject" class="subjects-container">
-      <div class="subject-card" *ngFor="let subject of subjects" (click)="selectSubject(subject)">
+      <div
+        class="subject-card"
+        *ngFor="let subject of subjects"
+        (click)="selectSubject(subject)"
+      >
         <div class="subject-icon">
           <img [src]="subject.icon" [alt]="'أيقونة ' + subject.name" />
         </div>
@@ -28,7 +43,11 @@
     </div>
 
     <div *ngIf="selectedSubject" class="modules-container">
-      <div class="module-card" *ngFor="let module of selectedSubject.modules" (click)="selectModule(module)">
+      <div
+        class="module-card"
+        *ngFor="let module of selectedSubject.modules"
+        (click)="selectModule(module)"
+      >
         <div class="module-icon">
           <img [src]="module.icon" [alt]="'أيقونة ' + module.name" />
         </div>
@@ -38,6 +57,22 @@
         <img src="/assets/images/sent.png" alt="Back" />
         <span>عودة</span>
       </button>
+
+      <!-- Error message -->
+      <div *ngIf="errorMsg" class="mt-2 text-red-600">
+        ⚠️ {{ errorMsg }}
+      </div>
+
+      <!-- Result display -->
+      <div *ngIf="result && !loading" class="mt-4 p-4 border rounded">
+        <p>✅ تم حفظ الملف: <code>{{ result.path }}</code></p>
+        <h3 class="font-bold">{{ result.data.title }}</h3>
+        <div *ngFor="let slide of result.data.slides">
+          <ng-container *ngFor="let kv of slide | keyvalue">
+            <p><strong>شريحة {{ kv.key }}:</strong> {{ kv.value }}</p>
+          </ng-container>
+        </div>
+      </div>
     </div>
   </div>
-</div> 
+</div>
