@@ -30,10 +30,10 @@ export class SelectModuleComponent implements OnInit {
       color: '#e53935',
       icon: '/assets/images/panda.png',
       modules: [
-        { name: 'الحواس والوقاية من الأمراض', value: 'senses',       icon: '/assets/images/senses-kid.png' },
+        { name: 'الحواس', value: 'senses',       icon: '/assets/images/senses-kid.png' },
         { name: 'التنقل',                      value: 'movement',     icon: '/assets/images/movement-kid.png' },
-        { name: 'التغذية',                     value: 'nutrition',    icon: '/assets/images/food-kid.png'     },
-        { name: 'التكاثر والنمو',               value: 'reproduction', icon: '/assets/images/growth-kid.png'  },
+        { name: 'مصادر الأغذية',                     value: 'nutrition',    icon: '/assets/images/food-kid.png'     },
+        { name: 'التكاثر',               value: 'reproduction', icon: '/assets/images/growth-kid.png'  },
         { name: 'التنفس',                      value: 'respiration',  icon: '/assets/images/lungs-kid.png'   }
       ]
     },
@@ -57,7 +57,7 @@ export class SelectModuleComponent implements OnInit {
   result   : any = null;
   errorMsg : string | null = null;
 
-  private readonly summaryUrl = 'https://7898-34-173-163-152.ngrok-free.app/summary';
+  private readonly summaryUrl = 'https://38cb-34-123-161-148.ngrok-free.app/summary';
 
   constructor(private router: Router, private route: ActivatedRoute) {}
 
