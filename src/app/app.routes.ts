@@ -13,7 +13,6 @@ import { LessonBoardComponent } from './component/lesson-board/lesson-board.comp
 import { ChatbotComponent } from './component/chatbot/chatbot.component';
 import { SelectModeComponent } from './component/select-mode/select-mode.component';
 import { SelectModuleComponent } from './component/select-module/select-module.component';
-import { ProfileComponent } from './component/profile/profile.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -30,6 +29,5 @@ export const routes: Routes = [
   { path: 'chatbot', component: ChatbotComponent },
   { path: 'select-mode', component: SelectModeComponent },
   { path: 'select-module', component: SelectModuleComponent },
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'profile', component: ProfileComponent },
+  { path: '', redirectTo: 'home', pathMatch: 'full' }
 ];

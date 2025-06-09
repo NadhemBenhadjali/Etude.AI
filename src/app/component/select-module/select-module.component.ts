@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule }      from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 
 interface ModuleOption {
@@ -30,11 +30,11 @@ export class SelectModuleComponent implements OnInit {
       color: '#e53935',
       icon: '/assets/images/panda.png',
       modules: [
-        { name: 'الحواس', value: 'senses',       icon: '/assets/images/senses-kid.png' },
-        { name: 'التنقل',                      value: 'movement',     icon: '/assets/images/movement-kid.png' },
-        { name: 'مصادر الأغذية',                     value: 'nutrition',    icon: '/assets/images/food-kid.png'     },
-        { name: 'التكاثر',               value: 'reproduction', icon: '/assets/images/growth-kid.png'  },
-        { name: 'التنفس',                      value: 'respiration',  icon: '/assets/images/lungs-kid.png'   }
+        { name: 'الحواس',       value: 'senses',      icon: '/assets/images/senses-kid.png' },
+        { name: 'التنقل',       value: 'movement',    icon: '/assets/images/movement-kid.png' },
+        { name: 'مصادر الأغذية', value: 'nutrition',   icon: '/assets/images/food-kid.png' },
+        { name: 'التكاثر',      value: 'reproduction', icon: '/assets/images/growth-kid.png' },
+        { name: 'التنفس',       value: 'respiration',  icon: '/assets/images/lungs-kid.png' }
       ]
     },
     {
@@ -43,9 +43,9 @@ export class SelectModuleComponent implements OnInit {
       color: '#d32f2f',
       icon: '/assets/images/science.png',
       modules: [
-        { name: 'الزمن',  value: 'time',   icon: '/assets/images/clock-kid.png' },
-        { name: 'المادة', value: 'matter', icon: '/assets/images/atom-kid.png'  },
-        { name: 'الطاقة', value: 'energy', icon: '/assets/images/energy-kid.png'}
+        { name: 'الزمن',   value: 'time',   icon: '/assets/images/clock-kid.png' },
+        { name: 'المادة',  value: 'matter', icon: '/assets/images/atom-kid.png'  },
+        { name: 'الطاقة',  value: 'energy', icon: '/assets/images/energy-kid.png'}
       ]
     }
   ];
@@ -62,7 +62,9 @@ export class SelectModuleComponent implements OnInit {
   constructor(private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(p => this.currentMode = p['mode'] || null);
+    this.route.queryParams.subscribe(p => {
+      this.currentMode = p['mode'] || null;
+    });
   }
 
   selectSubject(subject: SubjectOption) {
@@ -79,13 +81,16 @@ export class SelectModuleComponent implements OnInit {
       this.loading  = true;
       this.errorMsg = null;
 
-      const payload = { subject: this.selectedSubject.value, module: module.name };
+      const payload = {
+        subject: this.selectedSubject.value,
+        module: module.name
+      };
 
       try {
         const resp = await fetch(this.summaryUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:   JSON.stringify(payload)
+          body: JSON.stringify(payload)
         });
         const text = await resp.text();
         let data: any;
@@ -118,6 +123,15 @@ export class SelectModuleComponent implements OnInit {
       } finally {
         this.loading = false;
       }
+
+    } else if (this.currentMode === 'quiz') {
+      await this.router.navigate(['/chatbot-quiz'], {
+        queryParams: {
+          subject: this.selectedSubject.value,
+          module:  module.value,
+          mode:    this.currentMode
+        }
+      });
     } else {
       await this.router.navigate(['/chatbot'], {
         queryParams: {
@@ -129,5 +143,7 @@ export class SelectModuleComponent implements OnInit {
     }
   }
 
-  goBack() { this.selectedSubject = null; }
+  goBack() {
+    this.selectedSubject = null;
+  }
 }
