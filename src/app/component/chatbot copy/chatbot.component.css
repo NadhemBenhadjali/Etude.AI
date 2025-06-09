@@ -393,7 +393,3 @@ input:disabled {
 .exit-button span {
   font-size: 1.1rem;
 } 
-.message-bubble {
-  white-space: pre-wrap;
-  word-break: break-word;
-}

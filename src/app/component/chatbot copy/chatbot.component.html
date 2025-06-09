@@ -31,8 +31,9 @@
       <div *ngFor="let message of messages" 
            [ngClass]="{'message': true, 'user-message': message.isUser, 'bot-message': !message.isUser}">
         <div class="message-content">
-          <!-- use innerHTML so <br> tags show as line breaks -->
-          <div class="message-bubble" [innerHTML]="message.text"></div>
+          <div class="message-bubble">
+            {{ message.text }}
+          </div>
           <div class="message-time">
             {{ message.isUser ? 'أنت' : 'المساعد' }}
           </div>
@@ -69,7 +70,8 @@
         <button class="quick-response" (click)="sendQuickResponse('مرحباً!')" [disabled]="isLoading">مرحباً!</button>
         <button class="quick-response" (click)="sendQuickResponse('كيف حالك؟')" [disabled]="isLoading">كيف حالك؟</button>
         <button class="quick-response" (click)="sendQuickResponse('شكراً لك')" [disabled]="isLoading">شكراً لك</button>
+        <button class="quick-response" (click)="sendQuickResponse('شكراً لك')" [disabled]="isLoading">شكراً لك</button>
       </div>
     </div>
   </div>
-</div>
+</div> 

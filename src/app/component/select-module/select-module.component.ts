@@ -57,7 +57,7 @@ export class SelectModuleComponent implements OnInit {
   result   : any = null;
   errorMsg : string | null = null;
 
-  private readonly summaryUrl = 'https://38cb-34-123-161-148.ngrok-free.app/summary';
+  private readonly summaryUrl = 'https://e1b3-104-198-158-110.ngrok-free.app/summary';
 
   constructor(private router: Router, private route: ActivatedRoute) {}
 

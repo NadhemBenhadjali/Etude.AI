@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-chatbot',
@@ -12,13 +13,14 @@ import { FormsModule } from '@angular/forms';
 })
 export class ChatbotComponent implements OnInit {
   messages: { text: string; isUser: boolean }[] = [];
-  userInput: string = '';
-  isLoading: boolean = false;
-  currentMode: string = '';
+  userInput = '';
+  isLoading = false;
+  currentMode = '';
 
+  private apiUrl = 'https://d2a8-104-196-249-75.ngrok-free.app';
   constructor(
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit() {
@@ -30,57 +32,69 @@ export class ChatbotComponent implements OnInit {
 
   initializeChat() {
     this.messages = [];
+    let greeting = 'مرحباً! أنا مساعدك الذكي. كيف يمكنني مساعدتك اليوم؟';
     if (this.currentMode === 'summary') {
-      this.messages.push({
-        text: 'مرحباً! أنا هنا لمساعدتك في الحصول على ملخص للدروس. ما هو الدرس الذي تريد ملخصه؟',
-        isUser: false
-      });
+      greeting = 'مرحباً! أنا هنا لمساعدتك في الحصول على ملخص للدروس. ما هو الدرس الذي تريد ملخصه؟';
     } else if (this.currentMode === 'quiz') {
-      this.messages.push({
-        text: 'مرحباً! أنا هنا لمساعدتك في اختبار معلوماتك. هل أنت مستعد للبدء؟',
-        isUser: false
-      });
+      greeting = 'مرحباً! أنا هنا لمساعدتك في اختبار معلوماتك. هل أنت مستعد للبدء؟';
     } else if (this.currentMode === 'general') {
-      this.messages.push({
-        text: 'مرحباً! أنا هنا للإجابة على أسئلتك العامة. كيف يمكنني مساعدتك اليوم؟',
-        isUser: false
-      });
-    } else {
-      this.messages.push({
-        text: 'مرحباً! أنا مساعدك الذكي. كيف يمكنني مساعدتك اليوم؟',
-        isUser: false
-      });
+      greeting = 'مرحباً! أنا هنا للإجابة على أسئلتك العامة. كيف يمكنني مساعدتك اليوم؟';
     }
+    this.messages.push({ text: greeting, isUser: false });
   }
 
-  sendMessage() {
-    if (this.userInput.trim()) {
-      this.messages.push({
-        text: this.userInput,
-        isUser: true
+  async sendMessage() {
+    const txt = this.userInput.trim();
+    if (!txt) return;
+
+    this.messages.push({ text: txt, isUser: true });
+    this.isLoading = true;
+    this.userInput = '';
+
+    const endpoint = this.currentMode === 'summary' ? '/summary' : '/qa';
+    const payload = this.currentMode === 'summary'
+      ? { module: txt }
+      : { question: txt };
+
+    try {
+      const res = await fetch(this.apiUrl + endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
+      const data = await res.json();
 
-      this.isLoading = true;
-      setTimeout(() => {
-        let response = '';
-        if (this.currentMode === 'summary') {
-          response = 'سأقوم بتحضير ملخص مفيد لهذا الدرس. هل هناك نقاط معينة تريد التركيز عليها؟';
-        } else if (this.currentMode === 'quiz') {
-          response = 'حسناً، سأبدأ بطرح الأسئلة. هل أنت مستعد؟';
-        } else if (this.currentMode === 'general') {
-          response = 'سأحاول مساعدتك في هذا السؤال. هل يمكنك توضيح المزيد؟';
-        } else {
-          response = 'أنا أفهم سؤالك. سأقوم بمساعدتك في أقرب وقت ممكن.';
-        }
-        
-        this.messages.push({
-          text: response,
-          isUser: false
-        });
-        this.isLoading = false;
-      }, 2000);
+      let reply = '';
+      if (this.currentMode === 'summary' && data.data?.slides) {
+        // bullet each slide
+        reply = data.data.slides.map((s: any) => `• ${s.text}`).join('\n');
+      } else if (this.currentMode !== 'summary' && data.answer) {
+        reply = data.answer;
+      } else {
+        reply = JSON.stringify(data, null, 2);
+      }
 
-      this.userInput = '';
+      // convert **bold** → actual Arabic bold via <b> tags removed,
+      // or leave as-is if you prefer
+      // right after this line…
+      reply = reply.replace(/\*\*(.+?)\*\*/g, '$1');
+
+      // …insert these two lines:
+      reply = reply.replace(/\\n/g, '<br>')    // convert literal “\n” into <br>
+                  .replace(/"/g, '').replace(/\\(.+?)\\/g, '<strong>$1</strong>');
+
+                  ;         // remove all double-quotes
+
+      this.messages.push({ text: reply, isUser: false });
+
+    } catch (err) {
+      console.error(err);
+      this.messages.push({
+        text: '⚠️ حدث خطأ عند الاتصال بالخادم. حاول مرة أخرى.',
+        isUser: false
+      });
+    } finally {
+      this.isLoading = false;
     }
   }
 
@@ -88,4 +102,4 @@ export class ChatbotComponent implements OnInit {
     this.userInput = text;
     this.sendMessage();
   }
-} 
+}
