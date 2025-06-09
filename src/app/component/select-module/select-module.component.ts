@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { environment }                   from '../../../environments/environment';
 
 interface ModuleOption {
   name: string;
@@ -57,8 +58,8 @@ export class SelectModuleComponent implements OnInit {
   result   : any = null;
   errorMsg : string | null = null;
 
-  private readonly summaryUrl = 'https://d7c4-35-247-36-165.ngrok-free.app/summary';
-  private readonly quizUrl    = 'https://d7c4-35-247-36-165.ngrok-free.app/quiz';
+  private readonly summaryUrl  = environment.apiBase+'/summary';
+  private readonly quizUrl    = environment.apiBase+'/quiz';
 
   constructor(private router: Router, private route: ActivatedRoute) {}
 

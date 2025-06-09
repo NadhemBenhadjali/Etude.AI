@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { HttpClientModule, HttpClient, HttpResponse } from '@angular/common/http';
+import { environment }                   from '../../../environments/environment';
 
 import fallbackData from '../../../assets/lesson.json';
 
@@ -28,7 +29,7 @@ export class LessonBoardComponent implements OnInit {
   boardImage = '/assets/images/S.png';
 
   /** Your FastAPI backend base URL */
-  private readonly backendBase = "https://d7c4-35-247-36-165.ngrok-free.app";
+  private readonly backendBase = environment.apiBase;
 
   constructor(
     private router: Router,

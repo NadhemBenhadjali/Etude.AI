@@ -4,7 +4,7 @@ import { RouterModule, ActivatedRoute }  from '@angular/router';
 import { FormsModule }                   from '@angular/forms';
 import { HttpClientModule, HttpClient,
          HttpErrorResponse }             from '@angular/common/http';
-
+import { environment }                   from '../../../environments/environment';
 interface QuizQuestion {
   type:    'mc' | 'tf';
   q:       string;
@@ -32,8 +32,7 @@ export class ChatbotQuizComponent implements OnInit {
   inQuiz               = false;
   quizFinished         = false;  // ← new
 
-  private readonly API_URL = 'https://d7c4-35-247-36-165.ngrok-free.app';
-
+  private readonly API_URL = environment.apiBase;
   constructor(
     private route: ActivatedRoute,
     private http:  HttpClient

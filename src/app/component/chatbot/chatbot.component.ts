@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { environment }                   from '../../../environments/environment';
 
 @Component({
   selector: 'app-chatbot',
@@ -16,8 +17,8 @@ export class ChatbotComponent implements OnInit {
   userInput = '';
   isLoading = false;
   currentMode = '';
-
-  private apiUrl = 'https://7d9e-34-71-125-164.ngrok-free.app';
+  
+  private readonly apiUrl = environment.apiBase;
   constructor(
     private router: Router,
     private route: ActivatedRoute,
