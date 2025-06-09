@@ -181,65 +181,22 @@
   border-top: 4px solid #FFFAB7;
 }
 
-.input-wrapper {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.input-wrapper input {
-  flex: 1;
-  padding: 1rem 1.2rem;
-  border: 2px solid #FFD1E3;
-  border-radius: 25px;
-  font-size: 1.1rem;
-  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
-  transition: all 0.3s ease;
-}
-
-.input-wrapper input:focus {
-  outline: none;
-  border-color: #5BBCFF;
-  box-shadow: 0 0 8px rgba(91, 188, 255, 0.3);
-}
-
-.send-button {
-  background: #5BBCFF;
-  border: none;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.send-button:hover {
-  background: #7EA1FF;
-  transform: scale(1.05);
-}
-
-.send-button img {
-  width: 24px;
-  height: 24px;
-  filter: brightness(0) invert(1);
-}
-
+/* Updated quick-response button styles */
 .quick-responses {
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
   justify-content: center;
+  margin-top: 1rem;
 }
 
 .quick-response {
   background: #FFFAB7;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
+  padding: 1rem 2rem;
+  border-radius: 30px;
+  font-size: 1.2rem;
+  font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: 'FredFredburgerARAHeadBlack', sans-serif;
@@ -247,7 +204,7 @@
 
 .quick-response:hover {
   background: #FFD1E3;
-  transform: scale(1.05);
+  transform: scale(1.08);
 }
 
 /* Navbar styles */
@@ -304,12 +261,12 @@
   }
 
   .quick-responses {
-    gap: 0.3rem;
+    gap: 0.5rem;
   }
 
   .quick-response {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.8rem;
+    font-size: 1rem;
+    padding: 0.8rem 1.2rem;
   }
 }
 
@@ -349,25 +306,15 @@
 }
 
 @keyframes typing {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
 }
 
-/* Disabled state styles */
 .send-button:disabled,
 .quick-response:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none !important;
-}
-
-input:disabled {
-  background-color: #f5f5f5;
-  cursor: not-allowed;
 }
 
 .exit-button {
@@ -392,4 +339,20 @@ input:disabled {
 
 .exit-button span {
   font-size: 1.1rem;
-} 
+}
+.quick-responses {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem; /* More spacing between buttons */
+  margin-top: 1rem;
+}
+.quick-responses button.quick-response[disabled] {
+  background: #FF6F91 !important;  
+  color: white !important;    
+  opacity: 1 !important;           
+  cursor: default !important;      
+  transform: none !important;     
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important; 
+}
+

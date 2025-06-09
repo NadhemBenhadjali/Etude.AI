@@ -1,3 +1,5 @@
+<!-- chatbot-quiz.component.html -->
+
 <nav class="navbar">
   <ul>
     <li><a routerLink="/">الرئيسية</a></li>
@@ -8,6 +10,8 @@
 
 <div class="chat-container" dir="rtl">
   <div class="chat-box">
+
+    <!-- Header -->
     <div class="chat-header">
       <div class="bot-avatar">
         <img src="/assets/images/bot.png" alt="Chatbot Avatar" />
@@ -23,30 +27,31 @@
         <span class="star">⭐</span>
       </div>
       <button class="exit-button" routerLink="/select-mode">
-        <span>خروج</span>
+        خروج
       </button>
     </div>
 
+    <!-- Messages -->
     <div class="messages-container">
-      <div *ngFor="let message of messages" 
-           [ngClass]="{'message': true, 'user-message': message.isUser, 'bot-message': !message.isUser}">
+      <div *ngFor="let message of messages"
+           [ngClass]="{
+             'message': true,
+             'user-message': message.isUser,
+             'bot-message': !message.isUser
+           }">
         <div class="message-content">
-          <div class="message-bubble">
-            {{ message.text }}
-          </div>
+          <div class="message-bubble" [innerHTML]="message.text"></div>
           <div class="message-time">
             {{ message.isUser ? 'أنت' : 'المساعد' }}
           </div>
         </div>
       </div>
-      
+
       <div *ngIf="isLoading" class="message bot-message">
         <div class="message-content">
           <div class="message-bubble loading-bubble">
             <div class="typing-indicator">
-              <span></span>
-              <span></span>
-              <span></span>
+              <span></span><span></span><span></span>
             </div>
           </div>
           <div class="message-time">المساعد</div>
@@ -54,23 +59,37 @@
       </div>
     </div>
 
+    <!-- Input / Quick Responses -->
     <div class="input-container">
-      <div class="input-wrapper">
-        <input type="text" 
-               [(ngModel)]="userInput" 
-               (keyup.enter)="sendMessage()"
-               placeholder="اكتب رسالتك هنا..."
-               dir="rtl"
-               [disabled]="isLoading" />
-        <button class="send-button" (click)="sendMessage()" [disabled]="isLoading">
-          <img src="/assets/images/sent.png" alt="Send" />
+
+      <!-- 1) After quiz ends: static "كملنا" -->
+      <div class="quick-responses" *ngIf="quizFinished">
+        <button class="quick-response" disabled>كملنا</button>
+      </div>
+
+      <!-- 2) Before quiz starts: "ابدأ الاختبار" -->
+      <div class="quick-responses" *ngIf="!inQuiz && !quizFinished">
+        <button
+          class="quick-response"
+          (click)="sendQuickResponse('ابدأ الاختبار')"
+          [disabled]="isLoading"
+        >
+          ابدأ الاختبار
         </button>
       </div>
-      <div class="quick-responses">
-        <button class="quick-response" (click)="sendQuickResponse('مرحباً!')" [disabled]="isLoading">مرحباً!</button>
-        <button class="quick-response" (click)="sendQuickResponse('كيف حالك؟')" [disabled]="isLoading">كيف حالك؟</button>
-        <button class="quick-response" (click)="sendQuickResponse('شكراً لك')" [disabled]="isLoading">شكراً لك</button>
+
+      <!-- 3) While quiz is active: show options -->
+      <div class="quick-responses" *ngIf="inQuiz">
+        <button
+          *ngFor="let opt of questions[currentQuestionIndex]?.options"
+          class="quick-response"
+          (click)="answerQuestion(opt)"
+          [disabled]="isLoading"
+        >
+          {{ opt }}
+        </button>
       </div>
+
     </div>
   </div>
-</div> 
+</div>

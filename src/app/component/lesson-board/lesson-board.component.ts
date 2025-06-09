@@ -28,7 +28,7 @@ export class LessonBoardComponent implements OnInit {
   boardImage = '/assets/images/S.png';
 
   /** Your FastAPI backend base URL */
-  private readonly backendBase = "https://e1b3-104-198-158-110.ngrok-free.app";
+  private readonly backendBase = "https://d7c4-35-247-36-165.ngrok-free.app";
 
   constructor(
     private router: Router,

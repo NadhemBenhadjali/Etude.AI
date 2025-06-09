@@ -26,26 +26,26 @@ export class SelectModuleComponent implements OnInit {
   subjects: SubjectOption[] = [
     {
       name: 'أحياء',
-      value: 'biology',
+      value: 'أحياء',
       color: '#e53935',
       icon: '/assets/images/panda.png',
       modules: [
-        { name: 'الحواس',       value: 'senses',      icon: '/assets/images/senses-kid.png' },
-        { name: 'التنقل',       value: 'movement',    icon: '/assets/images/movement-kid.png' },
-        { name: 'مصادر الأغذية', value: 'nutrition',   icon: '/assets/images/food-kid.png' },
-        { name: 'التكاثر',      value: 'reproduction', icon: '/assets/images/growth-kid.png' },
-        { name: 'التنفس',       value: 'respiration',  icon: '/assets/images/lungs-kid.png' }
+        { name: 'الحواس',       value: 'الحواس',      icon: '/assets/images/senses-kid.png' },
+        { name: 'التنقل',       value: 'التنقل',    icon: '/assets/images/movement-kid.png' },
+        { name: 'مصادر الأغذية', value: 'مصادر الأغذية',   icon: '/assets/images/food-kid.png' },
+        { name: 'التكاثر',      value: 'التكاثر', icon: '/assets/images/growth-kid.png' },
+        { name: 'التنفس',       value: 'التنفس',  icon: '/assets/images/lungs-kid.png' }
       ]
     },
     {
       name: 'فيزياء',
-      value: 'physics',
+      value: 'فيزياء',
       color: '#d32f2f',
       icon: '/assets/images/science.png',
       modules: [
-        { name: 'الزمن',   value: 'time',   icon: '/assets/images/clock-kid.png' },
-        { name: 'المادة',  value: 'matter', icon: '/assets/images/atom-kid.png'  },
-        { name: 'الطاقة',  value: 'energy', icon: '/assets/images/energy-kid.png'}
+        { name: 'الزمن',   value: 'الزمن',   icon: '/assets/images/clock-kid.png' },
+        { name: 'المادة',  value: 'المادة', icon: '/assets/images/atom-kid.png'  },
+        { name: 'الطاقة',  value: 'الطاقة', icon: '/assets/images/energy-kid.png'}
       ]
     }
   ];
@@ -57,7 +57,8 @@ export class SelectModuleComponent implements OnInit {
   result   : any = null;
   errorMsg : string | null = null;
 
-  private readonly summaryUrl = 'https://e1b3-104-198-158-110.ngrok-free.app/summary';
+  private readonly summaryUrl = 'https://d7c4-35-247-36-165.ngrok-free.app/summary';
+  private readonly quizUrl    = 'https://d7c4-35-247-36-165.ngrok-free.app/quiz';
 
   constructor(private router: Router, private route: ActivatedRoute) {}
 
@@ -77,14 +78,14 @@ export class SelectModuleComponent implements OnInit {
   async selectModule(module: ModuleOption): Promise<void> {
     if (!this.selectedSubject || !this.currentMode) return;
 
+    const payload = {
+      subject: this.selectedSubject.value,
+      module: module.name
+    };
+
     if (this.currentMode === 'summary') {
       this.loading  = true;
       this.errorMsg = null;
-
-      const payload = {
-        subject: this.selectedSubject.value,
-        module: module.name
-      };
 
       try {
         const resp = await fetch(this.summaryUrl, {
@@ -125,21 +126,47 @@ export class SelectModuleComponent implements OnInit {
       }
 
     } else if (this.currentMode === 'quiz') {
-      await this.router.navigate(['/chatbot-quiz'], {
-        queryParams: {
-          subject: this.selectedSubject.value,
-          module:  module.value,
-          mode:    this.currentMode
+      this.loading  = true;
+      this.errorMsg = null;
+
+      try {
+        const resp = await fetch(this.quizUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const text = await resp.text();
+        let data: any;
+        try { data = JSON.parse(text); } catch {}
+
+        if (!resp.ok) {
+          this.errorMsg = `HTTP ${resp.status}\n${text}`;
+        } else if (data?.data) {
+          this.result = data;
+
+          await this.router.navigate(['/chatbot-quiz'], {
+            queryParams: {
+              subject: this.selectedSubject.value,
+              module:  module.value,
+              mode:    this.currentMode,
+              path:    data.path
+            },
+            state: {
+              quizPath: data.path,
+              quizData: data.data
+            }
+          });
+        } else if (data?.error) {
+          this.errorMsg = 'Error: ' + data.error;
+        } else {
+          this.errorMsg = 'Unexpected response:\n' + text;
         }
-      });
-    } else {
-      await this.router.navigate(['/chatbot'], {
-        queryParams: {
-          subject: this.selectedSubject.value,
-          module:  module.value,
-          mode:    this.currentMode
-        }
-      });
+      } catch (err: any) {
+        this.errorMsg = 'Fetch error: ' + err.message;
+      } finally {
+        this.loading = false;
+      }
+
     }
   }
 

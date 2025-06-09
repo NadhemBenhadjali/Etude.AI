@@ -17,7 +17,7 @@ export class ChatbotComponent implements OnInit {
   isLoading = false;
   currentMode = '';
 
-  private apiUrl = 'https://d2a8-104-196-249-75.ngrok-free.app';
+  private apiUrl = 'https://7d9e-34-71-125-164.ngrok-free.app';
   constructor(
     private router: Router,
     private route: ActivatedRoute,
