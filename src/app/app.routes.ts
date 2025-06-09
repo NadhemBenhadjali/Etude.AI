@@ -14,6 +14,8 @@ import { ChatbotComponent } from './component/chatbot/chatbot.component';
 import { SelectModeComponent } from './component/select-mode/select-mode.component';
 import { SelectModuleComponent } from './component/select-module/select-module.component';
 import { ChatbotQuizComponent } from './component/chatbot-quiz/chatbot-quiz.component';
+import { ProfileComponent } from './component/profile/profile.component';
+
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -31,5 +33,6 @@ export const routes: Routes = [
   { path: 'select-mode', component: SelectModeComponent },
   { path: 'select-module', component: SelectModuleComponent },
   { path: 'chatbot-quiz', component: ChatbotQuizComponent },
+  { path: 'profile', component: ProfileComponent },
   { path: '', redirectTo: 'home', pathMatch: 'full' }
 ];
