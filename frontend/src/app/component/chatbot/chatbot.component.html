@@ -1,0 +1,75 @@
+<nav class="navbar">
+  <ul>
+    <li><a routerLink="/">  الرئيسية </a></li>
+    <li><a routerLink="/about"> شكون احنا؟</a></li>
+    <li><a routerLink="/contact">كلمنا</a></li>
+  </ul>
+</nav>
+<app-avatar></app-avatar>
+<div class="chat-container" dir="rtl">
+  <div class="chat-box">
+    <div class="chat-header">
+      <div class="bot-avatar">
+        <img src="/assets/images/bot.png" alt="Chatbot Avatar" />
+        <div class="status-dot"></div>
+      </div>
+      <div class="header-text">
+        <h2>المساعد الذكي</h2>
+        <div class="status">متصل الآن</div>
+      </div>
+      <div class="header-decoration">
+        <span class="star">⭐</span>
+        <span class="star">⭐</span>
+        <span class="star">⭐</span>
+      </div>
+      <button class="exit-button" routerLink="/select-mode">
+        <span>العودة</span>
+      </button>
+    </div>
+
+    <div class="messages-container">
+      <div *ngFor="let message of messages" 
+           [ngClass]="{'message': true, 'user-message': message.isUser, 'bot-message': !message.isUser}">
+        <div class="message-content">
+          <!-- use innerHTML so <br> tags show as line breaks -->
+          <div class="message-bubble" [innerHTML]="message.text"></div>
+          <div class="message-time">
+            {{ message.isUser ? 'أنت' : 'المساعد' }}
+          </div>
+        </div>
+      </div>
+      
+      <div *ngIf="isLoading" class="message bot-message">
+        <div class="message-content">
+          <div class="message-bubble loading-bubble">
+            <div class="typing-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+          <div class="message-time">المساعد</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-container">
+      <div class="input-wrapper">
+        <input type="text" 
+               [(ngModel)]="userInput" 
+               (keyup.enter)="sendMessage()"
+               placeholder="اكتب رسالتك هنا..."
+               dir="rtl"
+               [disabled]="isLoading" />
+        <button class="send-button" (click)="sendMessage()" [disabled]="isLoading">
+          <img src="/assets/images/sent.png" alt="Send" />
+        </button>
+      </div>
+      <div class="quick-responses">
+        <button class="quick-response" (click)="sendQuickResponse('مرحباً!')" [disabled]="isLoading">مرحباً!</button>
+        <button class="quick-response" (click)="sendQuickResponse('كيف حالك؟')" [disabled]="isLoading">كيف حالك؟</button>
+        <button class="quick-response" (click)="sendQuickResponse('شكراً لك')" [disabled]="isLoading">شكراً لك</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,308 @@
+/* Background gradient */
+.lesson-container2 {
+  min-height: 100vh;
+  background: linear-gradient(270deg, #FFFAB7, #FFD1E3, #5BBCFF, #7EA1FF);
+  background-size: 400% 400%;
+  animation: backgroundMove 20s infinite linear;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 5% 1rem 1rem;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+@keyframes backgroundMove {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Navbar */
+.navbar {
+  position: fixed;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: transparent;
+  padding: 0;
+  z-index: 10;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+  direction: rtl;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.navbar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  gap: 4rem;
+}
+
+.navbar li a {
+  text-decoration: none;
+  color: #222;
+  font-size: 1.2rem;
+  font-weight: 700;
+  transition: color 0.3s ease;
+}
+
+.navbar li a:hover {
+  color: #FF6F91;
+}
+
+/* Lesson container & title */
+.lesson-container {
+  margin: 0 auto 1rem;
+  max-width: 1000px;
+  text-align: center;
+  background: transparent;
+}
+
+.lesson-title {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #0064f1;
+  background: none;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2%;
+  animation: fadeInUp 1s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Board + overlays */
+.image-wrapper {
+  position: relative;
+  max-width: 1000px;
+  height: 600px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 18px;
+}
+
+.board-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 18px;
+  display: block;
+}
+
+.overlay-content {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Slide photo */
+.slide-img {
+  max-width: 80%;
+  max-height: 60%;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+/* No-photo case (white box) */
+.slide-text.no-photo {
+  margin-top: 1rem;
+  width: 60%;
+  background:none;
+  padding: 1.2rem 1.8rem;
+  border-radius: 14px;
+  text-align: center;
+  font-size: 2rem;
+  line-height: 1.6;
+  color: #ffffff;
+  box-shadow: none;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+
+}
+
+/* Photo case (transparent box) */
+.slide-text.has-photo {
+  margin-top: 1rem;
+  width: 60%;
+  background: none;
+  padding: 1.2rem 1.8rem;
+  border-radius: 14px;
+  text-align: right;
+  font-size: 1.3rem;
+  line-height: 1.6;
+  color: #ffffff;
+  box-shadow: none;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+
+}
+.slide-text strong {
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow:
+    1px 1px 2px rgba(0,0,0,0.5),
+    -1px -1px 2px rgba(0,0,0,0.5);
+}
+
+
+/* Controls */
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 15px;
+}
+
+.next-button,
+.back-button,
+.question-button {
+  background: linear-gradient(135deg, #FF6F91, #FF9671);
+  border: none;
+  padding: 0.9rem 2rem;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  box-shadow: 0 6px 20px rgba(255, 111, 145, 0.5);
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+.question-button {
+  background: linear-gradient(135deg, #6A91FF, #71B1FF);
+  box-shadow: 0 6px 20px rgba(106, 145, 255, 0.5);
+}
+
+.next-button:hover,
+.back-button:hover,
+.question-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 30px rgba(255, 111, 145, 0.7);
+}
+
+/* Exit button */
+.exit-button {
+  position: absolute;
+  top: 20px; left: 20px;
+  background: linear-gradient(135deg, #FF6F91, #FF9671);
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(255, 111, 145, 0.3);
+  cursor: pointer;
+  z-index: 10;
+}
+
+.exit-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(255, 111, 145, 0.4);
+}
+
+.exit-button span {
+  font-size: 1.1rem;
+}
+
+.question-icon {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .lesson-title {
+    font-size: 2rem;
+    padding: 0 1rem;
+  }
+  .lesson-title.title-small {
+    font-size: 1.2rem;
+  }
+  .image-wrapper {
+    height: 480px;
+  }
+  .slide-img {
+    max-height: 50%;
+  }
+  .slide-text.no-photo {
+    width: 80%;
+    font-size: 1.1rem;
+  }
+  .slide-text.has-photo {
+    width: 80%;
+    font-size: 0.9rem;
+  }
+}
+
+/* --- Updated Audio Controls Styling --- */
+
+.audio-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.audio-controls button {
+  /* Removed specific background-color to use gradients */
+  color: white;
+  border: none;
+  border-radius: 30px; /* More rounded, similar to other buttons */
+  padding: 12px 25px;
+  font-size: 1.2rem; /* Slightly larger font for readability */
+  font-weight: 700; /* Bold font */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease; /* Transition for all properties */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* Soft shadow */
+  min-width: 120px; /* Ensure consistent width */
+  text-align: center; /* Center text and emoji within the button */
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif; /* Consistent font */
+}
+
+.audio-controls button:hover:not([disabled]) {
+  transform: translateY(-2px); /* Slight lift on hover */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); /* Enhanced shadow on hover */
+}
+
+.audio-controls button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  opacity: 0.6; /* Slightly less opaque when disabled */
+  box-shadow: none; /* No shadow when disabled */
+  transform: none; /* No hover effect when disabled */
+}
+
+/* Play button specific styles (Green with emoji) */
+.play-button {
+  background: linear-gradient(135deg, #28a745, #218838); /* Green gradient */
+}
+
+/* Stop button specific styles (Red with emoji) */
+.stop-button {
+  background: linear-gradient(135deg, #dc3545, #c82333); /* Red gradient */
+}
+
+/* Remove image icon styles as we are using emojis */
+.audio-icon {
+  display: none; /* Hide the image icon */
+}
+
+/* Style for the emoji within the button */
+.audio-controls button .emoji {
+    font-size: 1.5em; /* Make the emoji slightly larger */
+    line-height: 1; /* Align emoji vertically */
+    margin-top: -3px; /* Fine-tune vertical alignment if needed */
+}

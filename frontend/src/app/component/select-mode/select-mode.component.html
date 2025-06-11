@@ -1,0 +1,53 @@
+<nav class="navbar">
+  <ul>
+    <li><a routerLink="/">  الرئيسية </a></li>
+    <li><a routerLink="/about"> شكون احنا؟</a></li>
+    <li><a routerLink="/contact">كلمنا</a></li>
+  </ul>
+</nav>
+<app-avatar></app-avatar>
+<div class="mode-container" dir="rtl">
+  <div class="mode-box">
+    <div class="mode-header">
+      <h2>اختار كيفاش تحب تقرا.</h2>
+      <div class="header-decoration">
+        <span class="star">⭐</span>
+        <span class="star">⭐</span>
+        <span class="star">⭐</span>
+      </div>
+    </div>
+
+    <div class="options-container">
+      <div class="option-card" (click)="selectMode('summary')" [class.selected]="selectedMode === 'summary'">
+        <div class="option-icon">
+          <img src="/assets/images/read.png" alt="Summary" />
+        </div>
+        <h3>ملخص</h3>
+        <p>لهنا تلقى ملخص للدروس.</p>
+      </div>
+
+      <div class="option-card" (click)="selectMode('quiz')" [class.selected]="selectedMode === 'quiz'">
+        <div class="option-icon">
+          <img src="/assets/images/thinking.png" alt="Quiz" />
+        </div>
+        <h3>اختبار قصير</h3>
+        <p>اختبر معلوماتك بطريقة مسلية</p>
+      </div>
+
+      <div class="option-card" (click)="selectMode('general')" [class.selected]="selectedMode === 'general'">
+        <div class="option-icon">
+          <img src="/assets/images/happyy.png" alt="General Questions" />
+        </div>
+        <h3>أسئلة عامة</h3>
+        <p>اسأل أي سؤال تحب عليه</p>
+      </div>
+    </div>
+
+    <div class="navigation-buttons">
+      <button class="nav-button" routerLink="/finished">
+        <span>خروج</span>
+        <img src="/assets/images/sent.png" alt="Back" />
+      </button>
+    </div>
+  </div>
+</div> 
