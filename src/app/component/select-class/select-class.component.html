@@ -1,10 +1,12 @@
 <div class="select-class-page">
   <div class="avatar-container">
-    <img src="assets/images/read.png" alt="User Avatar" class="avatar" />
+    <a routerLink="/profile" class="avatar-link">
+      <img src="assets/images/panda.png" alt="User Avatar" class="avatar" (click)="goToProfile()" />
+    </a>
   </div>
 
   <div class="center-container">
-    <h2 class="instruction">الرجاء اختيار القسم الدراسي</h2>
+    <h2 class="instruction">اختار قسم القراية اللي تحب عليه.</h2>
 
     <div class="class-container">
       <div

@@ -1,8 +1,8 @@
 <nav class="navbar">
   <ul>
-    <li><a routerLink="/"> الرئيسية</a></li>
-    <li><a routerLink="/about"> من نحن</a></li>
-    <li><a routerLink="/contact"> اتصل بنا</a></li>
+    <li><a routerLink="/">  الصفحةالرئيسية </a></li>
+    <li><a routerLink="/about"> شكون احنا؟</a></li>
+    <li><a routerLink="/contact">كلمنا</a></li>
   </ul>
 </nav>
 
@@ -29,7 +29,7 @@
     <div class="xp-progress">
       <div class="xp-header">
         <span class="section-icon">📈</span>
-        <h3>نقاط التقدم</h3>
+        <h3>خبرتك </h3>
       </div>
       <div class="xp-bar">
         <div class="xp-fill" [style.width.%]="getXpPercentage()"></div>
@@ -42,12 +42,12 @@
     <div class="stats-container">
       <div class="stat-card">
         <span class="stat-icon">📚</span>
-        <h3>الدروس المكتملة</h3>
+        <h3>الدروس إلي كملتهم</h3>
         <p class="stat-value">{{ completedLessons }}</p>
       </div>
       <div class="stat-card">
         <span class="stat-icon">✍️</span>
-        <h3>الاختبارات المكتملة</h3>
+        <h3>الاختبارات إلي كملتهم</h3>
         <p class="stat-value">{{ completedQuizzes }}</p>
       </div>
       <div class="stat-card">
@@ -77,7 +77,7 @@
     <div class="recent-activity">
       <div class="section-header">
         <span class="section-icon">📝</span>
-        <h3>النشاط الأخير</h3>
+        <h3>نشاطك لخراني </h3>
       </div>
       <div class="activity-list">
         <div class="activity-item" *ngFor="let activity of recentActivities">
@@ -89,7 +89,7 @@
 
     <div class="start-learning">
       <button class="start-button" routerLink="/select-mode">
-        <span>ابدأ التعلم</span>
+        <span>ابدأ تعلم</span>
         <img src="/assets/images/sent.png" alt="Start Learning" />
       </button>
     </div>

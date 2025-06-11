@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-select-class',
   standalone: true,
@@ -16,7 +17,10 @@ export class SelectClassComponent {
   constructor(private router: Router) {}
 
   selectClass(classNumber: number) {
-    this.router.navigate(['/select-subject'], );
+    this.router.navigate(['/select-subject']);
+  }
+
+  goToProfile() {
+    this.router.navigate(['/profile']);
   }
 }
-

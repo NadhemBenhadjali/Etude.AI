@@ -1,15 +1,15 @@
 <nav class="navbar">
   <ul>
-    <li><a routerLink="/">الرئيسية</a></li>
-    <li><a routerLink="/about">من نحن</a></li>
-    <li><a routerLink="/contact">اتصل بنا</a></li>
+    <li><a routerLink="/">  الصفحةالرئيسية </a></li>
+    <li><a routerLink="/about"> شكون احنا؟</a></li>
+    <li><a routerLink="/contact">كلمنا</a></li>
   </ul>
 </nav>
-
+<app-avatar></app-avatar>
 <div class="mode-container" dir="rtl">
   <div class="mode-box">
     <div class="mode-header">
-      <h2>اختر طريقة التعلم</h2>
+      <h2>اختار كيفاش تحب تقرا.</h2>
       <div class="header-decoration">
         <span class="star">⭐</span>
         <span class="star">⭐</span>
@@ -23,7 +23,7 @@
           <img src="/assets/images/read.png" alt="Summary" />
         </div>
         <h3>ملخص</h3>
-        <p>احصل على ملخص مفيد للدروس</p>
+        <p>لهناتلقى ملخص باهي للدروس.</p>
       </div>
 
       <div class="option-card" (click)="selectMode('quiz')" [class.selected]="selectedMode === 'quiz'">
@@ -39,7 +39,7 @@
           <img src="/assets/images/happyy.png" alt="General Questions" />
         </div>
         <h3>أسئلة عامة</h3>
-        <p>اسأل أي سؤال تريد</p>
+        <p>اسأل أي سؤال تحب عليه</p>
       </div>
     </div>
 

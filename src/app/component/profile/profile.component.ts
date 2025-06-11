@@ -23,7 +23,7 @@ interface Activity {
 })
 export class ProfileComponent implements OnInit {
   username = 'Aziz Souid';
-  avatar = '/assets/images/dino.png';
+  avatar = '/assets/images/panda.png';
   level = 4;
   rank = 'المستكشف الفضولي';
   streak = 4;

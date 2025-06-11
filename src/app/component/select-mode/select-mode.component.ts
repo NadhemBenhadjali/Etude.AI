@@ -2,11 +2,11 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
+import { AvatarComponent } from '../../shared/avatar/avatar.component';
 @Component({
   selector: 'app-select-mode',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, AvatarComponent],
   templateUrl: './select-mode.component.html',
   styleUrls: ['./select-mode.component.css']
 })

@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { AvatarComponent } from "../../shared/avatar/avatar.component";
 
 @Component({
   selector: 'app-select-subject',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AvatarComponent],
   templateUrl: './select-subject.component.html',
   styleUrls: ['./select-subject.component.css']
 })

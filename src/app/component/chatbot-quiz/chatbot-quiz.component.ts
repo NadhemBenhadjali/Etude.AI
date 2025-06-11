@@ -5,6 +5,7 @@ import { FormsModule }                   from '@angular/forms';
 import { HttpClientModule, HttpClient,
          HttpErrorResponse }             from '@angular/common/http';
 import { environment}                    from '../../../environments/environment';
+import { AvatarComponent } from "../../shared/avatar/avatar.component";
 interface QuizQuestion {
   type:    'mc' | 'tf';
   q:       string;
@@ -15,7 +16,7 @@ interface QuizQuestion {
 @Component({
   selector: 'app-chatbot-quiz',
   standalone: true,
-  imports: [ CommonModule, RouterModule, FormsModule, HttpClientModule ],
+  imports: [CommonModule, RouterModule, FormsModule, HttpClientModule, AvatarComponent],
   templateUrl: './chatbot-quiz.component.html',
   styleUrls:   ['./chatbot-quiz.component.css']
 })

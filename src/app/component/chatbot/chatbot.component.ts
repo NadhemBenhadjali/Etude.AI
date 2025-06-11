@@ -4,11 +4,12 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { environment }                   from '../../../environments/environment';
+import { AvatarComponent } from "../../shared/avatar/avatar.component";
 
 @Component({
   selector: 'app-chatbot',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, AvatarComponent],
   templateUrl: './chatbot.component.html',
   styleUrls: ['./chatbot.component.css']
 })
@@ -32,17 +33,19 @@ export class ChatbotComponent implements OnInit {
   }
 
   initializeChat() {
-    this.messages = [];
-    let greeting = 'مرحباً! أنا مساعدك الذكي. كيف يمكنني مساعدتك اليوم؟';
-    if (this.currentMode === 'summary') {
-      greeting = 'مرحباً! أنا هنا لمساعدتك في الحصول على ملخص للدروس. ما هو الدرس الذي تريد ملخصه؟';
-    } else if (this.currentMode === 'quiz') {
-      greeting = 'مرحباً! أنا هنا لمساعدتك في اختبار معلوماتك. هل أنت مستعد للبدء؟';
-    } else if (this.currentMode === 'general') {
-      greeting = 'مرحباً! أنا هنا للإجابة على أسئلتك العامة. كيف يمكنني مساعدتك اليوم؟';
-    }
-    this.messages.push({ text: greeting, isUser: false });
+  this.messages = [];
+  let greeting = 'أهلاً! أنا المساعد الذكي متاعك. كيفاش نجم نعاونك اليوم؟';
+
+  if (this.currentMode === 'summary') {
+    greeting = 'أهلاً! أنا هنا باش نعاونك باش تلخّص الدروس. آشمن درس تحب عليه ملخص؟';
+  } else if (this.currentMode === 'quiz') {
+    greeting = 'أهلاً! أنا هنا باش نعاونك باش تختبر معلوماتك. حاضر باش تبدا؟';
+  } else if (this.currentMode === 'general') {
+    greeting = 'أهلاً! أنا هنا باش نجاوب على أسئلتك العامة. كيفاش نجم نعاونك اليوم؟';
   }
+
+  this.messages.push({ text: greeting, isUser: false });
+}
 
   async sendMessage() {
     const txt = this.userInput.trim();

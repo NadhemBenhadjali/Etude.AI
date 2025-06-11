@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { HttpClientModule, HttpClient, HttpResponse } from '@angular/common/http';
 import { environment }                   from '../../../environments/environment';
+import { AvatarComponent } from '../../shared/avatar/avatar.component';
 
 import fallbackData from '../../../assets/lesson.json';
 
@@ -15,7 +16,7 @@ interface Slide {
 @Component({
   selector: 'app-lesson-board',
   standalone: true,
-  imports: [CommonModule, RouterModule, HttpClientModule],
+  imports: [CommonModule, RouterModule, HttpClientModule, AvatarComponent],
   templateUrl: './lesson-board.component.html',
   styleUrls: ['./lesson-board.component.css']
 })

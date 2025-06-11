@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { environment }                   from '../../../environments/environment';
+import { AvatarComponent } from "../../shared/avatar/avatar.component";
 
 interface ModuleOption {
   name: string;
@@ -19,7 +20,7 @@ interface SubjectOption {
 @Component({
   selector: 'app-select-module',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, AvatarComponent],
   templateUrl: './select-module.component.html',
   styleUrls: ['./select-module.component.css']
 })
