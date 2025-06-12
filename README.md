@@ -85,7 +85,7 @@ Open **AI Pipeline/agents-integration-using-fastapi-and-ngrok.ipynb** and run th
 <video src="https://your-demo-video-link.mp4" width="700" controls></video>
 
 If your platform does not render the inline video, you can watch it directly:
-[https://drive.google.com/file/d/1NpsDk9j0XDxI0VBrm39RrBFyQ2e-RVHF/view?usp=sharing](https://drive.google.com/file/d/1NpsDk9j0XDxI0VBrm39RrBFyQ2e-RVHF/view?usp=sharing)
+[Link](https://drive.google.com/file/d/1NpsDk9j0XDxI0VBrm39RrBFyQ2e-RVHF/view?usp=sharing)
 
 ---
 
@@ -107,10 +107,5 @@ If your platform does not render the inline video, you can watch it directly:
 * Keep the ngrok tunnel active while the Angular app is running; otherwise the API calls will fail.
 * Recommended versions: **Node ≥ 18** and **Python ≥ 3.10**.
 
-```
 
-Replace:
-
-- `docs/ai_pipeline.png` with the actual relative path to your architecture image (already reflected in the `docs/` folder in the tree).
-- `https://your-demo-video-link.mp4` with your published video URL or GitHub-hosted asset.
 
