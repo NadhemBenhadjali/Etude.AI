@@ -1,4 +1,7 @@
 # Etude.AI – Arabic Learning Assistant
+<p align="center">
+  <img src="frontend/src/assets/images/_(copy)@1.25x.png" alt="AI Pipeline Diagram" width="850"/>
+</p>
 
 Etude.AI is an interactive tutoring environment for Arabic-speaking primary students. It combines an Angular front-end, an AI back-end based on LangChain/CrewAI, and a FastAPI micro-service that adds text-to-speech (TTS). All learning material is stored in a Neo4j knowledge graph created from the official school textbook.
 
@@ -71,9 +74,6 @@ Open **AI Pipeline/agents-integration-using-fastapi-and-ngrok.ipynb** and run th
 
 ## AI workflow (high-level)
 
-<p align="center">
-  <img src="docs/ai_pipeline.png" alt="AI Pipeline Diagram" width="850"/>
-</p>
 
 1. The student selects **Summary**, **Question**, or **Quiz**.
 2. The Router agent classifies the request.
