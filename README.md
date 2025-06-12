@@ -1,9 +1,12 @@
-# Etude.AI – Arabic Learning Assistant
+# Etude.AI – AI-powered educational platform that supports children with learning difficulties through personalized content in the Tunisian dialect. 
 <p align="center">
   <img src="frontend/src/assets/images/_(copy)@1.25x.png" alt="AI Pipeline Diagram" width="850"/>
 </p>
 
 Etude.AI is an interactive tutoring environment for Arabic-speaking primary students. It combines an Angular front-end, an AI back-end based on LangChain/CrewAI, and a FastAPI micro-service that adds text-to-speech (TTS). All learning material is stored in a Neo4j knowledge graph created from the official school textbook.
+<p align="center">
+  <img src="frontend/src/assets/images/logo.png" alt="AI Pipeline Diagram" width="850"/>
+</p>
 
 ---
 
