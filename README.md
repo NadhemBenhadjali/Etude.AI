@@ -17,8 +17,6 @@ Etude.AI/
 │   └── kg\_construction.py       # builds the Neo4j knowledge graph
 ├── frontend/                    # Angular web client
 ├── TTS-Integration/             # FastAPI micro-service for speech
-└── docs/
-└── ai\_pipeline.png          # architecture diagram (added below)
 
 ````
 
@@ -87,7 +85,7 @@ Open **AI Pipeline/agents-integration-using-fastapi-and-ngrok.ipynb** and run th
 <video src="https://your-demo-video-link.mp4" width="700" controls></video>
 
 If your platform does not render the inline video, you can watch it directly:
-[https://your-demo-video-link.mp4](https://your-demo-video-link.mp4)
+[https://drive.google.com/file/d/1NpsDk9j0XDxI0VBrm39RrBFyQ2e-RVHF/view?usp=sharing](https://drive.google.com/file/d/1NpsDk9j0XDxI0VBrm39RrBFyQ2e-RVHF/view?usp=sharing)
 
 ---
 
