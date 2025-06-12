@@ -23,7 +23,7 @@ app.add_middleware(
 
 # --- ElevenLabs TTS Configuration and Endpoint ---
 # Your ElevenLabs API Key (consider using environment variables for production)
-ELEVENLABS_API_KEY = "sk_15ba054f513f3612bd98223b7b44eeccbf34b6953bf70c66"
+ELEVENLABS_API_KEY = "sk_b4e54ff0deb255a7ff365b52cabfdff0972470acdeb2267e"
 
 class TTSRequest(BaseModel):
     text: str
