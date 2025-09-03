@@ -1,12 +1,3 @@
-"""
-End-to-end pipeline for:
-1. Writing a nested KG dict to Neo4j
-2. Adding (:Image) nodes from a CSV
-3. Computing & storing Arabic SBERT embeddings for every Lesson
-
-All tasks run sequentially from the main block—no command-line
-arguments required.
-"""
 # !pip install neo4j langchain-huggingface
 from __future__ import annotations
 from typing import Dict, Tuple
@@ -18,9 +9,9 @@ from neo4j import GraphDatabase, Driver
 from langchain_huggingface import HuggingFaceEmbeddings
 
 # ──────────────── Configuration ────────────────
-NEO4J_URI:      str = "neo4j+s://3e253ce0.databases.neo4j.ioo"
-NEO4J_USER:     str = "neo4j"
-NEO4J_PASSWORD: str = "eMH4uA1k--yp1Ugwev9vXbXPnzVVo3QVaRLZ7Sh4_gU"
+NEO4J_URI="neo4j+s://d24579bb.databases.neo4j.io"
+NEO4J_USER="neo4j"
+NEO4J_PASSWORD="C7ebpFAjR9JcM1QbLPJHy5R91gwzaQOUJoBvoUGhfWw"
 CSV_PATH:       Path = Path("/kaggle/input/arabic-captionsdataset/captions_ar (1).csv")
 MODEL_NAME:     str = "Omartificial-Intelligence-Space/GATE-AraBert-v1"
 CLEAR_DB_FIRST: bool = True          
@@ -93,7 +84,7 @@ class KGWriter:
     def clear_database(self) -> None:
         with self.driver.session() as sess:
             sess.run("MATCH (n) DETACH DELETE n")
-        print("✅ cleared database")
+        print("cleared database")
 
     def write(self, kg: dict) -> None:
         with self.driver.session() as sess:
@@ -126,7 +117,7 @@ class KGWriter:
                             e=end,
                             topic=topic,
                         )
-        print("✅ KG written")
+        print(" KG written")
 
 
 # ──────────────── Image loader ────────────────
@@ -154,7 +145,7 @@ def add_images_from_csv(driver: Driver, csv_path: Path) -> None:
                 SET img.caption=$caption, img.page=$page
                 WITH img
                 MATCH (l:Lesson)
-                WHERE $page BETWEEN l.start_page AND l.end_page
+                WHERE l.start_page <= $page AND $page <= l.end_page
                 MERGE (l)-[:HAS_IMAGE]->(img)
                 """,
                 fname=fname,
@@ -163,7 +154,7 @@ def add_images_from_csv(driver: Driver, csv_path: Path) -> None:
             )
             print(f"✓ linked {fname} → {page}")
 
-    print("✅ images processed")
+    print("images processed")
 
 
 # ──────────────── Embeddings ────────────────
@@ -179,7 +170,7 @@ def embed_lessons(driver: Driver, model_name: str) -> None:
                 id=rec["id"],
                 vec=vec,
             )
-    print("✅ embeddings stored")
+    print("embeddings stored")
 
 
 # ──────────────── Main run ────────────────
@@ -195,6 +186,6 @@ if __name__ == "__main__":
         add_images_from_csv(driver, CSV_PATH)
         embed_lessons(driver, MODEL_NAME)
 
-        print("🎉 pipeline finished")
+        print("pipeline finished")
     finally:
         driver.close()
