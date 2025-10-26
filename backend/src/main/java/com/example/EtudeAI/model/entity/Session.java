@@ -22,9 +22,9 @@ public class Session {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "child_id", nullable = false)
-    @NotNull(message = "Child must be specified")
-    private Child child;
+    @JoinColumn(name = "user_id", nullable = false)
+    @NotNull(message = "User must be specified")
+    private User user;
 
     @Column(nullable = false)
     @NotBlank(message = "Subject must not be blank")
