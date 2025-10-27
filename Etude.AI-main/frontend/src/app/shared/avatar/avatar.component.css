@@ -1,0 +1,21 @@
+.avatar {
+  position: absolute; /* Ensures it stays in place relative to the viewport */
+  top: 20px;       /* Distance from the top of the viewport */
+  right: 20px;     /* Distance from the right of the viewport */
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid #FFFAB7;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  object-fit: cover;
+  background-color: white;
+  cursor: pointer; /* Keeps the cursor pointer property */
+  z-index: 1000;   /* Optional: Ensures it stays above other content if needed */
+}
+
+@media (max-width: 600px) {
+  .avatar {
+    width: 60px;
+    height: 60px;
+  }
+}

@@ -1,0 +1,115 @@
+.select-class-page {
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: linear-gradient(270deg, #5BBCFF, #FFFAB7, #FFD1E3, #7EA1FF);
+  background-size: 800% 800%;
+  animation: gradientMove 15s ease infinite;
+  padding: 20px;
+  position: relative;
+}
+
+.center-container {
+  width: 100%;
+  max-width: 700px;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.instruction {
+  font-size: 32px;
+  color: #7EA1FF;
+  margin-bottom: 40px;
+  font-weight: bold;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+  text-align: center;
+  letter-spacing: 1.2px;
+  text-shadow: 2px 2px 5px #5BBCFF;
+  background: linear-gradient(90deg, #010e17, #5BBCFF);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: pulseText 2s ease-in-out infinite;
+}
+
+@keyframes pulseText {
+  50% {
+    transform: scale(1.05);
+    text-shadow: 3px 3px 3px #5BBCFF;
+  }
+}
+
+.class-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px 160px;
+  justify-content: center;
+  align-items: center;
+  padding: 0 10px;
+}
+
+.class-box {
+  width: 350px;
+  height: 350px;
+  border-radius: 24px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-blend-mode: overlay;
+}
+
+.class-box:hover {
+  transform: scale(1.07);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+.class-box img {
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+  margin: auto;
+}
+
+.class-box p {
+  font-weight: bold;
+  font-size: 22px;
+  margin-top: 2px;
+  color: #06033a;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+.avatar-container {
+  position: absolute;
+  top: 50px;
+  right: 110px;
+  z-index: 1000;
+}
+
+.avatar {
+  position: fixed;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid #FFFAB7;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  object-fit: cover;
+  background-color: white;
+}
+
+@media (max-width: 600px) {
+  .avatar {
+    width: 60px;
+    height: 60px;
+  }
+}

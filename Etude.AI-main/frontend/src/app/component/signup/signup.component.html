@@ -1,0 +1,38 @@
+<form class="signup-form" (ngSubmit)="signup()" #signupForm="ngForm" novalidate>
+    <h2>🌟اعمل حساب جديد🌟</h2> 
+
+    <div class="input-group">
+      <input type="text" id="lastName" name="lastName" [(ngModel)]="lastName" required placeholder=" " />
+      <label for="lastName">الاسم واللقب</label>
+    </div>
+
+    <div class="input-group">
+      <input type="email" id="email" name="email" [(ngModel)]="email" required placeholder=" " />
+      <label for="email">الإيميل</label>
+    </div>
+
+    <div class="input-group">
+      <input type="password" id="password" name="password" [(ngModel)]="password" required placeholder=" " />
+      <label for="password">كلمة السر</label>
+    </div>
+
+    <div class="input-group">
+      <input type="password" id="confirmPassword" name="confirmPassword" [(ngModel)]="confirmPassword" required placeholder=" " />
+      <label for="confirmPassword">أكّد كلمة السر</label>
+    </div>
+
+    <div class="avatar-selection">
+      <h3>اختار تصويرة</h3>
+      <div class="avatar-list">
+        <img *ngFor="let avatar of avatars"
+             [src]="avatar"
+             (click)="selectAvatar(avatar)"
+             [class.selected]="avatar === selectedAvatar" />
+      </div>
+    </div>
+    
+    <button type="submit" [disabled]="!signupForm.form.valid">واصل</button> 
+    <p class="simple-link">
+      عندكش حساب؟ <a (click)="goToSignIn()" class="text-link">ادخل</a>
+    </p>
+</form>

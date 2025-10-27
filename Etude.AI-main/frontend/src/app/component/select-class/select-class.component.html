@@ -1,0 +1,23 @@
+<div class="select-class-page">
+  <div class="avatar-container">
+    <a routerLink="/profile" class="avatar-link">
+      <img src="assets/images/panda.png" alt="User Avatar" class="avatar" (click)="goToProfile()" />
+    </a>
+  </div>
+
+  <div class="center-container">
+    <h2 class="instruction">اختار قسم القراية اللي تحب عليه.</h2>
+
+    <div class="class-container">
+      <div
+        class="class-box"
+        *ngFor="let classNumber of classes; let i = index"
+        [ngStyle]="{ 'background-color': colors[i % colors.length] }"
+        (click)="selectClass(classNumber)"
+      >
+        <img [src]="'assets/images/' + classNumber + '.png'" alt="Class {{classNumber}}" />
+        <p>السنة</p>
+      </div>
+    </div>
+  </div>
+</div>

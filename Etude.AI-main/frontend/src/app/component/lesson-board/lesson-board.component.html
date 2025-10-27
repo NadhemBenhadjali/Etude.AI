@@ -1,0 +1,75 @@
+<app-avatar></app-avatar>
+<div class="lesson-container2">
+  <div class="lesson-container">
+
+    <h2
+      class="lesson-title"
+    >
+      {{ title }} — الشريحة {{ slides[currentSlideIndex].number }}
+    </h2>
+
+    <button class="exit-button" routerLink="/select-mode">
+      <span>العودة</span>
+    </button>
+
+    <div class="image-wrapper">
+      <img
+        [src]="boardImage"
+        alt="Board"
+        class="board-image"
+      />
+
+      <div class="overlay-content">
+        <img
+          *ngIf="hasPhoto(slides[currentSlideIndex])"
+          [src]="slides[currentSlideIndex].image"
+          [alt]="'Slide photo ' + slides[currentSlideIndex].number"
+          class="slide-img"
+        />
+
+        <div
+          class="slide-text"
+          [ngClass]="hasPhoto(slides[currentSlideIndex]) ? 'has-photo' : 'no-photo'"
+          [innerHTML]="slides[currentSlideIndex].text"
+        ></div>
+
+      </div>
+    </div>
+
+    <div class="audio-controls">
+      <button class="play-button" (click)="playSummary()" [disabled]="!slides[currentSlideIndex].text || isPlaying">
+        الاستماع
+      </button>
+      <button class="stop-button" (click)="stopSummary()" [disabled]="!isPlaying">
+        إيقاف الصوت
+      </button>
+    </div>
+
+    <div class="button-group">
+      <button
+        class="back-button"
+        (click)="prevSlide()"
+        [disabled]="currentSlideIndex === 0"
+      >
+        العودة ←
+      </button>
+
+      <button class="question-button" (click)="onQuestion()">
+        <img
+          src="/assets/images/arrow.png"
+          alt="سؤال"
+          class="question-icon"
+        />
+      </button>
+
+      <button
+        class="next-button"
+        (click)="nextSlide()"
+        [disabled]="currentSlideIndex === slides.length - 1"
+      >
+        اللي بعدو →
+      </button>
+    </div>
+
+  </div>
+</div>

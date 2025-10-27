@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=El+Messiri:wght@500;700&display=swap');
+
+/* Page background */
+.signin-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #5BBCFF, #FFFAB7, #FFD1E3, #7EA1FF);
+  background-size: 400% 400%;
+  animation: gradientShift 12s ease infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'El Messiri', 'Amiri', sans-serif;
+  animation: backgroundMove 20s infinite linear;
+  padding: 1rem;
+}
+
+@keyframes backgroundMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Form box */
+.signin-form {
+  background: #ffffffee;
+  border-radius: 1.5rem;
+  padding: 2.8rem 3rem;
+  width: 340px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  text-align: right;
+  position: relative;
+  overflow: hidden;
+  animation: slideUp 1s ease forwards;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Form heading */
+.signin-form h2 {
+  color: #7EA1FF;
+  font-weight: 700;
+  font-size: 2rem;
+  margin-bottom: 1.8rem;
+  text-align: center;
+  animation: bounce 1.5s infinite alternate;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+@keyframes bounce {
+  to {
+    transform: translateY(-5px);
+  }
+}
+
+/* Labels */
+.signin-form label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  color: #444;
+  font-size: 1rem;
+}
+
+/* Inputs */
+.signin-form input {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  margin-bottom: 1.3rem;
+  border: 2px solid #FFD1E3;
+  border-radius: 1rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: #fffdfd;
+  box-sizing: border-box;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+.signin-form input:focus {
+  outline: none;
+  border-color: #7EA1FF;
+  box-shadow: 0 0 8px #7EA1FFAA;
+}
+
+/* Submit button */
+.signin-form button {
+  width: 100%;
+  background: linear-gradient(to right, #7EA1FF, #8fa9f1);
+  border: none;
+  border-radius: 1.2rem;
+  color: white;
+  font-size: 1.1rem;
+  padding: 0.85rem 0;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.4s ease, transform 0.2s;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+.signin-form button:hover {
+  background: linear-gradient(to right, #5BBCFF, #9fcff2);
+  transform: scale(1.03);
+}
+
+/* Signup link */
+.signup-link {
+  margin-top: 1.3rem;
+  font-size: 1rem;
+  color: #555;
+  text-align: center;
+}
+
+.signup-link a {
+  color: #7EA1FF;
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.3s ease;
+}
+
+.signup-link a:hover {
+  color: #FF69B4;
+}
+.signin-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap-reverse;
+}
+
+/* Image container */
+.signin-image {
+  flex: 1;
+  max-width: 350px;
+  animation: float 4s ease-in-out infinite;
+}
+
+.signin-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 1.5rem;
+}
+
+/* Floating animation for fun */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+.signup-link {
+  margin-top: 1.3rem;
+  font-size: 1rem;
+  color: #555;
+  text-align: center;
+  font-family: 'El Messiri', sans-serif;
+  background: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.signup-link .text-link {
+  color: #7EA1FF;
+  text-decoration: no;
+  font-weight: 700;
+  cursor: pointer;
+  background: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border: none !important;
+  transition: color 0.3s ease;
+}
+
+.signup-link .text-link:hover {
+  color: #FF69B4;
+}
+

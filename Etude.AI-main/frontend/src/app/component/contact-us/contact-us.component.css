@@ -1,0 +1,206 @@
+.contact-container {
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #FFFAB7 10%, #FFD1E3 90%);
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+  max-width: 1000px;
+  margin: auto;
+  border-radius: 30px;
+  box-shadow: 0 8px 25px rgba(91, 188, 255, 0.4);
+  animation: fadeInUp 1.2s ease-out both;
+  margin-top: 6%;
+}
+
+.contact-wrapper {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.contact-info {
+  flex: 1;
+  text-align: right;
+  color: #0A0A0A;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.contact-info h2 {
+  font-size: 2rem;
+  color: #5BBCFF;
+  margin-bottom: 1rem;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+.contact-info p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.social-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.social-item img {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 0.4rem;
+  transition: transform 0.3s ease;
+}
+
+.social-item:hover img {
+  transform: scale(1.2) rotate(5deg);
+}
+
+.social-item span {
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.funny-img {
+  width: 180px;
+  margin-top: 2rem;
+  align-self: center;
+  animation: bounce 2s infinite;
+}
+
+.contact-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  background-color: #7EA1FF;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  animation: slideIn 1.2s ease-out;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+
+.input-group label {
+  font-weight: bold;
+  color: white;
+  margin-bottom: 0.5rem;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+.input-group input,
+.input-group textarea {
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  border: 2px solid white;
+  font-size: 1rem;
+  background: white;
+  color: #333;
+  transition: all 0.3s ease;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+.input-group input:focus,
+.input-group textarea:focus {
+  outline: none;
+  border-color: #FFD1E3;
+  box-shadow: 0 0 8px #FFD1E3;
+}
+
+.send-button {
+  background: #5BBCFF;
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 0.9rem 2rem;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  align-self: center;
+  margin-top: 1rem;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+.send-button:hover {
+  background: #FFD1E3;
+  color: #0a0a0a;
+  transform: scale(1.05);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(50px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .contact-wrapper {
+    flex-direction: column;
+  }
+
+  .funny-img {
+    margin: auto;
+    width: 140px;
+  }
+}
+.navbar {
+  position: absolute;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: transparent;
+  padding: 0;
+  z-index: 10;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+  direction: rtl;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+}
+
+.navbar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  gap: 7rem;
+  background: transparent;
+}
+
+.navbar li a {
+  text-decoration: none;
+  color: #000;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.navbar li a:hover {
+  color: #eb90b3;
+}

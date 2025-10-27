@@ -1,0 +1,343 @@
+<nav class="navbar">
+  <ul>
+    <li><a routerLink="/">  الرئيسية </a></li>
+    <li><a routerLink="/about"> شكون احنا؟</a></li>
+    <li><a routerLink="/contact">كلمنا</a></li>
+  </ul>
+</nav>
+<app-avatar></app-avatar>
+
+<!-- Game Loading Screen -->
+<div *ngIf="gameLoading" class="game-loading-screen">
+  <div class="loading-content">
+    <div class="game-logo">🏆 مغامرة الكلمات 🏆</div>
+    <div class="loading-bar">
+      <div class="loading-progress" [style.width.%]="loadingProgress"></div>
+    </div>
+    <div class="loading-text">{{ loadingText }}</div>
+  </div>
+</div>
+
+<div class="game-container" dir="rtl" [class.game-active]="inQuiz">
+  <!-- Game HUD (Heads-Up Display) -->
+  <div class="game-hud">
+    <div class="hud-left">
+      <div class="combo-display" *ngIf="currentCombo > 1">
+        <span class="combo-text">متتالية × {{ currentCombo }}</span>
+        <div class="combo-fire">🔥</div>
+      </div>
+    </div>
+    
+    <div class="hud-center">
+      <!-- Level display moved to powerups section -->
+    </div>
+    
+    <div class="hud-right">
+      <div class="time-display" [class.time-warning]="timeLeft <= 10">
+        <span class="time-icon">⏱️</span>
+        <span class="time-value">{{ timeLeft }}</span>
+      </div>
+      <div class="lives-display">
+        <span *ngFor="let life of lives; let i = index" 
+              class="life-heart" 
+              [class.life-lost]="i >= currentLives">❤️</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-header">
+    <div class="bot-avatar">
+      <img src="/assets/images/bot.png" alt="Game Avatar" />
+      <div class="status-dot" [class.pulse-fast]="inQuiz"></div>
+      <div class="avatar-speech-bubble" *ngIf="avatarMessage">{{ avatarMessage }}</div>
+    </div>
+    <div class="header-text">
+      <h2>مغامرة ديناصور الكلمات</h2>
+      <div class="status">{{ gameStatus }}</div>
+      <div class="difficulty-badge" [class]="'difficulty-' + currentDifficulty">
+        {{ getDifficultyText() }}
+      </div>
+    </div>
+    <div class="header-decoration">
+      <div class="achievement-icons">
+        <span *ngFor="let achievement of unlockedAchievements" class="achievement-star">🌟</span>
+      </div>
+    </div>
+    <div class="score-display">
+      <span class="score-label">النقاط</span>
+      <span class="score-value" [class.score-animate]="scoreAnimating">{{ score }}</span>
+    </div>
+    <button class="exit-button" routerLink="/select-mode">
+      <span class="exit-icon">🚪</span>
+      العودة
+    </button>
+  </div>
+
+  <div class="game-area">
+    <!-- Enhanced Progress Track -->
+    <div class="game-progress-section">
+      <div class="progress-track">
+        <div class="track-background"></div>
+        <div class="progress-line" [style.width.%]="gameProgressPercent"></div>
+        <div class="checkpoint" 
+             *ngFor="let checkpoint of progressCheckpoints; let i = index"
+             [style.left.%]="checkpoint.position"
+             [class.checkpoint-reached]="checkpoint.reached"
+             [class.checkpoint-current]="checkpoint.current">
+          <span class="checkpoint-icon">{{ checkpoint.icon }}</span>
+        </div>
+      </div>
+      
+      <!-- Enhanced Dino Character -->
+      <div class="dino-container" [style.left.%]="dinoPosition">
+        <img src="/assets/images/dino.png" alt="Dinosaur" 
+             class="dino-character" 
+             [class.dino-happy]="lastAnswerCorrect"
+             [class.dino-thinking]="isLoading"
+             [class.dino-celebrating]="showConfetti">
+        <div class="dino-power-aura" *ngIf="currentCombo > 3"></div>
+        <div class="dino-speech" *ngIf="dinoMessage">{{ dinoMessage }}</div>
+      </div>
+    </div>
+
+    <!-- Power-ups Display with Level -->
+    <div class="powerups-section" *ngIf="availablePowerups.length > 0">
+      <!-- Level Display next to powerups -->
+      <div class="level-display">
+        <span class="level-text">{{ getDifficultyText() }}</span>
+        <div class="xp-bar">
+          <div class="xp-progress" [style.width.%]="experiencePercent"></div>
+        </div>
+      </div>
+      
+      <!-- Powerups -->
+      <div class="powerup-item" 
+           *ngFor="let powerup of availablePowerups"
+           (click)="usePowerup(powerup)"
+           [class.powerup-available]="powerup.available">
+        <span class="powerup-icon">{{ powerup.icon }}</span>
+        <span class="powerup-count">{{ powerup.count }}</span>
+      </div>
+    </div>
+
+    <!-- Enhanced Feedback System -->
+    <div class="feedback-system">
+      <div *ngIf="feedbackMessage" 
+           class="feedback-message" 
+           [class]="feedbackClass">
+        <div class="feedback-content">
+          <span class="feedback-icon">{{ feedbackIcon }}</span>
+          <span class="feedback-text">{{ feedbackMessage }}</span>
+        </div>
+        <div class="feedback-particles" *ngIf="showFeedbackParticles">
+          <span *ngFor="let particle of feedbackParticles" 
+                class="particle"
+                [style.left.px]="particle.x"
+                [style.animationDelay.ms]="particle.delay">{{ particle.emoji }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Quiz Content -->
+    <div class="quiz-content" *ngIf="inQuiz && !gameFinished && currentQuestion">
+      <div class="question-container">
+        <div class="question-number">
+          <span class="question-current">{{ currentQuestionIndex + 1 }}</span>
+          <span class="question-separator">/</span>
+          <span class="question-total">{{ totalQuestions }}</span>
+        </div>
+        
+        <div class="question-text" [class.question-animate]="questionAnimating">
+          {{ currentQuestion.q }}
+        </div>
+        
+        <div class="question-category" *ngIf="currentQuestion?.category">
+          <span class="category-tag">{{ currentQuestion.category }}</span>
+        </div>
+      </div>
+      
+      <div class="answer-options">
+        <button
+          *ngFor="let opt of currentQuestion?.options; let i = index"
+          class="answer-option"
+          [class]="'option-' + (i + 1)"
+          [class.hint-correct]="hintActive && i === correctAnswerIndex"
+          (click)="answerQuestion(opt)"
+          [disabled]="isLoading || answerLocked"
+          (mouseover)="onOptionHover(i)"
+        >
+          <span class="option-letter">{{ getOptionLetter(i) }}</span>
+          <span class="option-text">{{ opt }}</span>
+          <div class="option-glow"></div>
+        </button>
+      </div>
+      
+      <!-- Skip Option for Hard Questions -->
+      <div class="question-actions" *ngIf="currentDifficulty === 'expert'">
+        <button class="skip-button" 
+                (click)="skipQuestion()" 
+                [disabled]="skipsUsed >= maxSkips">
+          <span class="skip-icon">⏭️</span>
+          تخطي ({{ maxSkips - skipsUsed }} متبقي)
+        </button>
+      </div>
+    </div>
+
+    <!-- Enhanced Start Screen -->
+    <div class="start-screen" *ngIf="!inQuiz && !gameFinished">
+      <div class="start-content">
+        <div class="welcome-message">
+          <h3>مرحباً أيها المغامر الصغير!</h3>
+          <p>استعد لمغامرة مليئة بالتحدي والمتعة!</p>
+        </div>
+        
+        <div class="difficulty-selection">
+          <h4>اختر مستوى التحدي:</h4>
+          <div class="difficulty-options">
+            <button class="difficulty-btn difficulty-easy"
+                    (click)="setDifficulty('easy')"
+                    [class.selected]="selectedDifficulty === 'easy'">
+              <span class="diff-icon">🌱</span>
+              <span class="diff-name">مبتدئ</span>
+              <span class="diff-desc">سهل ومريح</span>
+            </button>
+            <button class="difficulty-btn difficulty-normal"
+                    (click)="setDifficulty('normal')"
+                    [class.selected]="selectedDifficulty === 'normal'">
+              <span class="diff-icon">⚡</span>
+              <span class="diff-name">متوسط</span>
+              <span class="diff-desc">تحدي متوازن</span>
+            </button>
+            <button class="difficulty-btn difficulty-expert"
+                    (click)="setDifficulty('expert')"
+                    [class.selected]="selectedDifficulty === 'expert'">
+              <span class="diff-icon">🔥</span>
+              <span class="diff-name">خبير</span>
+              <span class="diff-desc">تحدي قصوى</span>
+            </button>
+          </div>
+        </div>
+        
+        <button
+          class="start-game-button"
+          (click)="startGameWithDifficulty()"
+          [disabled]="!selectedDifficulty"
+        >
+          <span class="start-icon">🚀</span>
+          ابدأ المغامرة!
+        </button>
+      </div>
+    </div>
+
+    <!-- Enhanced Final Screen -->
+    <div class="final-screen" *ngIf="gameFinished">
+      <div class="results-container">
+        <div class="results-header">
+          <div class="final-score-big">{{ score }}</div>
+          <div class="score-label-big">نقطة نهائية</div>
+          <div class="stat">
+            <span class="stat-label">عدد الإجابات الصحيحة:</span>
+            <span class="stat-value">{{ score }} / 10</span>
+          </div>
+        </div>
+        
+        <div class="performance-stats">
+          <div class="stat-item">
+            <span class="stat-icon">🎯</span>
+            <span class="stat-label">دقة الإجابات</span>
+            <span class="stat-value">{{ getAccuracyPercent() }}%</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">⚡</span>
+            <span class="stat-label">أعلى متتالية</span>
+            <span class="stat-value">{{ maxComboReached }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-icon">⏱️</span>
+            <span class="stat-label">الوقت المتبقي</span>
+            <span class="stat-value">{{ timeLeft }}ث</span>
+          </div>
+        </div>
+        
+        <div class="achievement-showcase" *ngIf="newAchievements.length > 0">
+          <h4>إنجازات جديدة! 🏆</h4>
+          <div class="new-achievements">
+            <div *ngFor="let achievement of newAchievements" class="achievement-card">
+              <span class="achievement-emoji">{{ achievement.icon }}</span>
+              <span class="achievement-name">{{ achievement.name }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="final-message" [class]="getPerformanceClass()">
+          <div class="performance-icon">{{ getPerformanceIcon() }}</div>
+          <div class="performance-text">{{ getFinalMessage() }}</div>
+        </div>
+        
+        <div class="final-actions">
+          <button class="action-button restart-button" (click)="restartGame()">
+            <span class="action-icon">🔄</span>
+            العب مرة أخرى!
+          </button>
+          <button class="action-button difficulty-button" (click)="changeDifficulty()">
+            <span class="action-icon">⚙️</span>
+            غير المستوى
+          </button>
+          <button class="action-button share-button" (click)="shareScore()">
+            <span class="action-icon">📱</span>
+            شارك النتيجة
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Loading Indicator -->
+    <div *ngIf="isLoading" class="loading-overlay">
+      <div class="loading-content">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">{{ loadingText }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Particle Systems -->
+  <div class="particle-container">
+    <!-- Confetti Effect -->
+    <div *ngIf="showConfetti" class="confetti-system">
+      <div *ngFor="let confetti of confettiParticles" 
+           class="confetti-piece"
+           [style.left.px]="confetti.x"
+           [style.animationDelay.ms]="confetti.delay"
+           [style.backgroundColor]="confetti.color">
+      </div>
+    </div>
+    
+    <!-- Star Burst Effect -->
+    <div *ngIf="showStarBurst" class="starburst-system">
+      <div *ngFor="let star of starBurstParticles"
+           class="star-particle"
+           [style.left.px]="star.x"
+           [style.top.px]="star.y"
+           [style.animationDelay.ms]="star.delay">⭐</div>
+    </div>
+  </div>
+
+  <!-- Powerup Notification Popup -->
+  <div *ngIf="powerupNotification.visible" class="powerup-notification-overlay">
+    <div class="powerup-notification-popup">
+      <button class="notification-close" (click)="dismissPowerupNotification()">×</button>
+      <div class="notification-header">
+        <div class="notification-icon">{{ powerupNotification.powerup.icon }}</div>
+        <div class="notification-title">قوة جديدة! 🎉</div>
+      </div>
+      <div class="notification-content">
+        <div class="powerup-name">{{ powerupNotification.powerup.name }}</div>
+        <div class="powerup-description">{{ powerupNotification.powerup.description }}</div>
+        <div class="notification-message">{{ powerupNotification.message }}</div>
+      </div>
+      <div class="notification-footer">
+        <button class="notification-btn" (click)="dismissPowerupNotification()">رائع! 👍</button>
+      </div>
+    </div>
+  </div>
+</div>

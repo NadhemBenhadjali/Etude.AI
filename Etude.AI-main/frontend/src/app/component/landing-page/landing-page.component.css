@@ -1,0 +1,201 @@
+.landing-container {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem;
+  direction: rtl;
+  font-family: 'El Messiri', sans-serif;
+  text-align: center;
+  gap: 2rem;
+  box-sizing: border-box; /* ensure padding is included in width */
+background: linear-gradient(-45deg, #5BBCFF, #a5cef3, #A9D6FF, #5BBCFF);
+  background-size: 400% 400%;
+  animation: gradientAnimation 15s ease infinite;
+}
+
+@keyframes gradientAnimation {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
+}
+
+.images-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  max-width: 900px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Main image container with distinct background & style */
+.center-image-box {
+   
+  margin-top: 4%;
+  background: #FFFAB7; /* warm yellow background */
+  padding: 1.5rem;
+  border-radius: 30px;
+  box-shadow: 0 10px 30px #FFFAB7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 480px;
+  flex: 1 1 400px;
+  transition: box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+
+.center-image-box:hover {
+  box-shadow: 0 15px 45px rgba(255, 217, 93, 0.8);
+}
+
+.center-image {
+  max-width: 100%;
+  border-radius: 25px;
+  object-fit: cover;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+  display: block; /* prevent inline image gap */
+  user-select: none; /* prevent accidental drag/select */
+}
+
+.center-image:hover {
+  transform: scale(1.05);
+}
+
+.side-image {
+  flex: 1 1 250px;
+  max-width: 350px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  display: block;
+  user-select: none;
+}
+
+.side-image:hover {
+  transform: scale(1.05);
+}
+
+h2 {
+  width: 20%;
+  font-size: 1.5rem;
+  color: #FFD1E3;
+  margin: 0rem 0 0 0; /* no bottom margin */
+  font-weight: 700;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+.encouragement {
+  width: 100%;
+  font-size: 1.1rem;
+  color: #000000;
+  max-width: 400px;
+  line-height: 1.1; /* slightly tighter */
+  font-weight: 500;
+  padding: 0 0;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+  margin-top: 0PX; /* small gap from h2 */
+  margin-bottom: 0rem;
+  box-sizing: border-box;
+}
+
+/* Responsive adjustments */
+@media (max-width: 700px) {
+  .images-wrapper {
+    flex-direction: column;
+  }
+
+  .center-image-box, .side-image {
+    max-width: 90vw;
+    flex: none;
+  }
+}
+.voltage-button {
+  position: relative;
+  display: inline-block;
+  margin-top: 0PX;
+}
+.voltage-button button {
+  background: linear-gradient(135deg, #FFD1E3, #FF8FB1);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(255, 105, 180, 0.3);
+  transition: all 0.3s ease;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+  margin-top: 0; /* Ensure no margin between text and button */
+  padding-top: 0;
+}
+
+.voltage-button button:hover {
+  background: linear-gradient(135deg, #FFB3C6, #FF5E8E);
+  transform: scale(1.05);
+}
+
+.voltage-button button:hover {
+  background-color: #ffc2d6;
+  transform: scale(1.05);
+}
+
+.voltage-button svg {
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 10px;
+}
+
+.voltage-button .line-1,
+.voltage-button .line-2 {
+  stroke: #ffffff;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: drawLine 1s forwards ease-in-out;
+  animation-delay: 0.3s;
+}
+
+@keyframes drawLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.voltage-button .dots {
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+}
+
+.voltage-button .dot {
+  width: 6px;
+  height: 6px;
+  background: #ffffff;
+  border-radius: 50%;
+  opacity: 0;
+  animation: blink 1.2s infinite ease-in-out;
+}
+
+.voltage-button .dot-1 { animation-delay: 0s; }
+.voltage-button .dot-2 { animation-delay: 0.2s; }
+.voltage-button .dot-3 { animation-delay: 0.4s; }
+.voltage-button .dot-4 { animation-delay: 0.6s; }
+.voltage-button .dot-5 { animation-delay: 0.8s; }
+
+@keyframes blink {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}

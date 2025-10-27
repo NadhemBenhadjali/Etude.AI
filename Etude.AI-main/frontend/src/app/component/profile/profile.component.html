@@ -1,0 +1,88 @@
+<div class="profile-container" dir="rtl">
+  <div class="profile-box">
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <img [src]="avatar" alt="Profile Avatar" />
+        <div class="level-badge" [style.background-color]="getLevelColor()">
+          ⭐ المستوى {{ level }}
+        </div>
+      </div>
+      <div class="profile-info">
+        <h1>{{ username }}</h1>
+        <p class="rank">
+          👑 {{ rank }}
+        </p>
+        <div class="streak">
+          🔥 {{ streak }} يوم متتالي
+        </div>
+      </div>
+      <div class="start-learning">
+        <button class="start-button" routerLink="/select-mode">
+          <span>ابدأ تعلم</span>
+          <img src="/assets/images/sent.png" alt="Start Learning" />
+        </button>
+      </div>
+    </div>
+
+    <div class="xp-progress">
+      <div class="xp-header">
+        <span class="section-icon">📈</span>
+        <h3>خبرتك </h3>
+      </div>
+      <div class="xp-bar">
+        <div class="xp-fill" [style.width.%]="getXpPercentage()"></div>
+      </div>
+      <div class="xp-text">
+        <span>{{ xp }}</span> / <span>{{ xpToNextLevel }}</span> نقطة
+      </div>
+    </div>
+
+    <div class="stats-container">
+      <div class="stat-card">
+        <span class="stat-icon">📚</span>
+        <h3>الدروس إلي كملتهم</h3>
+        <p class="stat-value">{{ completedLessons }}</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">✍️</span>
+        <h3>الاختبارات إلي كملتهم</h3>
+        <p class="stat-value">{{ completedQuizzes }}</p>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">🔥</span>
+        <h3>أعلى تتابع</h3>
+        <p class="stat-value">{{ highestStreak }} يوم</p>
+      </div>
+    </div>
+
+    <div class="achievements-section">
+      <div class="section-header">
+        <span class="section-icon">🏆</span>
+        <h2>الإنجازات</h2>
+      </div>
+      <div class="achievements-grid">
+        <div class="achievement-card" *ngFor="let achievement of achievements" [class.locked]="!achievement.unlocked">
+          <span class="achievement-icon">{{ achievement.icon }}</span>
+          <h3>{{ achievement.name }}</h3>
+          <p>{{ achievement.description }}</p>
+          <div class="achievement-badge" *ngIf="achievement.unlocked">
+            🔓
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="recent-activity">
+      <div class="section-header">
+        <span class="section-icon">📝</span>
+        <h3>نشاطك لخراني </h3>
+      </div>
+      <div class="activity-list">
+        <div class="activity-item" *ngFor="let activity of recentActivities">
+          <span class="activity-icon">{{ activity.icon }}</span>
+          <span class="activity-text">{{ activity.text }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

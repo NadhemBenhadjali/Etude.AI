@@ -1,0 +1,81 @@
+.welcome-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #7EA1FF, #6D83F2, #A0C1F7);
+  background-size: 400% 400%;
+  animation: welcomeGradient 12s ease infinite;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: 'El Messiri', sans-serif;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+@keyframes welcomeGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.image-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.glow-box {
+  background-color: #FFFFFF;
+  padding: 1rem;
+  border-radius: 50%;
+  box-shadow: 0 0 30px rgba(173, 216, 230, 0.7);
+  transition: transform 0.3s ease;
+}
+
+.glow-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 50px rgba(173, 216, 230, 1);
+}
+
+.welcome-image {
+  width: 250px;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+h2 {
+  font-size: 2rem;
+  color: #FFFAB7;
+  margin: 0;
+  font-weight: bold;
+   font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+.description {
+  max-width: 500px;
+  font-size: 1.2rem;
+  color: #1b010b;
+  line-height: 1.5;
+  font-weight: 500;
+   font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+.start-button button {
+  background: #FFD1E3;
+  color: #131201;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+   font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+.start-button button:hover {
+  background: #FFFAB7;
+  transform: scale(1.05);
+}

@@ -1,0 +1,21 @@
+<div class="signin-container">
+  <div class="signin-image">
+    <img src="/assets/images/kiddd.png" alt="أطفال يسجلون الدخول" />
+  </div>
+
+  <form class="signin-form" dir="rtl" lang="ar" aria-label="فورم تسجيل الدخول" (submit)="onSubmit($event)">
+    <h2>🌟 تسجيل الدخول 🌟</h2> 
+
+    <label for="email">📧 الإيميل</label>
+    <input type="email" id="email" name="email" placeholder="example@domain.com" required />
+
+    <label for="password">🔒 كلمة السر</label>
+    <input type="password" id="password" name="password" placeholder="********" required />
+
+    <button type="submit">🚀 ادخل</button>
+
+    <p class="signup-link">
+      ماعندكش حساب؟ <a (click)="goToSignUp()" style="cursor:pointer;">✨ اعمل حساب جديد</a>
+    </p>
+</form>
+</div>

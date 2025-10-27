@@ -1,0 +1,20 @@
+<app-avatar></app-avatar>
+<div class="select-class-page">
+
+
+  <div class="center-container">
+    <h2 class="instruction"> اختار المادة</h2>
+
+    <div class="class-container">
+      <div
+        class="class-box"
+        *ngFor="let subject of subjects; let i = index"
+        [ngStyle]="{ 'background-color': colors[i % colors.length] }"
+        (click)="selectSubject(subject.name)"
+      >
+        <img [src]="'assets/images/' + subject.image" alt="{{subject.name}}" />
+        <p>{{ subject.name }}</p>
+      </div>
+    </div>
+  </div>
+</div>

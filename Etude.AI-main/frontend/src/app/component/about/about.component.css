@@ -1,0 +1,176 @@
+.about-section {
+  max-width: 1200px;
+  margin: 4rem auto;
+  padding: 2.5rem;
+  background: linear-gradient(135deg, #FFFAB7, #FFD1E3);
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(91, 188, 255, 0.3);
+  font-family: 'Segoe UI', 'FredFredburgerARAHeadBlack', sans-serif;
+  color: #0A0A0A;
+  text-align: center;
+  overflow: hidden;
+  animation: fadeIn 1s ease-out;
+  margin-top: 6%;
+}
+
+.section-title {
+  font-size: 3rem; /* Slightly larger for stronger impact */
+  margin-bottom: 2rem;
+  color: #5BBCFF;
+  position: relative;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+  text-transform: uppercase; /* Adds a bold, professional tone */
+  letter-spacing: 1px; /* Improves readability */
+  line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 2.2rem; /* Responsive size for smaller screens */
+    margin-bottom: 1.2rem;
+  }
+}
+
+
+.about-intro {
+  font-size: 1.4rem;
+  margin-bottom: 3rem;
+  color: #333;
+  line-height: 1.8;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+.about-intro span.highlight {
+  color: #D72638;
+  background: #fff3f8;
+  padding: 0.1rem 0.5rem;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.features-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.feature-card {
+  background: #7EA1FF;
+  color: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  width: 220px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transition: transform 0.4s ease, box-shadow 0.3s ease;
+  opacity: 0;
+  transform: translateY(50px);
+  animation: slideIn 0.8s ease forwards;
+}
+
+.feature-card img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.2));
+}
+.feature-card h3 {
+  font-size: 1.3rem; /* Slightly larger for better visibility */
+  margin-bottom: 0.6rem;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+  color: #de0c79; /* Fun, warm color */
+  letter-spacing: 1px;
+  text-transform: capitalize;
+  transition: transform 0.3s ease, color 0.3s ease;
+  position: relative;
+  cursor: default;
+}
+
+.feature-card h3:hover {
+  color: #f7f0a3; /* Softer shade on hover */
+  transform: scale(1.05); /* Slight zoom effect */
+}
+.feature-card h3::after {
+  content: ' ✨';
+  position: absolute;
+  right: -1.2rem;
+  top: 0;
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.feature-card p {
+  font-size: 1rem;
+  line-height: 1.5;
+    font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+/* Animation Keyframes */
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(-20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Delays for animated cards */
+.wow.delay-1 { animation-delay: 0.3s; }
+.wow.delay-2 { animation-delay: 0.6s; }
+.wow.delay-3 { animation-delay: 0.9s; }
+.wow { animation-name: slideIn; animation-fill-mode: forwards; }
+
+/* Hover Effect */
+.feature-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 25px rgba(255, 209, 227, 0.6);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .features-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+  .feature-card {
+    width: 90%;
+  }
+}
+.navbar {
+  position: absolute;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: transparent;
+  padding: 0;
+  z-index: 10;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+  direction: rtl;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+}
+
+.navbar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  gap: 7rem;
+  background: transparent;
+}
+
+.navbar li a {
+  text-decoration: none;
+  color: #000;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.navbar li a:hover {
+  color: #eb90b3;
+}
