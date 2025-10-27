@@ -74,7 +74,7 @@
   }
   
   .voltage-button svg path.line-2 {
-    stroke: #6bfeff;
+    stroke: #FFD1E3;
     stroke-dashoffset: 500;
     animation: spark-2 3s linear infinite;
   }
@@ -215,7 +215,7 @@
   .welcome-section p.highlight {
     font-size: 1.25rem;
     font-weight: 700;  /* bold */
-    color: #de0c79;
+    color: #FFD1E3;
     margin-top: 1.5rem;
 }
 .special-font {
@@ -251,5 +251,5 @@
 }
 
 .navbar li a:hover {
-  color: #eb90b3;
+  color: #FFD1E3;
 }

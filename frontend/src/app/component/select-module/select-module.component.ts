@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { environment }                   from '../../../environments/environment';
 import { AvatarComponent } from "../../shared/avatar/avatar.component";
+import { QuizService } from '../../services/quiz.service';
 
 interface ModuleOption {
   name: string;
@@ -60,9 +61,8 @@ export class SelectModuleComponent implements OnInit {
   errorMsg : string | null = null;
 
   private readonly summaryUrl  = environment.apiBase+'/summary';
-  private readonly quizUrl    = environment.apiBase+'/quiz';
 
-  constructor(private router: Router, private route: ActivatedRoute) {}
+  constructor(private router: Router, private route: ActivatedRoute, private quizService: QuizService) {}
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(p => {
@@ -132,43 +132,40 @@ export class SelectModuleComponent implements OnInit {
       this.errorMsg = null;
 
       try {
-        const resp = await fetch(this.quizUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+        // Use static quiz service instead of fetch
+        const quizRequest = {
+          module: module.name,
+          num_mc: 6,
+          num_tf: 4
+        };
+
+        this.quizService.generateQuiz(quizRequest).subscribe({
+          next: (data) => {
+            this.result = data;
+
+            this.router.navigate(['/chatbot-quiz'], {
+              queryParams: {
+                subject: this.selectedSubject!.value,
+                module:  module.value,
+                mode:    this.currentMode,
+                path:    'static'
+              },
+              state: {
+                quizPath: 'static',
+                quizData: data.data
+              }
+            });
+            this.loading = false;
+          },
+          error: (err) => {
+            this.errorMsg = 'Error loading quiz: ' + err.message;
+            this.loading = false;
+          }
         });
-        const text = await resp.text();
-        let data: any;
-        try { data = JSON.parse(text); } catch {}
-
-        if (!resp.ok) {
-          this.errorMsg = `HTTP ${resp.status}\n${text}`;
-        } else if (data?.data) {
-          this.result = data;
-
-          await this.router.navigate(['/chatbot-quiz'], {
-            queryParams: {
-              subject: this.selectedSubject.value,
-              module:  module.value,
-              mode:    this.currentMode,
-              path:    data.path
-            },
-            state: {
-              quizPath: data.path,
-              quizData: data.data
-            }
-          });
-        } else if (data?.error) {
-          this.errorMsg = 'Error: ' + data.error;
-        } else {
-          this.errorMsg = 'Unexpected response:\n' + text;
-        }
       } catch (err: any) {
-        this.errorMsg = 'Fetch error: ' + err.message;
-      } finally {
+        this.errorMsg = 'Error: ' + err.message;
         this.loading = false;
       }
-
     }
   }
 
