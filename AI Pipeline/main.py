@@ -1,14 +1,13 @@
-from pathlib import Path
-from kg import Neo4jKG
-from cli import run_cli
-from config import URI, USER, PASSWORD
-def main():
-    sample_pdf = Path("config_files/الإيقاظ العلمي - السنة الرابعة من التعليم الأساسي (1).pdf")
-    neo_kg = Neo4jKG(URI, USER, PASSWORD)
-    if sample_pdf.exists():
-        run_cli(sample_pdf, neo_kg)
-    else:
-        print("PDF not found, please adjust sample_pdf path first.")
+import os
+import nest_asyncio, uvicorn
+from pyngrok import ngrok, conf
+from fastapi import FastAPI
+from app.app import app
 
 if __name__ == "__main__":
-    main()
+    nest_asyncio.apply()
+    os.environ['ngrok_authToken']='2yMaZ6btidIIiv3fwpkG287hAOT_2ezDgPqKcpGa2w9Z3WpxT'
+    conf.get_default().auth_token = os.environ["ngrok_authToken"]
+    public_url = ngrok.connect(8000)
+    print("Public URL:", public_url)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
