@@ -1,0 +1,34 @@
+spring:
+  application:
+      name: EtudeAI
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/Etudeai
+    username: admin
+    password: admin
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "http://localhost:8083/realms/etudeAi/protocol/openid-connect/certs"
+logging:
+  level:
+    org.springframework.security: INFO
+server:
+  port: 8081
+
+keycloak:
+  base-url: http://localhost:8083
+  realm: etudeAi
+  admin-username: admin
+  admin-password: admin
+  client-id: backend
+  client-secret: "tUrff0wg8nsWqy1nTZIHoOTpMUw8A65p"
+
+

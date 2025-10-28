@@ -1,8 +1,11 @@
 package com.example.EtudeAI.model.entity;
 
+import com.example.EtudeAI.model.enums.Level;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -28,10 +31,14 @@ public class Note {
     @NotBlank(message = "Content must not be blank")
     private String content;
 
-    @Temporal(TemporalType.DATE)
     @Column(nullable = false)
     @NotNull(message = "Date must be specified")
-    private Date date;
+    private ZonedDateTime date;
+
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Level is required")
+    @Column(nullable = false)
+    private Level level;
 
     @Column(nullable = false)
     @NotBlank(message = "Subject must not be blank")
