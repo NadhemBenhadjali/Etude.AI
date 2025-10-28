@@ -1,7 +1,7 @@
 services:
   # ---------- BACKEND DATABASE ----------
   backend-db:
-    image: postgres:16
+    image: postgres:latest
     container_name: backend-db
     restart: always
     environment:
@@ -37,7 +37,7 @@ services:
 
   # ---------- KEYCLOAK DATABASE ----------
   keycloak-db:
-    image: postgres:16
+    image: postgres:latest
     container_name: keycloak-db
     restart: always
     environment:
