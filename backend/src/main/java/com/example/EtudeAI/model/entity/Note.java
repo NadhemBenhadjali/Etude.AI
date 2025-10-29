@@ -7,6 +7,9 @@ import lombok.*;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+import com.example.EtudeAI.model.enums.Level;
+import com.example.EtudeAI.model.enums.NoteType;
+
 @Entity
 @Table(name = "note")
 @Getter
@@ -24,6 +27,10 @@ public class Note {
     @NotNull(message = "User must be specified")
     private User user;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private NoteType noteType;
+
     @NotBlank(message = "Content must not be blank")
     @Column(nullable = false)
     private String content;
@@ -32,8 +39,20 @@ public class Note {
     @Column(nullable = false)
     private ZonedDateTime date;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JoinColumn(name = "course_id", nullable = false, unique = true)
-    @NotNull(message = "Course must be specified")
-    private Course course;
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Level is required")
+    @Column(nullable = false)
+    private Level level;
+
+    @NotBlank(message = "Subject cannot be blank")
+    @Column(nullable = false)
+    private String subject;
+
+    @NotBlank(message = "Module cannot be blank")
+    @Column(nullable = false)
+    private String module;
+
+    @NotBlank(message = "Lesson cannot be blank")
+    @Column(nullable = false)
+    private String lesson;
 }

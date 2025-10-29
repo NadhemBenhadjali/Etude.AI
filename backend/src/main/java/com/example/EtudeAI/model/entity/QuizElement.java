@@ -20,6 +20,10 @@ public class QuizElement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "session_id", nullable = false)
+    private Session session;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private QuizType quizType;
