@@ -1,4 +1,4 @@
-package com.example.EtudeAI.Controller;
+package com.example.EtudeAI.controller;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
