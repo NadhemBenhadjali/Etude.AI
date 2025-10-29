@@ -8,20 +8,17 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "sessions")
+@Table(name = "session")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Session {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -57,23 +54,23 @@ public class Session {
     @Column(nullable = false, updatable = false)
     private ZonedDateTime createdAt;
 
-    @Column()
+    @Column(nullable = true, updatable = true)
     private ZonedDateTime startedAt;
 
-    @Column()
+    @Column(nullable = true, updatable = true)
     private ZonedDateTime completedAt;
 
     @ElementCollection
     @CollectionTable(name = "session_summary_points", joinColumns = @JoinColumn(name = "session_id"))
-    @Column(name = "point", nullable = false)
+    @Column(nullable = false)
     @OrderColumn(name = "idx")
-    private List<String> summaryPointsOfFocus = new ArrayList<>();
+    private List<String> summaryPointsOfFocus;
 
     @ElementCollection
     @CollectionTable(name = "session_quiz_points", joinColumns = @JoinColumn(name = "session_id"))
-    @Column(name = "quiz_point", nullable = false)
+    @Column(nullable = false)
     @OrderColumn(name = "idx")
-    private List<String> quizPointsOfFocus = new ArrayList<>();
+    private List<String> quizPointsOfFocus;
 
     @Min(value = 0, message = "Quiz score cannot be negative")
     @Max(value = 10, message = "Quiz score cannot exceed 10")
@@ -88,15 +85,13 @@ public class Session {
     @Lob
     private String lessonContent;
 
-
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "session_id")
+    @OrderColumn(name = "idx")
+    private List<QuizElement> quizElements;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "session_id") // FK lives on child table
+    @JoinColumn(name = "session_id")
     @OrderColumn(name = "idx")
-    private List<QuizElement> quizElements = new ArrayList<>();
-
-    @ElementCollection
-    @CollectionTable(name = "session_qna", joinColumns = @JoinColumn(name = "session_id"))
-    @OrderColumn(name = "idx")
-    private List<QAElement> qnaElements = new ArrayList<>();
+    private List<QnAElement> qnaElements;
 }

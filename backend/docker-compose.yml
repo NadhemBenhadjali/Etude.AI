@@ -21,7 +21,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - Etude.ai
+      - etudeai
 
 #  # ---------- BACKEND SERVICE ----------
 #  backend:
@@ -58,10 +58,10 @@ services:
       - ./ops/keycloak/data:/opt/keycloak/data
       - ./ops/keycloak/themes:/opt/keycloak/themes
     networks:
-      - Etude.ai
+      - etudeai
 
 networks:
-  Etude.ai:
+  etudeai:
     driver: bridge
 
 
