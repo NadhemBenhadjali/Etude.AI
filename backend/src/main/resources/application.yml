@@ -10,6 +10,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/Etudeai
     username: admin
     password: admin
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,12 +18,15 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
   security:
-    resourceserver:
-      jwt:
-        jwk-set-uri: "http://localhost:8083/realms/etudeAi/protocol/openid-connect/certs"
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8083/realms/etudeAi
+
 logging:
   level:
     org.springframework.security: INFO
+
 springdoc:
   api-docs:
     enabled: true
