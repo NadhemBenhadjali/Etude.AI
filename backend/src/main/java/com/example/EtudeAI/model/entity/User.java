@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user")
+@Table(name = "client")
 @Getter
 @Setter
 @Builder
@@ -43,7 +43,7 @@ public class User {
     private UUID id;
 
     @Column(name = "keycloak_user_id", unique = true, nullable = false, length = 36)
-    private String keycloakUserId;
+    private String keycloakClientId;
 
     @Email(message = "Email must be a valid address")
     @NotBlank(message = "Email cannot be blank")

@@ -17,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class QuizElement {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)

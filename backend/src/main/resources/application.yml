@@ -17,9 +17,11 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: "http://localhost:8083/realms/etudeAi/protocol/openid-connect/certs"
+
 logging:
   level:
     org.springframework.security: INFO
+
 server:
   port: 8081
 
@@ -31,4 +33,8 @@ keycloak:
   client-id: backend
   client-secret: "tUrff0wg8nsWqy1nTZIHoOTpMUw8A65p"
 
-
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
