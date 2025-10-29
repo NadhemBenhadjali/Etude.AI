@@ -34,21 +34,11 @@ spring:
         jwt:
           issuer-uri: ${app.security.issuer-uri}
 
-# App-specific settings used by SecurityConfig
 app:
   security:
     issuer-uri: http://localhost:8083/realms/etudeAi
     client-id: backend
     client-secret: tUrff0wg8nsWqy1nTZIHoOTpMUw8A65p
-    allowed-origins: "http://localhost:4200"
   frontend:
     base-url: http://localhost:4200
 
-#keycloak:
-#  base-url: http://localhost:8083
-#  realm: etudeAi
-#  admin-realm: etudeAi
-#  admin-username: admin
-#  admin-password: admin
-#  client-id: backend
-#  client-secret: tUrff0wg8nsWqy1nTZIHoOTpMUw8A65p
