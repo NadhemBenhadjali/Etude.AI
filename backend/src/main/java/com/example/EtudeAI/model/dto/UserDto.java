@@ -1,19 +1,22 @@
 package com.example.EtudeAI.model.dto;
 
 import com.example.EtudeAI.model.enums.Level;
-import java.util.Date;
+import com.example.EtudeAI.model.enums.Role;
+
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 public record UserDTO(
         UUID id,
-        String keycloakId,
+        String keycloakUserId,
         String email,
         String firstname,
         String lastname,
-        String phoneNumber,
-        Date birthDate,
+        LocalDate birthDate,
         Level level,
         Integer elo,
-        String createdAt,
-        String updatedAt
+        Role role,
+        ZonedDateTime createdAt,
+        ZonedDateTime updatedAt
 ) {}

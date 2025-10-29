@@ -1,9 +1,12 @@
 package com.example.EtudeAI.model.entity;
 
+import com.example.EtudeAI.model.enums.Level;
 import com.example.EtudeAI.model.enums.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -12,13 +15,12 @@ import java.util.UUID;
 @Table(name = "session")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Session {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(updatable = false, nullable = false)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -26,45 +28,70 @@ public class Session {
     @NotNull(message = "User must be specified")
     private User user;
 
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Level is required")
     @Column(nullable = false)
-    @NotBlank(message = "Subject must not be blank")
+    private Level level;
+
+    @NotBlank(message = "Subject cannot be blank")
+    @Column(nullable = false)
     private String subject;
 
+    @NotBlank(message = "Module cannot be blank")
     @Column(nullable = false)
-    @NotBlank(message = "Module must not be blank")
     private String module;
 
+    @NotBlank(message = "Lesson cannot be blank")
     @Column(nullable = false)
-    @NotBlank(message = "Lesson must not be blank")
     private String lesson;
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "Status is required")
     @Column(nullable = false)
-    @NotNull(message = "Status must be specified")
-    private Status status = Status.PENDING;
+    private Status status;
 
-    @Column(updatable = false, nullable = false)
-    private ZonedDateTime createdAt = ZonedDateTime.now();
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private ZonedDateTime createdAt;
 
+    @Column(nullable = true, updatable = true)
     private ZonedDateTime startedAt;
 
+    @Column(nullable = true, updatable = true)
     private ZonedDateTime completedAt;
 
     @ElementCollection
-    @CollectionTable(name = "session_main_points", joinColumns = @JoinColumn(name = "session_id"))
-    @Column(name = "main_point")
-    private List<String> mainPoints;
+    @CollectionTable(name = "session_summary_points", joinColumns = @JoinColumn(name = "session_id"))
+    @Column(nullable = false)
+    @OrderColumn(name = "idx")
+    private List<String> summaryPointsOfFocus;
 
     @ElementCollection
-    @CollectionTable(name = "session_quiz_evaluation", joinColumns = @JoinColumn(name = "session_id"))
-    @Column(name = "quiz_evaluation")
-    private List<String> quizEvaluation;
+    @CollectionTable(name = "session_quiz_points", joinColumns = @JoinColumn(name = "session_id"))
+    @Column(nullable = false)
+    @OrderColumn(name = "idx")
+    private List<String> quizPointsOfFocus;
 
-    @Min(value = 0, message = "Quiz score must be >= 0")
-    @Max(value = 10, message = "Quiz score must be <= 10")
+    @Min(value = 0, message = "Quiz score cannot be negative")
+    @Max(value = 10, message = "Quiz score cannot exceed 10")
     private Integer quizScore;
 
     @Lob
-    @Column(columnDefinition = "TEXT")
-    private String report;
+    private String summary;
+
+    @Lob
+    private String sessionFeedback;
+
+    @Lob
+    private String lessonContent;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "session_id")
+    @OrderColumn(name = "idx")
+    private List<QuizElement> quizElements;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "session_id")
+    @OrderColumn(name = "idx")
+    private List<QnAElement> qnaElements;
 }

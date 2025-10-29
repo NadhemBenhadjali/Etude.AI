@@ -1,75 +1,98 @@
 package com.example.EtudeAI.model.entity;
 
 import com.example.EtudeAI.model.enums.Level;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import com.example.EtudeAI.model.enums.Role;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user")
+@Table(name = "client")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(updatable = false, nullable = false)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
-    @NotBlank(message = "Keycloak ID must not be blank")
-    private String keycloakId;
+    @Column(name = "keycloak_user_id", unique = true, nullable = false, length = 36)
+    private String keycloakUserId;
 
-    @Column(nullable = false, unique = true)
-    @Email(message = "Email must be valid")
-    @NotBlank(message = "Email must not be blank")
+    @Email(message = "Email must be a valid address")
+    @NotBlank(message = "Email cannot be blank")
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @NotBlank(message = "First name cannot be blank")
+    @Size(max = 50, message = "First name cannot exceed 50 characters")
+    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ\\-\\s]+$", message = "First name can only contain letters, spaces, or hyphens")
     @Column(nullable = false)
-    @NotBlank(message = "Firstname must not be blank")
-    @Size(min = 2, max = 50, message = "Firstname must be between 2 and 50 characters")
     private String firstname;
 
+    @NotBlank(message = "Last name cannot be blank")
+    @Size(max = 50, message = "Last name cannot exceed 50 characters")
+    @Pattern(regexp = "^[A-Za-zÀ-ÖØ-öø-ÿ\\-\\s]+$", message = "Last name can only contain letters, spaces, or hyphens")
     @Column(nullable = false)
-    @NotBlank(message = "Lastname must not be blank")
-    @Size(min = 2, max = 50, message = "Lastname must be between 2 and 50 characters")
     private String lastname;
 
-    @Column(length = 15)
-    @Size(min = 6, max = 15, message = "Phone number must be between 6 and 15 digits")
-    @Pattern(regexp = "^[0-9]*$", message = "Phone number must contain only digits")
-    private String phoneNumber;
-
-    @Temporal(TemporalType.DATE)
-    @NotNull(message = "Birth date must be specified")
-    private Date birthDate;
+    @Past(message = "Birth date must be in the past")
+    @NotNull(message = "Birth date is required")
+    @Column(nullable = false)
+    private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "Level is required")
     @Column(nullable = false)
-    @NotNull(message = "Level must be specified")
     private Level level;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Note> strongPoints;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Note> weakPoints;
-
+    @NotNull(message = "Elo is required")
+    @Min(value = 0, message = "Elo cannot be negative")
     @Column(nullable = false)
-    @Min(value = 0, message = "ELO must be greater than or equal to 0")
     private Integer elo;
 
-    @Column(updatable = false, nullable = false)
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Role is required")
+    @Column(nullable = false)
+    private Role role;
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private ZonedDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(nullable = false)
     private ZonedDateTime updatedAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Session> sessions;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Note> notes;
 }

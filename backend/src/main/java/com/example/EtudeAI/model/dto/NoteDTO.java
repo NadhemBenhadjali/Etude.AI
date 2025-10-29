@@ -1,13 +1,17 @@
 package com.example.EtudeAI.model.dto;
 
-import java.util.Date;
+import com.example.EtudeAI.model.enums.Level;
+import com.example.EtudeAI.model.enums.NoteType;
+
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 public record NoteDTO(
         UUID id,
-        UUID userId,
+        NoteType noteType,
         String content,
-        Date date,
+        ZonedDateTime date,
+        Level level,
         String subject,
         String module,
         String lesson
