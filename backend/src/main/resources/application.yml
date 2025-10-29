@@ -23,10 +23,6 @@ spring:
         jwt:
           issuer-uri: http://localhost:8083/realms/etudeAi
 
-logging:
-  level:
-    org.springframework.security: INFO
-
 springdoc:
   api-docs:
     enabled: true
