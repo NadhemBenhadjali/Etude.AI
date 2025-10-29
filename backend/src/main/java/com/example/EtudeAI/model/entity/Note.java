@@ -1,12 +1,10 @@
 package com.example.EtudeAI.model.entity;
 
-import com.example.EtudeAI.model.enums.Level;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -16,7 +14,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Note {
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(updatable = false, nullable = false)
@@ -27,28 +24,16 @@ public class Note {
     @NotNull(message = "User must be specified")
     private User user;
 
-    @Column(nullable = false)
     @NotBlank(message = "Content must not be blank")
+    @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
     @NotNull(message = "Date must be specified")
+    @Column(nullable = false)
     private ZonedDateTime date;
 
-    @Enumerated(EnumType.STRING)
-    @NotNull(message = "Level is required")
-    @Column(nullable = false)
-    private Level level;
-
-    @Column(nullable = false)
-    @NotBlank(message = "Subject must not be blank")
-    private String subject;
-
-    @Column(nullable = false)
-    @NotBlank(message = "Module must not be blank")
-    private String module;
-
-    @Column(nullable = false)
-    @NotBlank(message = "Lesson must not be blank")
-    private String lesson;
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "course_id", nullable = false, unique = true)
+    @NotNull(message = "Course must be specified")
+    private Course course;
 }

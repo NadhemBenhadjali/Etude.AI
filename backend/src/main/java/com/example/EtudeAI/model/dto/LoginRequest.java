@@ -1,4 +1,3 @@
-// src/main/java/com/example/EtudeAI/model/dto/LoginRequest.java
 package com.example.EtudeAI.model.dto;
 
 import jakarta.validation.constraints.Email;

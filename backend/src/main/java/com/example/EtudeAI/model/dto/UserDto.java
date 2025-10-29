@@ -1,4 +1,3 @@
-// src/main/java/com/example/EtudeAI/model/dto/UserDto.java
 package com.example.EtudeAI.model.dto;
 
 import com.example.EtudeAI.model.enums.Level;
