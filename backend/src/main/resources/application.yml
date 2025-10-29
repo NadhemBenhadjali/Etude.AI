@@ -39,6 +39,5 @@ app:
     issuer-uri: http://localhost:8083/realms/etudeAi
     client-id: backend
     client-secret: tUrff0wg8nsWqy1nTZIHoOTpMUw8A65p
-  frontend:
-    base-url: http://localhost:4200
+
 
