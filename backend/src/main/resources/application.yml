@@ -25,14 +25,6 @@ logging:
 server:
   port: 8081
 
-keycloak:
-  base-url: http://localhost:8083
-  realm: etudeAi
-  admin-username: admin
-  admin-password: admin
-  client-id: backend
-  client-secret: "tUrff0wg8nsWqy1nTZIHoOTpMUw8A65p"
-
 springdoc:
   api-docs:
     enabled: true

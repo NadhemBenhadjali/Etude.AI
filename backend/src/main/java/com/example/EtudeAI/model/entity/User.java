@@ -43,7 +43,7 @@ public class User {
     private UUID id;
 
     @Column(name = "keycloak_user_id", unique = true, nullable = false, length = 36)
-    private String keycloakClientId;
+    private String keycloakUserId;
 
     @Email(message = "Email must be a valid address")
     @NotBlank(message = "Email cannot be blank")
