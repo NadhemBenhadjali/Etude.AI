@@ -1,6 +1,10 @@
+server:
+  port: 8081
+
 spring:
   application:
-      name: EtudeAI
+    name: EtudeAI
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/Etudeai
@@ -14,8 +18,21 @@ spring:
 
   security:
     oauth2:
+      # --- OIDC Login (Option A) ---
+      client:
+        registration:
+          keycloak:
+            client-id: ${app.security.client-id}
+            client-secret: ${app.security.client-secret}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope: openid,profile,email
+        provider:
+          keycloak:
+            issuer-uri: ${app.security.issuer-uri}
       resourceserver:
         jwt:
+          issuer-uri: ${app.security.issuer-uri}
           jwk-set-uri: "http://localhost:8083/realms/etudeAi/protocol/openid-connect/certs"
 
 logging:
@@ -25,6 +42,15 @@ logging:
 server:
   port: 8081
 
+<<<<<<< HEAD
+=======
+app:
+  security:
+    issuer-uri: http://localhost:8083/realms/etudeAi
+    client-id: backend
+    client-secret: tUrff0wg8nsWqy1nTZIHoOTpMUw8A65p
+
+>>>>>>> 96a3b49c24c12bb7de4992adcf5e27bb80aa5a04
 springdoc:
   api-docs:
     enabled: true
