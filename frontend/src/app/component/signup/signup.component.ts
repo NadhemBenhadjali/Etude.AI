@@ -1,77 +1,47 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common'; 
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router'; 
-import { NgForm } from '@angular/forms';
-
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { ProfileSyncService } from '../../services/profile-sync.service';
+import { KcAuthService } from '../../services/kc-auth.service';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css']
 })
 export class SignupComponent {
-  lastName = '';
-  name = '';
-  email = '';
-  password = '';
-  confirmPassword = '';
+  form: FormGroup;
+  submitting = false;
 
-  avatars: string[] = [
-    'assets/images/monster.png',
-    'assets/images/puss-in-boots.png',
-    'assets/images/unicorn.png',
-    'assets/images/witch.png',
-    'assets/images/wizard.png',
-    'assets/images/dino.png',
-    'assets/images/thinking.png',
-    'assets/images/read.png',
-    'assets/images/school.png',
-    'assets/images/corgi.png',
-    'assets/images/panda.png',
-    'assets/images/hi.png',
-  ];
-  selectedAvatar: string = '';
-
-  // ✅ Inject the Router
-  constructor(private router: Router) {}
-
-  selectAvatar(avatar: string) {
-    this.selectedAvatar = avatar;
+  constructor(
+    private fb: FormBuilder,
+    private kc: KcAuthService,
+    private sync: ProfileSyncService,
+    private router: Router
+  ) {
+    this.form = this.fb.group({
+      firstname: ['', [Validators.required, Validators.maxLength(50)]],
+      lastname: ['', [Validators.required, Validators.maxLength(50)]],
+      birthDate: ['', [Validators.required]],
+      level: ['FIRST', [Validators.required]]
+    });
   }
 
-  signup() {
-    if (this.password !== this.confirmPassword) {
-      alert('Passwords do not match.');
-      return;
-    }
+  async onSubmit(): Promise<void> {
+    if (this.form.invalid) return;
+    this.submitting = true;
 
-    if (!this.selectedAvatar) {
-      alert('Please select an avatar.');
-      return;
-    }
-
-    console.log('Signed up with:', {
-      fullName: `${this.lastName}`,
-      email: this.email,
-      avatar: this.selectedAvatar
+    const { firstname, lastname, birthDate, level } = this.form.value;
+    this.sync.savePendingProfile({
+      firstname: firstname!,
+      lastname: lastname!,
+      birthDate: birthDate!,
+      level: level as 'FIRST' | 'SECOND' | 'THIRD'
     });
 
-    alert('تم التسجيل بنجاح');
-    this.router.navigate(['/signin']);
+    await this.kc.register(window.location.origin + '/');
   }
-
- 
-  goToSignIn(): void {
-    this.router.navigate(['/signin']);
-  }
-  onSubmit(form: NgForm) {
-  if (form.valid) {
-    
-    this.router.navigate(['/welcome']);
-  }
-}
-
 }

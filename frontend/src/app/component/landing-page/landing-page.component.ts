@@ -1,17 +1,21 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { KcAuthService } from '../../services/kc-auth.service';
 
 @Component({
   selector: 'app-landing-page',
-  standalone: true, 
+  standalone: true,
   imports: [CommonModule],
-  templateUrl: './landing-page.component.html',
-  styleUrls: ['./landing-page.component.css']
+  template: `<button (click)="goToSignIn()">ابدأ</button>`
 })
 export class LandingComponent {
-  constructor(private router: Router) {}
-goToSignIn(): void {
-    this.router.navigate(['/select-class']);
+  constructor(private router: Router, private kc: KcAuthService) {}
+  goToSignIn(): void {
+    if (this.kc.authenticated) {
+      this.router.navigate(['/select-class']);
+    } else {
+      this.kc.login();
+    }
   }
 }

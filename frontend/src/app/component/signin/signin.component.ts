@@ -1,26 +1,14 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { KcAuthService } from '../../services/kc-auth.service';
 
 @Component({
   selector: 'app-signin',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './signin.component.html',
-  styleUrls: ['./signin.component.css']
+  template: `<button (click)="login()">تسجيل الدخول</button>`
 })
 export class SigninComponent {
-  constructor(private router: Router) {}
-
-  goToSignUp(): void {
-    this.router.navigate(['/signup']);
-  }
-
-  onSubmit(event: Event): void {
-    event.preventDefault();
-
-    // Here add your authentication logic
-    // For demo, we just navigate to landing page
-    this.router.navigate(['/landing']);
-  }
+  constructor(private kc: KcAuthService) {}
+  async login() { await this.kc.login(); }
 }
