@@ -4,18 +4,22 @@
   </div>
 
   <form class="signin-form" dir="rtl" lang="ar" aria-label="فورم تسجيل الدخول" (submit)="onSubmit($event)">
-    <h2>🌟 تسجيل الدخول 🌟</h2> 
+    <h2>🌟 تسجيل الدخول 🌟</h2>
 
-    <label for="email">📧 الإيميل</label>
-    <input type="email" id="email" name="email" placeholder="example@domain.com" required />
+    <label for="username">📧 اسم المستخدم</label>
+    <input type="text" id="username" name="username" [(ngModel)]="username" placeholder="اسم المستخدم" required />
 
     <label for="password">🔒 كلمة السر</label>
-    <input type="password" id="password" name="password" placeholder="********" required />
+    <input type="password" id="password" name="password" [(ngModel)]="password" placeholder="********" required />
+
+    <div *ngIf="errorMessage" class="error-message" style="color: red; margin-bottom: 10px;">
+      {{ errorMessage }}
+    </div>
 
     <button type="submit">🚀 ادخل</button>
 
     <p class="signup-link">
       ماعندكش حساب؟ <a (click)="goToSignUp()" style="cursor:pointer;">✨ اعمل حساب جديد</a>
     </p>
-</form>
+  </form>
 </div>

@@ -4,6 +4,7 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { HttpClientModule, HttpClient, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
+import { firstValueFrom } from 'rxjs';
 
 import fallbackData from '../../../assets/lesson.json';
 
@@ -41,7 +42,7 @@ export class LessonBoardComponent implements OnInit, OnDestroy { // Implement On
     private router: Router,
     private route: ActivatedRoute,
     private http: HttpClient
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.pingBackend();
@@ -170,26 +171,26 @@ export class LessonBoardComponent implements OnInit, OnDestroy { // Implement On
 
     // Stop any currently playing audio if it's different from the one we're about to play
     if (this.audioPlayer && this.currentAudioUrl !== null) {
-        this.stopSummary();
+      this.stopSummary();
     }
 
 
     try {
       console.log('Requesting TTS for text:', plainText);
-      const response = await this.http.post(`${this.backendBase}/tts`, { text: plainText }, {
+      const response = await firstValueFrom(this.http.post(`${this.backendBase}/tts`, { text: plainText }, {
         responseType: 'blob' // Important: Expect a Blob for audio files
-      }).toPromise();
+      }));
 
       if (response instanceof Blob) {
         const audioUrl = URL.createObjectURL(response);
         this.currentAudioUrl = audioUrl; // Store the URL
 
         if (this.audioPlayer) {
-            this.audioPlayer.pause();
-            this.audioPlayer.currentTime = 0;
-            this.audioPlayer.src = audioUrl;
+          this.audioPlayer.pause();
+          this.audioPlayer.currentTime = 0;
+          this.audioPlayer.src = audioUrl;
         } else {
-            this.audioPlayer = new Audio(audioUrl);
+          this.audioPlayer = new Audio(audioUrl);
         }
 
         // Event listener for when audio finishes

@@ -1,28 +1,82 @@
 import os
 import re
+from pathlib import Path
+from pydantic_settings import BaseSettings
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-# --- Environment & external service credentials (from original script) ---
-os.environ['TESSDATA_PREFIX'] = '/usr/share/tesseract-ocr/5/tessdata'
-os.environ["GEMINI_API_KEY"] = "AIzaSyA6qNq5Gc08rtJviKT_A3kd2p0o82o2KNo"
-os.environ["CHROMA_GOOGLE_GENAI_API_KEY"] = os.environ["GEMINI_API_KEY"]
-os.environ["QDRANT_URL"]="https://07cc33cb-f09d-4add-b07f-8440c6bbdb54.us-west-2-0.aws.cloud.qdrant.io:6333"
-os.environ["QDRANT_API_KEY"]="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.bbIl5bU8oQisaPH4D0TMBr4zz4mkuejR6Zp37izO-N4"
-PDF_PATH = "config_files/Book.pdf"  # ← change to your PDF if needed
-# Neo4j connection
-URI = "neo4j+s://2192f3cc.databases.neo4j.io"
-USER = "neo4j"
-PASSWORD = "hLTWxx2CxBqDkp66-XR0n-GJyz48V8f3unBdd6rXQ8A" 
-# --- Arabic font & images configuration (from original script) ---
-ARABIC_FONT_PATH = "config_files/NotoNaskhArabic-Regular.ttf"     # ← change if needed
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
+ENV_PATH = BASE_DIR / ".env"
+class Settings(BaseSettings):
+    # Environment
+    TESSDATA_PREFIX: str = '/usr/share/tesseract-ocr/5/tessdata'
+
+    # AI Keys
+    GEMINI_API_KEY: str
+    CHROMA_GOOGLE_GENAI_API_KEY: str = ""
+
+    # Qdrant
+    QDRANT_URL: str
+    QDRANT_API_KEY: str
+
+    # Neo4j
+    NEO4J_URI: str
+    NEO4J_USER: str
+    NEO4J_PASSWORD: str
+
+    # Ngrok
+    NGROK_AUTH_TOKEN: str | None = None
+
+    # Redis
+    REDIS_URL: str = "redis://redis:6379/0"
+
+
+    class Config:
+        env_file = str(ENV_PATH)
+        extra = "ignore"
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        if not self.CHROMA_GOOGLE_GENAI_API_KEY:
+            self.CHROMA_GOOGLE_GENAI_API_KEY = self.GEMINI_API_KEY
+
+
+# Initialize Settings
+settings = Settings()
+
+# --- Apply to Environment for libraries that rely on os.environ ---
+os.environ['TESSDATA_PREFIX'] = settings.TESSDATA_PREFIX
+os.environ["GEMINI_API_KEY"] = settings.GEMINI_API_KEY
+os.environ["CHROMA_GOOGLE_GENAI_API_KEY"] = settings.CHROMA_GOOGLE_GENAI_API_KEY
+os.environ["QDRANT_URL"] = settings.QDRANT_URL
+os.environ["QDRANT_API_KEY"] = settings.QDRANT_API_KEY
+
+# --- Neo4j Credentials ---
+URI = settings.NEO4J_URI
+USER = settings.NEO4J_USER
+PASSWORD = settings.NEO4J_PASSWORD
+
+# --- File Paths & Assets ---
+PDF_PATH = "config_files/Book.pdf"
+ARABIC_FONT_PATH = "config_files/NotoNaskhArabic-Regular.ttf"
 ARABIC_FONT_NAME = "NotoArabic"
-IMG_DIR = "config_files/book_images"     # adjust if your folder differs
-MAX_IMG_W = 180                           # pixel width allowed on page
-MAX_IMG_H = 140                           # pixel height allowed on page
+IMG_DIR = "config_files/book_images"
+MAX_IMG_W = 180
+MAX_IMG_H = 140
 
 # Markdown image tag regex
-MD_IMG = re.compile(r'!\[(.*?)\]\((.*?)\)')   # ![alt](path)
+MD_IMG = re.compile(r'!\[(.*?)\]\((.*?)\)')
 
-# Register the Arabic font
-pdfmetrics.registerFont(TTFont(ARABIC_FONT_NAME, ARABIC_FONT_PATH))
+# Register the Arabic font safely
+try:
+    pdfmetrics.registerFont(TTFont(ARABIC_FONT_NAME, ARABIC_FONT_PATH))
+except Exception as e:
+    print(f"Warning: Could not register font {ARABIC_FONT_PATH}. Ensure file exists. Error: {e}")
+
+embedder_cfg = {
+    "provider": "google-generativeai",
+    "config": {
+        "api_key": settings.GEMINI_API_KEY,
+        "model_name": "text-embedding-004",
+    },
+}

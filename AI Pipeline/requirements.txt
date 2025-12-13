@@ -1,0 +1,54 @@
+# Web Framework
+fastapi==0.120.0
+uvicorn==0.38.0
+python-multipart
+
+# Rate Limiting
+slowapi
+
+# AI & ML
+crewai==0.203.1
+crewai-tools==0.75.0
+langchain==0.3.27
+langchain-community==0.3.31
+langchain-core==0.3.79
+langchain-experimental==0.3.4
+langchain-google-genai==2.0.10
+langchain-huggingface==0.3.1
+langchain-text-splitters==0.3.11
+google-generativeai==0.8.5
+pyngrok==7.4.0
+
+# Databases
+neo4j==6.0.2
+qdrant-client==1.15.1
+redis
+
+# PDF & Image Processing
+reportlab==4.4.4
+Pillow==12.0.0
+
+# Arabic Text Processing
+arabic-reshaper==3.0.0
+python-bidi==0.6.6
+
+# Data Processing
+pandas==2.3.3
+pydantic==2.12.3
+pydantic-core==2.41.4
+pydantic-settings==2.11.0
+
+# HTTP & Utilities
+requests==2.32.5
+requests-oauthlib==2.0.0
+requests-toolbelt==1.0.0
+structlog
+
+# Testing
+pytest
+
+prometheus_client
+
+# Database Construction (Optional - only needed for setup scripts)
+# PyMuPDF
+# pytesseract

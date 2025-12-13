@@ -96,6 +96,14 @@ class KGWriter:
             sess.run("MATCH (n) DETACH DELETE n")
         print("✅ cleared database")
 
+    def create_indexes(self) -> None:
+        with self.driver.session() as sess:
+            # Create indexes for frequently queried nodes
+            sess.run("CREATE INDEX lesson_title_index IF NOT EXISTS FOR (n:Lesson) ON (n.title)")
+            sess.run("CREATE INDEX topic_name_index IF NOT EXISTS FOR (n:Topic) ON (n.name)")
+            sess.run("CREATE INDEX branch_name_index IF NOT EXISTS FOR (n:Branch) ON (n.name)")
+        print("✅ indexes created")
+
     def write(self, kg: dict) -> None:
         with self.driver.session() as sess:
             for branch, topics in kg.items():
@@ -191,6 +199,7 @@ if __name__ == "__main__":
         if CLEAR_DB_FIRST:
             kg_writer.clear_database()
 
+        kg_writer.create_indexes()
         kg_writer.write(KG)
         add_images_from_csv(driver, CSV_PATH)
         embed_lessons(driver, MODEL_NAME)

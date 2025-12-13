@@ -22,6 +22,13 @@
   animation: float 6s ease-in-out infinite;
 }
 
+/* Header Actions - Contains Chat Toggle & Profile Button */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .student-info {
   display: flex;
   align-items: center;
@@ -78,6 +85,27 @@
   gap: 0.5rem;
   color: #FF6F91;
   font-size: 1rem;
+}
+
+/* Profile Button */
+.go-profile-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  background: #5BBCFF;
+  color: #fff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.go-profile-btn:hover {
+  background: #4338ca;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 /* Chat Toggle */

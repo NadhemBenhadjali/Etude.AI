@@ -9,6 +9,7 @@
       </div>
       <div class="profile-info">
         <h1>{{ username }}</h1>
+        <p class="email" *ngIf="email">{{ email }}</p>
         <p class="rank">
           👑 {{ rank }}
         </p>
@@ -16,10 +17,19 @@
           🔥 {{ streak }} يوم متتالي
         </div>
       </div>
+
+      <!-- Action Buttons from Front2 -->
       <div class="start-learning">
         <button class="start-button" routerLink="/select-mode">
           <span>ابدأ تعلم</span>
-          <img src="/assets/images/sent.png" alt="Start Learning" />
+        </button>
+        <br>
+        <button class="start-button" routerLink="/dashboard">
+          <span>لوحة القيادة</span>
+        </button>
+        <!-- Added User Management Button -->
+        <button class="user-management-button" routerLink="/user-management">
+          <span>⚙️ إدارة الحساب</span>
         </button>
       </div>
     </div>
@@ -62,7 +72,11 @@
       </div>
       <div class="achievements-grid">
         <div class="achievement-card" *ngFor="let achievement of achievements" [class.locked]="!achievement.unlocked">
-          <span class="achievement-icon">{{ achievement.icon }}</span>
+          <!-- Handle both icon name string and google font icons -->
+                    <span class="achievement-icon">
+            {{ achievement.icon }}
+          </span>
+
           <h3>{{ achievement.name }}</h3>
           <p>{{ achievement.description }}</p>
           <div class="achievement-badge" *ngIf="achievement.unlocked">

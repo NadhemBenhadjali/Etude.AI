@@ -82,6 +82,9 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
+    @Column(length = 255)
+    private String avatar;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private ZonedDateTime createdAt;
@@ -95,4 +98,12 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Note> notes;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer totalQuizzes = 0;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Integer highestScore = 0;
 }

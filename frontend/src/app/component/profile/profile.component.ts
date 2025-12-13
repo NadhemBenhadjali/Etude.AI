@@ -1,13 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
-interface Achievement {
-  name: string;
-  description: string;
-  icon: string;
-  unlocked: boolean;
-}
+import { UserService, UserDTO } from '../../services/user.service';
+import { GamificationService, Achievement } from '../../services/gamification.service';
 
 interface Activity {
   icon: string;
@@ -22,64 +17,84 @@ interface Activity {
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  username = 'Aziz Souid';
-  avatar = '/assets/images/panda.png';
-  level = 4;
-  rank = 'المستكشف الفضولي';
-  streak = 4;
-  xp = 750;
-  xpToNextLevel = 1000;
-  completedLessons = 3;
-  completedQuizzes = 6;
-  highestStreak = 4;
+  private userService = inject(UserService);
+  private gamificationService = inject(GamificationService);
 
-  achievements: Achievement[] = [
-    {
-      name: 'المتعلم النشط',
-      description: 'أكمل 10 دروس',
-      icon: '📚',
-      unlocked: false
-    },
-    {
-      name: 'المفكر العميق',
-      description: 'أجاب على 20 سؤال بشكل صحيح',
-      icon: '💡',
-      unlocked: true
-    },
-    {
-      name: 'المثابر',
-      description: 'حافظ على التتابع لمدة 5 أيام',
-      icon: '🔥',
-      unlocked: false
-    }
-  ];
+  // Front2 Data Fields
+  username = 'Loading...';
+  email = '';
+  avatar = 'assets/images/panda.png';
+  level = 1;
+  rank = 'المستكشف الفضولي';
+  streak = 4; // Mock for now, could come from backend later
+
+  xp = 0;
+  xpToNextLevel = 1000;
+
+  completedLessons = 0;
+  completedQuizzes = 0;
+  highestStreak = 0;
+
+  achievements: Achievement[] = [];
 
   recentActivities: Activity[] = [
-    {
-      icon: '📚',
-      text: 'أكملت درس "الأعداد"'
-    },
-    {
-      icon: '🎯',
-      text: 'حصلت على 90% في اختبار الرياضيات'
-    },
-    {
-      icon: '⭐',
-      text: 'فزت بإنجاز "المتعلم النشط"'
-    }
+    { icon: '📚', text: 'أكملت درس "الأعداد"' },
+    { icon: '🎯', text: 'بدأت رحلة التعلم' }
   ];
 
-  constructor() { }
-
   ngOnInit(): void {
+    this.loadProfile();
+    this.loadAchievements();
+  }
+
+  loadProfile() {
+    this.userService.getCurrentUser().subscribe({
+      next: (user: UserDTO) => {
+        this.username = `${user.firstname} ${user.lastname}`;
+        this.email = user.email;
+        this.xp = user.elo || 0;
+        this.level = this.mapLevel(user.level);
+
+        // Map backend stats to UI
+        this.completedQuizzes = user.totalQuizzes || 0;
+        // Mock data for missing backend fields to keep UI rich
+        this.completedLessons = Math.floor(this.xp / 50);
+        this.highestStreak = Math.floor(Math.random() * 10);
+      },
+      error: (err) => {
+        console.error('Failed to load profile', err);
+        this.username = 'Guest';
+      }
+    });
+  }
+
+  loadAchievements() {
+    this.gamificationService.getMyAchievements().subscribe({
+      next: (data) => {
+        this.achievements = data;
+      },
+      error: (err) => console.error('Error loading achievements', err)
+    });
+  }
+
+  mapLevel(levelStr: string): number {
+    switch (levelStr) {
+      case 'FIRST': return 1;
+      case 'SECOND': return 2;
+      case 'THIRD': return 3;
+      case 'FOURTH': return 4;
+      case 'FIFTH': return 5;
+      case 'SIXTH': return 6;
+      default: return 1;
+    }
   }
 
   getLevelColor(): string {
     const colors = ['#FF6F91', '#FF9671', '#FFC75F', '#F9F871'];
-    return colors[this.level % colors.length];
+    return colors[(this.level - 1) % colors.length];
   }
 
   getXpPercentage(): number {
     return (this.xp / this.xpToNextLevel) * 100;
   }
-} 
+}

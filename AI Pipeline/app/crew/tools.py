@@ -1,20 +1,28 @@
-from crewai_tools import QdrantVectorSearchTool
+from crewai.tools import BaseTool
 import os
 import google.generativeai as genai
+from pydantic import BaseModel, Field
+from typing import Type, List, Any
+from app.crew.knowledge_graph import Neo4jKG
 
-def configure_gemini():
-    genai.configure(os.getenv("GEMINI_API_KEY"))
+class LessonRetrievalInput(BaseModel):
+    topic_name: str
 
-def embed(text: str):
-    res = genai.embed_content(model="text-embedding-004", content=text)
-    emb = res.get("embedding")
-    return emb["values"] if isinstance(emb, dict) and "values" in emb else emb
+class LessonRetrieverTool(BaseTool):
+    name: str = "get_lessons_for_topic"
+    description: str = (
+        "يسترجع قائمة بالدروس (بعناوينها وأرقام الصفحات) المتعلقة بموضوع معين في قاعدة المعرفة."
+        " أدخل اسم الموضوع بدقة مثل 'Fractions' أو 'Electricity'."
+    )
+    args_schema: Type[BaseModel] = LessonRetrievalInput
 
-qdrant_tool = QdrantVectorSearchTool(
-    qdrant_url=os.getenv("QDRANT_URL"),
-    qdrant_api_key=os.getenv("QDRANT_API_KEY"),
-    collection_name="etudeai",
-    limit=5,
-    score_threshold=0.35,
-    custom_embedding_fn=embed
-)
+    def __init__(self, kg: Neo4jKG):
+        super().__init__()
+        object.__setattr__(self, "_kg", kg)
+
+    def _run(self, topic_name: str, **kwargs: Any) -> List[dict]:
+        print(f"fetching lessons for topic: {topic_name}")
+        return self._kg.get_lessons_for_topic(topic_name)
+
+    def _arun(self, *args: Any, **kwargs: Any) -> Any:
+        raise NotImplementedError("This tool does not support async execution")

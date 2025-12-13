@@ -17,9 +17,17 @@
 }
 
 @keyframes backgroundMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* === Shared Form Container === */
@@ -37,12 +45,19 @@
   overflow: hidden;
   animation: slideUp 1s ease forwards;
   font-family: 'FredFredburgerARAHeadBlack', sans-serif;
-  
+
 }
 
 @keyframes slideUp {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* === Headings === */
@@ -57,7 +72,9 @@
 }
 
 @keyframes bounce {
-  to { transform: translateY(-5px); }
+  to {
+    transform: translateY(-5px);
+  }
 }
 
 /* === Input Groups === */
@@ -67,6 +84,7 @@
 }
 
 .input-group input,
+.input-group select,
 .signin-form input {
   width: 100%;
   padding: 0.65rem 1rem;
@@ -77,6 +95,17 @@
   box-sizing: border-box;
   font-family: 'FredFredburgerARAHeadBlack', sans-serif;
   transition: all 0.3s ease;
+}
+
+.input-group select {
+  cursor: pointer;
+  text-align: right;
+  padding-right: 1rem;
+}
+
+.input-group input[type="date"] {
+  text-align: right;
+  direction: rtl;
 }
 
 .input-group label,
@@ -92,7 +121,8 @@
 
 /* Input focus effect */
 .signin-form input:focus,
-.input-group input:focus {
+.input-group input:focus,
+.input-group select:focus {
   outline: none;
   border-color: #7EA1FF;
   box-shadow: 0 0 8px #7EA1FFAA;
@@ -152,6 +182,7 @@ button:hover:enabled {
   border-color: #5a1bd4;
   transform: scale(1.1);
 }
+
 .simple-link {
 
   margin: 1.3rem 0 0 0;
@@ -198,7 +229,15 @@ button:hover:enabled {
 }
 
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
 }

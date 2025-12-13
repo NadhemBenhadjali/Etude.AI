@@ -5,7 +5,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct, Distance, VectorParams, PayloadSchemaType, Filter, FieldCondition, MatchValue, Range
 
 # ---- config (use env; rotate your leaked key!) ----
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyCVnreRO2aIosNcG6FwgvnIYYdeSvDO-YI")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyCMXmtbs6fu3YuLhtbUwS4wM0t0_Izc4xQ")
 QDRANT_URL = os.getenv("QDRANT_URL", "https://07cc33cb-f09d-4add-b07f-8440c6bbdb54.us-west-2-0.aws.cloud.qdrant.io:6333")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.bbIl5bU8oQisaPH4D0TMBr4zz4mkuejR6Zp37izO-N4")
 COLLECTION = "etudeai"

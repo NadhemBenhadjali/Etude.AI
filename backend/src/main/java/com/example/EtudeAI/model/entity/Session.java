@@ -76,13 +76,13 @@ public class Session {
     @Max(value = 10, message = "Quiz score cannot exceed 10")
     private Integer quizScore;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String summary;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String sessionFeedback;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String lessonContent;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

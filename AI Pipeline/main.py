@@ -3,11 +3,19 @@ import nest_asyncio, uvicorn
 from pyngrok import ngrok, conf
 from fastapi import FastAPI
 from app.app import app
+from app.crew.config import settings
 
 if __name__ == "__main__":
     nest_asyncio.apply()
-    os.environ['ngrok_authToken']='2yMaZ6btidIIiv3fwpkG287hAOT_2ezDgPqKcpGa2w9Z3WpxT'
-    conf.get_default().auth_token = os.environ["ngrok_authToken"]
-    public_url = ngrok.connect(8000)
-    print("Public URL:", public_url)
+
+    # Only run ngrok if token is provided in env
+    if settings.NGROK_AUTH_TOKEN:
+        os.environ['ngrok_authToken'] = settings.NGROK_AUTH_TOKEN
+        conf.get_default().auth_token = settings.NGROK_AUTH_TOKEN
+        try:
+            public_url = ngrok.connect(8000)
+            print("Public URL:", public_url)
+        except Exception as e:
+            print(f"Ngrok connection failed: {e}")
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,0 +1,230 @@
+<div class="user-management-container" dir="rtl">
+  <div class="user-management-box">
+    <div class="header">
+      <h1>⚙️ إدارة الحساب</h1>
+      <button class="back-button" routerLink="/profile">
+        ← رجوع للملف الشخصي
+      </button>
+    </div>
+
+    <div *ngIf="error" class="alert alert-error">
+      ⚠️ {{ error }}
+    </div>
+
+    <div *ngIf="successMessage" class="alert alert-success">
+      ✅ {{ successMessage }}
+    </div>
+
+    <div *ngIf="loading" class="loading-spinner">
+      <div class="spinner"></div>
+      <p>جاري التحميل...</p>
+    </div>
+
+    <!-- PROFILE FORM -->
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+      <div class="form-section">
+        <h2>📝 المعلومات الشخصية</h2>
+
+        <!-- NEW: Email -->
+        <div class="form-group">
+          <label for="email">البريد الإلكتروني *</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            placeholder="example@email.com"
+          />
+          <div
+            class="error-message"
+            *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched"
+          >
+            البريد الإلكتروني غير صالح
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="firstname">الاسم الأول *</label>
+          <input
+            type="text"
+            id="firstname"
+            formControlName="firstname"
+            placeholder="أدخل اسمك الأول"
+          />
+          <div
+            class="error-message"
+            *ngIf="userForm.get('firstname')?.invalid && userForm.get('firstname')?.touched"
+          >
+            الاسم الأول مطلوب
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="lastname">اسم العائلة *</label>
+          <input
+            type="text"
+            id="lastname"
+            formControlName="lastname"
+            placeholder="أدخل اسم عائلتك"
+          />
+          <div
+            class="error-message"
+            *ngIf="userForm.get('lastname')?.invalid && userForm.get('lastname')?.touched"
+          >
+            اسم العائلة مطلوب
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="birthDate">تاريخ الميلاد *</label>
+          <input type="date" id="birthDate" formControlName="birthDate" />
+          <div
+            class="error-message"
+            *ngIf="userForm.get('birthDate')?.invalid && userForm.get('birthDate')?.touched"
+          >
+            تاريخ الميلاد مطلوب
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="level">السنة الدراسية 📚</label>
+          <select id="level" formControlName="level">
+            <option value="FIRST">السنة الاولى</option>
+            <option value="SECOND">السنة الثانية</option>
+            <option value="THIRD">السنة الثالثة</option>
+            <option value="FOURTH">السنة الرابعة</option>
+            <option value="FIFTH">السنة الخامسة</option>
+            <option value="SIXTH">السنة السادسة</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-section" *ngIf="currentUser">
+        <h2>ℹ️ معلومات إضافية</h2>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">📧 البريد الإلكتروني</span>
+            <span class="info-value">{{ currentUser.email }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">🏆 نقاط Elo</span>
+            <span class="info-value">{{ currentUser.elo || 0 }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">👤 الدور</span>
+            <span class="info-value">{{ currentUser.role }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">📅 تاريخ الإنشاء</span>
+            <span class="info-value">{{ currentUser.createdAt | date: 'short' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="userForm.invalid || loading"
+        >
+          <span>💾 حفظ التغييرات</span>
+        </button>
+
+        <button
+          type="button"
+          class="btn-danger"
+          (click)="onDelete()"
+          *ngIf="currentUser"
+          [disabled]="loading"
+        >
+          <span>🗑️ حذف الحساب</span>
+        </button>
+      </div>
+    </form>
+
+    <!-- PASSWORD FORM -->
+    <div class="form-section" *ngIf="!loading && currentUser">
+      <h2>🔒 تغيير كلمة المرور</h2>
+
+      <div *ngIf="passwordError" class="alert alert-error">
+        ⚠️ {{ passwordError }}
+      </div>
+
+      <div *ngIf="passwordSuccess" class="alert alert-success">
+        ✅ {{ passwordSuccess }}
+      </div>
+
+      <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
+        <div class="form-group">
+          <label for="currentPassword">كلمة المرور الحالية *</label>
+          <input
+            type="password"
+            id="currentPassword"
+            formControlName="currentPassword"
+            placeholder="أدخل كلمة المرور الحالية"
+          />
+          <div
+            class="error-message"
+            *ngIf="
+              passwordForm.get('currentPassword')?.invalid &&
+              passwordForm.get('currentPassword')?.touched
+            "
+          >
+            كلمة المرور الحالية مطلوبة
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="newPassword">كلمة المرور الجديدة *</label>
+          <input
+            type="password"
+            id="newPassword"
+            formControlName="newPassword"
+            placeholder="أدخل كلمة مرور جديدة"
+          />
+          <div
+            class="error-message"
+            *ngIf="
+              passwordForm.get('newPassword')?.invalid &&
+              passwordForm.get('newPassword')?.touched
+            "
+          >
+            كلمة المرور يجب أن تكون على الأقل 6 أحرف
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">تأكيد كلمة المرور الجديدة *</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            placeholder="أعد كتابة كلمة المرور الجديدة"
+          />
+          <div
+            class="error-message"
+            *ngIf="
+              passwordForm.hasError('passwordsMismatch') &&
+              passwordForm.get('confirmPassword')?.touched
+            "
+          >
+            كلمتا المرور غير متطابقتين
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="passwordForm.invalid || loading"
+          >
+            <span>🔒 حفظ كلمة المرور الجديدة</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

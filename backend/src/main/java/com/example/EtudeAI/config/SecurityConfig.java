@@ -18,25 +18,27 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 @Configuration
 public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain api(HttpSecurity http) throws Exception {
+    SecurityFilterChain api(HttpSecurity http, RateLimitingFilter rateLimitingFilter) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()
-                        .anyRequest().permitAll()
-                )
+                        .anyRequest().permitAll())
+                .addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class)
                 .oauth2ResourceServer(oauth -> oauth
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(keycloakAuthoritiesConverter()))
-                );
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(keycloakAuthoritiesConverter())));
         return http.build();
     }
 
@@ -48,14 +50,16 @@ public class SecurityConfig {
             Map<String, Object> realmAccess = jwt.getClaim("realm_access");
             if (realmAccess instanceof Map<?, ?> m) {
                 Object rs = m.get("roles");
-                if (rs instanceof Collection<?> c) c.forEach(r -> roles.add(String.valueOf(r)));
+                if (rs instanceof Collection<?> c)
+                    c.forEach(r -> roles.add(String.valueOf(r)));
             }
             Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
             if (resourceAccess instanceof Map<?, ?> resources) {
                 resources.values().forEach(v -> {
                     if (v instanceof Map<?, ?> client) {
                         Object cr = client.get("roles");
-                        if (cr instanceof Collection<?> c) c.forEach(r -> roles.add(String.valueOf(r)));
+                        if (cr instanceof Collection<?> c)
+                            c.forEach(r -> roles.add(String.valueOf(r)));
                     }
                 });
             }
@@ -74,8 +78,8 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowedOrigins(List.of("http://localhost:4200"));
-        cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
-        cfg.setAllowedHeaders(List.of("Authorization","Content-Type"));
+        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        cfg.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         cfg.setAllowCredentials(true);
         cfg.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

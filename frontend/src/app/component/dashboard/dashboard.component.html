@@ -3,7 +3,9 @@
   <div class="dashboard-header">
     <div class="student-info">
       <div class="student-avatar">
-        <img [src]="studentData.avatar" [alt]="studentData.name">
+        <a routerLink="/profile">
+          <img src="assets/images/panda.png" [alt]="studentData?.name">
+        </a>
         <div class="status-indicator" [class.online]="studentData.isOnline"></div>
       </div>
       <div class="student-details">
@@ -15,11 +17,16 @@
         </div>
       </div>
     </div>
-    
-    <!-- Chat Icon -->
-    <div class="chat-toggle" (click)="toggleChat()" [class.active]="chatOpen">
-      <span class="chat-icon">💬</span>
-      <span class="chat-notification" *ngIf="hasNewMessages">{{newMessagesCount}}</span>
+
+    <!-- Header Actions - Chat Toggle & Profile Button -->
+    <div class="header-actions">
+      <button class="go-profile-btn" routerLink="/profile">
+        👤 الملف الشخصي
+      </button>
+      <div class="chat-toggle" (click)="toggleChat()" [class.active]="chatOpen">
+        <span class="chat-icon">💬</span>
+        <span class="chat-notification" *ngIf="hasNewMessages">{{newMessagesCount}}</span>
+      </div>
     </div>
   </div>
 
@@ -28,23 +35,23 @@
     <div class="section-header">
       <span class="section-icon">📅</span>
       <h2>التقويم الدراسي</h2>
-      
+
       <!-- Calendar View Toggle -->
       <div class="calendar-view-toggle">
-        <button 
-          class="view-toggle-btn" 
+        <button
+          class="view-toggle-btn"
           [class.active]="currentCalendarView === 'month'"
           (click)="setCalendarView('month')">
           📅
         </button>
-        <button 
-          class="view-toggle-btn" 
+        <button
+          class="view-toggle-btn"
           [class.active]="currentCalendarView === 'list'"
           (click)="setCalendarView('list')">
           📋
         </button>
-        <button 
-          class="view-toggle-btn" 
+        <button
+          class="view-toggle-btn"
           [class.active]="currentCalendarView === 'card'"
           (click)="setCalendarView('card')">
           🗂️
@@ -64,19 +71,19 @@
           <div class="day-header" *ngFor="let day of weekDays">{{day}}</div>
         </div>
         <div class="calendar-days">
-          <div class="calendar-day" 
-               *ngFor="let day of calendarDays" 
+          <div class="calendar-day"
+               *ngFor="let day of calendarDays"
                [class]="day.status"
                [class.today]="day.isToday"
                [class.has-sessions]="day.sessions.length > 0"
                [class.other-month]="!day.isCurrentMonth"
                (click)="selectDay(day)">
             <span class="day-number">{{day.number}}</span>
-            
+
             <!-- Session Names Display -->
             <div class="day-sessions" *ngIf="day.sessions.length > 0">
-              <div class="session-item" 
-                   *ngFor="let session of day.sessions; let i = index" 
+              <div class="session-item"
+                   *ngFor="let session of day.sessions; let i = index"
                    [class]="session.status"
                    [class.hidden]="i >= 2">
                 <span class="session-name">{{session.sessionName}}</span>
@@ -96,8 +103,8 @@
         <h3>الجلسات القادمة</h3>
       </div>
       <div class="sessions-list">
-        <div class="list-session-item" 
-             *ngFor="let session of getUpcomingSessions()" 
+        <div class="list-session-item"
+             *ngFor="let session of getUpcomingSessions()"
              [class]="session.status">
           <div class="session-date">
             <div class="date-number">{{ formatArabicDay(session.date) }}</div>
@@ -115,8 +122,8 @@
             </div>
           </div>
           <div class="session-actions">
-            <button 
-              class="action-btn" 
+            <button
+              class="action-btn"
               *ngIf="session.status !== 'completed'"
               (click)="startSession(session)">
               ابدأ
@@ -129,8 +136,8 @@
     <!-- Card View Calendar -->
     <div class="calendar-card-view" *ngIf="currentCalendarView === 'card'">
       <div class="cards-container">
-        <div class="session-card-item" 
-             *ngFor="let session of getUpcomingSessions()" 
+        <div class="session-card-item"
+             *ngFor="let session of getUpcomingSessions()"
              [class]="session.status">
           <div class="card-header">
             <div class="card-date">
@@ -141,16 +148,16 @@
               <span class="status-dot"></span>
             </div>
           </div>
-          
+
           <div class="card-content">
             <h3>{{session.sessionName}}</h3>
             <p class="card-chapter">{{session.chapterName}}</p>
             <p class="card-description">{{session.description}}</p>
-            
+
             <div class="card-footer">
               <span class="card-time">🕐 {{session.time || 'غير محدد'}}</span>
-              <button 
-                class="card-action-btn" 
+              <button
+                class="card-action-btn"
                 *ngIf="session.status !== 'completed'"
                 (click)="startSession(session)">
                 ابدأ الجلسة
@@ -161,7 +168,7 @@
       </div>
     </div>
   </div>
-  
+
 
   <!-- Recent Activities -->
   <div class="section recent-activities">
@@ -233,96 +240,97 @@
   </div>
 
   <!-- Chat Window -->
-<div class="chat-window" [class.open]="chatOpen">
-  <div class="chat-header">
-    <div class="chat-agent-info">
-      <div class="agent-avatar">🤖</div>
-      <div class="agent-details">
-        <h3>مساعد إدارة الجلسات</h3>
-        <span class="agent-status">متصل</span>
+  <div class="chat-window" [class.open]="chatOpen">
+    <div class="chat-header">
+      <div class="chat-agent-info">
+        <div class="agent-avatar">🤖</div>
+        <div class="agent-details">
+          <h3>مساعد إدارة الجلسات</h3>
+          <span class="agent-status">متصل</span>
+        </div>
+      </div>
+      <button class="close-chat" (click)="toggleChat()">×</button>
+    </div>
+
+    <div class="chat-messages" #chatMessagesContainer>
+      <div class="message" *ngFor="let message of chatMessagesList" [class]="message.sender">
+        <div class="message-content">
+          <p>{{message.content}}</p>
+          <span class="message-time">{{message.time}}</span>
+        </div>
+      </div>
+
+      <!-- Suggested Plan Display -->
+      <div class="suggested-plan" *ngIf="suggestedPlan">
+        <div class="plan-header">
+          <span>💡</span>
+          <h4>خطة مقترحة</h4>
+        </div>
+        <div class="plan-content">
+          <p>{{suggestedPlan.description}}</p>
+          <ul>
+            <li *ngFor="let item of suggestedPlan.items">{{item}}</li>
+          </ul>
+        </div>
+        <div class="plan-actions">
+          <button class="approve-btn" (click)="approvePlan()">موافق</button>
+          <button class="reject-btn" (click)="rejectPlan()">تعديل</button>
+        </div>
       </div>
     </div>
-    <button class="close-chat" (click)="toggleChat()">×</button>
-  </div>
-  
-  <div class="chat-messages" #chatMessagesContainer>
-    <div class="message" *ngFor="let message of chatMessagesList" [class]="message.sender">
-      <div class="message-content">
-        <p>{{message.content}}</p>
-        <span class="message-time">{{message.time}}</span>
-      </div>
-    </div>
-    
-    <!-- Suggested Plan Display -->
-    <div class="suggested-plan" *ngIf="suggestedPlan">
-      <div class="plan-header">
-        <span>💡</span>
-        <h4>خطة مقترحة</h4>
-      </div>
-      <div class="plan-content">
-        <p>{{suggestedPlan.description}}</p>
-        <ul>
-          <li *ngFor="let item of suggestedPlan.items">{{item}}</li>
-        </ul>
-      </div>
-      <div class="plan-actions">
-        <button class="approve-btn" (click)="approvePlan()">موافق</button>
-        <button class="reject-btn" (click)="rejectPlan()">تعديل</button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Chat Input Section -->
-  <div class="chat-input">
-    <textarea 
-      [(ngModel)]="chatMessage" 
+
+    <!-- Chat Input Section -->
+    <div class="chat-input">
+    <textarea
+      [(ngModel)]="chatMessage"
       (keydown)="onChatKeyPress($event)"
       placeholder="اكتب رسالتك هنا..."
       rows="1"></textarea>
-    <button 
-      class="send-btn" 
-      (click)="sendMessage()"
-      [disabled]="!chatMessage.trim()">
-      ➤
-    </button>
-  </div>
-</div> 
-<div class="modal-overlay" *ngIf="selectedDay" (click)="closeModal()">
-  <div class="day-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>جلسات يوم {{ selectedDay.arabicDate }}</h2>
-      <button class="close-modal" (click)="closeModal()">×</button>
+      <button
+        class="send-btn"
+        (click)="sendMessage()"
+        [disabled]="!chatMessage.trim()">
+        ➤
+      </button>
     </div>
-    <div class="modal-content">
-      <div class="session-card" 
-           *ngFor="let session of selectedDay.sessions" 
-           [class]="session.status">
-        <div class="session-header">
-          <div class="session-info">
-            <h3>{{ session.sessionName }}</h3>
-            <p class="chapter-name">{{ session.chapterName }}</p>
-          </div>
-          <div class="session-status" [class]="session.status">
+  </div>
+  <div class="modal-overlay" *ngIf="selectedDay" (click)="closeModal()">
+    <div class="day-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>جلسات يوم {{ selectedDay.arabicDate }}</h2>
+        <button class="close-modal" (click)="closeModal()">×</button>
+      </div>
+      <div class="modal-content">
+        <div class="session-card"
+             *ngFor="let session of selectedDay.sessions"
+             [class]="session.status">
+          <div class="session-header">
+            <div class="session-info">
+              <h3>{{ session.sessionName }}</h3>
+              <p class="chapter-name">{{ session.chapterName }}</p>
+            </div>
+            <div class="session-status" [class]="session.status">
             <span class="status-text">
               {{session.status === 'completed' ? 'مكتملة' : session.status === 'in-progress' ? 'جارية' : 'لم تبدأ'}}
             </span>
+            </div>
+          </div>
+          <div class="session-details">
+            <p class="session-description">{{ session.description }}</p>
+            <div class="session-time">
+              <span>🕐</span>
+              <span>{{ session.time || 'غير محدد' }}</span>
+            </div>
+          </div>
+          <div class="session-actions" *ngIf="session.status !== 'completed'">
+            <button class="start-session-btn" (click)="startSession(session)">
+              ابدأ الجلسة
+            </button>
           </div>
         </div>
-        <div class="session-details">
-          <p class="session-description">{{ session.description }}</p>
-          <div class="session-time">
-            <span>🕐</span>
-            <span>{{ session.time || 'غير محدد' }}</span>
-          </div>
+        <div class="no-sessions" *ngIf="selectedDay.sessions.length === 0">
+          <p>لا توجد جلسات مجدولة لهذا اليوم</p>
         </div>
-        <div class="session-actions" *ngIf="session.status !== 'completed'">
-          <button class="start-session-btn" (click)="startSession(session)">
-            ابدأ الجلسة
-          </button>
-        </div>
-      </div>
-      <div class="no-sessions" *ngIf="selectedDay.sessions.length === 0">
-        <p>لا توجد جلسات مجدولة لهذا اليوم</p>
       </div>
     </div>
   </div>

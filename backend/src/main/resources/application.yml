@@ -7,24 +7,70 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/Etudeai
-    username: admin
-    password: admin
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:Etudeai}
+    username: ${POSTGRES_USER:admin}
+    password: ${POSTGRES_PASSWORD:admin}
 
   jpa:
     hibernate:
-      ddl-auto: update
-    database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
 
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8083/realms/etudeAi
+          issuer-uri: ${KEYCLOAK_PUBLIC_URL:http://localhost:8083}/realms/${KEYCLOAK_REALM:etudeai}
+          jwk-set-uri: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8083}/realms/${KEYCLOAK_REALM:etudeai}/protocol/openid-connect/certs
 
-springdoc:
-  api-docs:
-    enabled: true
-  swagger-ui:
-    enabled: true
+  # Redis Configuration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+keycloak:
+  auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8083}
+  realm: ${KEYCLOAK_REALM:etudeai}
+  resource: ${KEYCLOAK_RESOURCE:etudeai-backend}
+  admin:
+    username: ${KEYCLOAK_ADMIN:admin}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
+
+# Application Custom Config
+ai-pipeline:
+  url: ${AI_PIPELINE_URL:http://localhost:8000}
+
+# Observability
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics,info
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+sentry:
+  dsn: ${SENTRY_DSN:}
+  environment: ${SPRING_PROFILES_ACTIVE:production}
+  traces-sample-rate: 1.0
+  enable-tracing: true
+
+otel:
+  metrics:
+    exporter: none
+  logs:
+    exporter: none
+  traces:
+    exporter: none

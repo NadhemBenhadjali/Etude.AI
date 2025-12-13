@@ -27,19 +27,19 @@
         <div class="combo-fire">🔥</div>
       </div>
     </div>
-    
+
     <div class="hud-center">
       <!-- Level display moved to powerups section -->
     </div>
-    
+
     <div class="hud-right">
       <div class="time-display" [class.time-warning]="timeLeft <= 10">
         <span class="time-icon">⏱️</span>
         <span class="time-value">{{ timeLeft }}</span>
       </div>
       <div class="lives-display">
-        <span *ngFor="let life of lives; let i = index" 
-              class="life-heart" 
+        <span *ngFor="let life of lives; let i = index"
+              class="life-heart"
               [class.life-lost]="i >= currentLives">❤️</span>
       </div>
     </div>
@@ -79,7 +79,7 @@
       <div class="progress-track">
         <div class="track-background"></div>
         <div class="progress-line" [style.width.%]="gameProgressPercent"></div>
-        <div class="checkpoint" 
+        <div class="checkpoint"
              *ngFor="let checkpoint of progressCheckpoints; let i = index"
              [style.left.%]="checkpoint.position"
              [class.checkpoint-reached]="checkpoint.reached"
@@ -87,11 +87,11 @@
           <span class="checkpoint-icon">{{ checkpoint.icon }}</span>
         </div>
       </div>
-      
+
       <!-- Enhanced Dino Character -->
       <div class="dino-container" [style.left.%]="dinoPosition">
-        <img src="/assets/images/dino.png" alt="Dinosaur" 
-             class="dino-character" 
+        <img src="/assets/images/dino.png" alt="Dinosaur"
+             class="dino-character"
              [class.dino-happy]="lastAnswerCorrect"
              [class.dino-thinking]="isLoading"
              [class.dino-celebrating]="showConfetti">
@@ -109,9 +109,9 @@
           <div class="xp-progress" [style.width.%]="experiencePercent"></div>
         </div>
       </div>
-      
+
       <!-- Powerups -->
-      <div class="powerup-item" 
+      <div class="powerup-item"
            *ngFor="let powerup of availablePowerups"
            (click)="usePowerup(powerup)"
            [class.powerup-available]="powerup.available">
@@ -122,15 +122,15 @@
 
     <!-- Enhanced Feedback System -->
     <div class="feedback-system">
-      <div *ngIf="feedbackMessage" 
-           class="feedback-message" 
+      <div *ngIf="feedbackMessage"
+           class="feedback-message"
            [class]="feedbackClass">
         <div class="feedback-content">
           <span class="feedback-icon">{{ feedbackIcon }}</span>
           <span class="feedback-text">{{ feedbackMessage }}</span>
         </div>
         <div class="feedback-particles" *ngIf="showFeedbackParticles">
-          <span *ngFor="let particle of feedbackParticles" 
+          <span *ngFor="let particle of feedbackParticles"
                 class="particle"
                 [style.left.px]="particle.x"
                 [style.animationDelay.ms]="particle.delay">{{ particle.emoji }}</span>
@@ -146,16 +146,16 @@
           <span class="question-separator">/</span>
           <span class="question-total">{{ totalQuestions }}</span>
         </div>
-        
+
         <div class="question-text" [class.question-animate]="questionAnimating">
           {{ currentQuestion.q }}
         </div>
-        
+
         <div class="question-category" *ngIf="currentQuestion?.category">
           <span class="category-tag">{{ currentQuestion.category }}</span>
         </div>
       </div>
-      
+
       <div class="answer-options">
         <button
           *ngFor="let opt of currentQuestion?.options; let i = index"
@@ -171,11 +171,11 @@
           <div class="option-glow"></div>
         </button>
       </div>
-      
+
       <!-- Skip Option for Hard Questions -->
       <div class="question-actions" *ngIf="currentDifficulty === 'expert'">
-        <button class="skip-button" 
-                (click)="skipQuestion()" 
+        <button class="skip-button"
+                (click)="skipQuestion()"
                 [disabled]="skipsUsed >= maxSkips">
           <span class="skip-icon">⏭️</span>
           تخطي ({{ maxSkips - skipsUsed }} متبقي)
@@ -190,7 +190,7 @@
           <h3>مرحباً أيها المغامر الصغير!</h3>
           <p>استعد لمغامرة مليئة بالتحدي والمتعة!</p>
         </div>
-        
+
         <div class="difficulty-selection">
           <h4>اختر مستوى التحدي:</h4>
           <div class="difficulty-options">
@@ -217,7 +217,7 @@
             </button>
           </div>
         </div>
-        
+
         <button
           class="start-game-button"
           (click)="startGameWithDifficulty()"
@@ -240,7 +240,7 @@
             <span class="stat-value">{{ score }} / 10</span>
           </div>
         </div>
-        
+
         <div class="performance-stats">
           <div class="stat-item">
             <span class="stat-icon">🎯</span>
@@ -258,7 +258,7 @@
             <span class="stat-value">{{ timeLeft }}ث</span>
           </div>
         </div>
-        
+
         <div class="achievement-showcase" *ngIf="newAchievements.length > 0">
           <h4>إنجازات جديدة! 🏆</h4>
           <div class="new-achievements">
@@ -268,12 +268,12 @@
             </div>
           </div>
         </div>
-        
+
         <div class="final-message" [class]="getPerformanceClass()">
           <div class="performance-icon">{{ getPerformanceIcon() }}</div>
           <div class="performance-text">{{ getFinalMessage() }}</div>
         </div>
-        
+
         <div class="final-actions">
           <button class="action-button restart-button" (click)="restartGame()">
             <span class="action-icon">🔄</span>
@@ -304,14 +304,14 @@
   <div class="particle-container">
     <!-- Confetti Effect -->
     <div *ngIf="showConfetti" class="confetti-system">
-      <div *ngFor="let confetti of confettiParticles" 
+      <div *ngFor="let confetti of confettiParticles"
            class="confetti-piece"
            [style.left.px]="confetti.x"
            [style.animationDelay.ms]="confetti.delay"
            [style.backgroundColor]="confetti.color">
       </div>
     </div>
-    
+
     <!-- Star Burst Effect -->
     <div *ngIf="showStarBurst" class="starburst-system">
       <div *ngFor="let star of starBurstParticles"

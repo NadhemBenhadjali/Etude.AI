@@ -1,0 +1,167 @@
+# ==============================================================================
+# GLOBAL / OS / IDE
+# ==============================================================================
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# JetBrains / IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Environment Variables (CRITICAL: Never commit API keys)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+yarn-debug.log*
+
+# ==============================================================================
+# PYTHON (Global & AI Pipeline & TTS-Integration)
+# ==============================================================================
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+Scripts/
+Include/
+Lib/
+
+# Bytecode and Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Distribution / Build
+build/
+develop-eggs/
+dist/
+eggs/
+*.egg-info/
+.eggs/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# AI/ML Specific Models & Cache (Don't commit large weights)
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.gguf
+/models/
+
+# ==============================================================================
+# AI PIPELINE SPECIFIC
+# ==============================================================================
+# Generated Reports and temporary outputs
+AI Pipeline/reports/*.pdf
+AI Pipeline/reports/*.json
+
+# Generated Lessons (Keep seed files, ignore generated ones if applicable)
+# Uncomment the line below if you generate dynamic lessons you don't want tracked
+# AI Pipeline/lessons/*.json
+
+# OCR Cache / Temporary JSONs
+AI Pipeline/config_files/ktebjson/
+
+# Local Vector DB storage (if saving to disk instead of cloud)
+chroma_db/
+qdrant_storage/
+
+# ==============================================================================
+# TTS INTEGRATION SPECIFIC
+# ==============================================================================
+# Generated Audio Files
+TTS-Integration/*.mp3
+TTS-Integration/*.wav
+TTS-Integration/output/
+
+# ==============================================================================
+# BACKEND (Java / Spring Boot)
+# ==============================================================================
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# Local DB Data / Docker Volumes
+backend_data/
+prometheus_data/
+grafana_data/
+backend/ops/keycloak/data/
+backend/ops/postgres/data/
+
+# ==============================================================================
+# FRONTEND (Angular / Node)
+# ==============================================================================
+frontend/node_modules/
+frontend/dist/
+frontend/out-tsc/
+frontend/bazel-out/
+
+# Angular specific
+frontend/.angular/
+frontend/.angular/cache/
+
+# Test coverage
+frontend/coverage/
+
+# Misc
+.sass-cache/
+connect.lock
+*.js.map
+*.ts.map
+
+# ==============================================================================
+# DOCKER
+# ==============================================================================
+docker-compose.override.yml
+.docker/
+
+# ==============================================================================
+# ASSETS / LARGE MEDIA
+# ==============================================================================
+# If you have large PDFs or Images that shouldn't be in git, list them here.
+# Assuming config_files/Book.pdf is needed for the logic, we keep it.
+# If Book.pdf is just a test file and very large, uncomment below:
+# AI Pipeline/config_files/*.pdf

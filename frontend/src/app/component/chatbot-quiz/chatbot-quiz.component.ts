@@ -1,9 +1,12 @@
-import { Component, OnInit, OnDestroy }             from '@angular/core';
-import { CommonModule }                  from '@angular/common';
-import { RouterModule, ActivatedRoute }  from '@angular/router';
-import { FormsModule }                   from '@angular/forms';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule, ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { AvatarComponent } from "../../shared/avatar/avatar.component";
 import { QuizService, QuizQuestion } from '../../services/quiz.service';
+import { AiService } from '../../services/ai.service';
+import { GamificationService } from '../../services/gamification.service';
+import { firstValueFrom } from 'rxjs';
 
 interface Achievement {
   id: string;
@@ -48,16 +51,21 @@ interface PowerupNotification {
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule, AvatarComponent],
   templateUrl: './chatbot-quiz.component.html',
-  styleUrls:   ['./chatbot-quiz.component.css']
+  styleUrls: ['./chatbot-quiz.component.css']
 })
 export class ChatbotQuizComponent implements OnInit, OnDestroy {
+  private route = inject(ActivatedRoute);
+  private quizService = inject(QuizService);
+  private aiService = inject(AiService);
+  private gamificationService = inject(GamificationService);
+
   messages: { text: string; isUser: boolean }[] = [];
   isLoading = false;
-  
+
   // Game State
-  currentMode   = '';
+  currentMode = '';
   currentModule = '';
-  
+
   // Quiz Logic
   questions: QuizQuestion[] = [];
   currentQuestionIndex = 0;
@@ -66,22 +74,22 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
   quizFinished = false;
   gameFinished = false;
   totalQuestions = 0;
-  
+
   // Enhanced Game Features
   gameLoading = false;
   loadingProgress = 0;
   loadingText = 'جاري التحضير...';
-  
+
   // Difficulty System
   currentDifficulty: 'easy' | 'normal' | 'expert' = 'normal';
   selectedDifficulty: 'easy' | 'normal' | 'expert' | null = null;
-  
+
   // Scoring & Progression
   currentLevel = 1;
   experience = 0;
   experienceToNext = 100;
   experiencePercent = 0;
-  
+
   // Game Mechanics
   currentCombo = 0;
   maxComboReached = 0;
@@ -89,7 +97,7 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
   lives = [1, 2, 3]; // For display
   timeLeft = 30;
   gameTimer: any;
-  
+
   // Visual Feedback
   dinoPosition = 0;
   gameProgressPercent = 0;
@@ -99,7 +107,7 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
   avatarMessage = '';
   dinoMessage = '';
   gameStatus = 'استعد للمغامرة!';
-  
+
   // Animation States
   scoreAnimating = false;
   questionAnimating = false;
@@ -109,22 +117,22 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
   showFeedbackParticles = false;
   answerLocked = false;
   lastAnswerCorrect = false;
-  
+
   // Hint System
   hintActive = false;
   correctAnswerIndex = -1;
-  
+
   // Progress System
   progressCheckpoints: Checkpoint[] = [];
-  checkpointsReached: boolean[] = []; // Track which checkpoints have been reached to avoid duplicate notifications
-  
+  checkpointsReached: boolean[] = [];
+
   // Powerup Notification System
   powerupNotification: PowerupNotification = {
     powerup: { id: '', name: '', icon: '', count: 0, available: false, description: '' },
     visible: false,
     message: ''
   };
-  
+
   // Achievements System
   achievements: Achievement[] = [
     { id: 'first_correct', name: 'البداية الصحيحة', icon: '🌟', description: 'أجب على أول سؤال بشكل صحيح', unlocked: false },
@@ -135,32 +143,26 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
   ];
   unlockedAchievements: Achievement[] = [];
   newAchievements: Achievement[] = [];
-  
+
   // Power-ups System
   availablePowerups: PowerUp[] = [
     { id: 'hint', name: 'تلميح', icon: '💡', count: 2, available: true, description: 'احصل على تلميح للسؤال' },
     { id: 'skip', name: 'تخطي', icon: '⏭️', count: 1, available: true, description: 'تخطي السؤال الحالي' },
     { id: 'freeze', name: 'تجميد', icon: '❄️', count: 1, available: true, description: 'توقيف الوقت لـ 10 ثوانِ' }
   ];
-  
+
   // Skip system
   skipsUsed = 0;
   maxSkips = 2;
-  
+
   // Particle Effects
   confettiParticles: Particle[] = [];
   starBurstParticles: Particle[] = [];
   feedbackParticles: Particle[] = [];
 
-  constructor(
-    private route: ActivatedRoute,
-    private quizService: QuizService
-  ) {}
-
   ngOnInit() {
-    console.log('[DEBUG] Enhanced Word Game initialized');
     this.route.queryParams.subscribe(params => {
-      this.currentMode   = params['mode']   || '';
+      this.currentMode = params['mode'] || '';
       this.currentModule = params['module'] || '';
       this.initializeGame();
     });
@@ -181,24 +183,17 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
   private loadGameResources() {
     this.gameLoading = true;
     this.loadingText = 'جاري تحميل الأسئلة...';
-    
-    // Simulate loading with progress
+
     const loadingInterval = setInterval(() => {
       this.loadingProgress += 10;
-      
-      if (this.loadingProgress === 30) {
-        this.loadingText = 'إعداد الشخصيات...';
-      } else if (this.loadingProgress === 60) {
-        this.loadingText = 'تحضير المؤثرات...';
-      } else if (this.loadingProgress === 90) {
-        this.loadingText = 'اللمسات الأخيرة...';
-      }
-      
+      if (this.loadingProgress === 30) this.loadingText = 'إعداد الشخصيات...';
+      else if (this.loadingProgress === 60) this.loadingText = 'تحضير المؤثرات...';
+      else if (this.loadingProgress === 90) this.loadingText = 'اللمسات الأخيرة...';
+
       if (this.loadingProgress >= 100) {
         clearInterval(loadingInterval);
         this.gameLoading = false;
         this.gameStatus = 'جاهز للبدء!';
-        // Do NOT auto-load static quiz. Wait for user to select difficulty and click start.
       }
     }, 200);
   }
@@ -226,22 +221,74 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
     this.lastAnswerCorrect = false;
     this.newAchievements = [];
     this.resetTimer();
-    
-    // Reset hint system
     this.hintActive = false;
     this.correctAnswerIndex = -1;
-    
+
     let greeting = 'مرحباً! أنا مساعدك الذكي. كيف يمكنني مساعدتك اليوم؟';
     if (this.currentMode === 'summary') {
       greeting = 'مرحباً! أنا هنا لمساعدتك في الحصول على ملخص للدروس.';
     } else if (this.currentMode === 'quiz') {
       greeting = '🎮 اختر مستوى التحدي وابدأ المغامرة!';
     }
-    
     this.messages.push({ text: greeting, isUser: false });
   }
 
-  // Difficulty Management
+  get currentQuestion(): QuizQuestion | undefined {
+    return this.questions[this.currentQuestionIndex];
+  }
+
+  // --- Template Helper Methods ---
+
+  onOptionHover(index: number) {
+    // Optional sound or visual effect
+  }
+
+  getAccuracyPercent(): number {
+    return this.totalQuestions > 0 ? Math.round((this.score / this.totalQuestions) * 100) : 0;
+  }
+
+  getPerformanceClass(): string {
+    const percent = this.getAccuracyPercent();
+    if (percent >= 90) return 'excellent';
+    if (percent >= 70) return 'good';
+    return 'needs-improvement';
+  }
+
+  getPerformanceIcon(): string {
+    const percent = this.getAccuracyPercent();
+    if (percent >= 90) return '🏆';
+    if (percent >= 70) return '🌟';
+    return '📚';
+  }
+
+  getFinalMessage(): string {
+    const percent = this.getAccuracyPercent();
+    if (percent >= 90) return 'أداء أسطوري! أنت بطل حقيقي!';
+    if (percent >= 70) return 'عمل رائع! استمر في التقدم.';
+    return 'بداية جيدة، ولكن يمكنك تحقيق الأفضل!';
+  }
+
+  dismissPowerupNotification() {
+    this.powerupNotification.visible = false;
+  }
+
+  restartGame() {
+    this.initializeGame();
+  }
+
+  shareScore() {
+    this.avatarMessage = 'تم نسخ النتيجة!';
+    setTimeout(() => this.avatarMessage = '', 2000);
+  }
+
+  changeDifficulty() {
+    this.gameFinished = false;
+    this.inQuiz = false;
+    this.selectedDifficulty = null;
+    this.score = 0;
+    this.messages = [];
+  }
+
   setDifficulty(difficulty: 'easy' | 'normal' | 'expert') {
     this.selectedDifficulty = difficulty;
     this.updateGameSettings();
@@ -249,7 +296,6 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
 
   private updateGameSettings() {
     if (!this.selectedDifficulty) return;
-    
     switch (this.selectedDifficulty) {
       case 'easy':
         this.timeLeft = 45;
@@ -280,12 +326,10 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
 
   startGameWithDifficulty() {
     if (!this.selectedDifficulty) return;
-    
     this.currentDifficulty = this.selectedDifficulty;
     this.updateGameSettings();
     this.loadQuizFromServer();
     this.avatarMessage = 'ممتاز! لنبدأ!';
-    
     setTimeout(() => {
       this.avatarMessage = '';
     }, 2000);
@@ -299,21 +343,18 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
       { position: 75, icon: '👑', reached: false, current: false },
       { position: 100, icon: '🏆', reached: false, current: false }
     ];
-    // Initialize checkpoint tracking array
     this.checkpointsReached = new Array(this.progressCheckpoints.length).fill(false);
-    this.checkpointsReached[0] = true; // First checkpoint is always reached at start
+    this.checkpointsReached[0] = true;
   }
 
   private updateProgressCheckpoints() {
     const progress = this.gameProgressPercent;
     this.progressCheckpoints.forEach((checkpoint, index) => {
-      const wasReached = checkpoint.reached;
       checkpoint.reached = progress >= checkpoint.position;
-      checkpoint.current = progress >= checkpoint.position && 
-                          (index === this.progressCheckpoints.length - 1 || 
-                           progress < this.progressCheckpoints[index + 1].position);
-      
-      // Check if this is a new checkpoint reached
+      checkpoint.current = progress >= checkpoint.position &&
+        (index === this.progressCheckpoints.length - 1 ||
+          progress < this.progressCheckpoints[index + 1].position);
+
       if (checkpoint.reached && !this.checkpointsReached[index] && index > 0) {
         this.checkpointsReached[index] = true;
         this.showPowerupNotification(index);
@@ -321,595 +362,332 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
     });
   }
 
-  sendQuickResponse(text: string) {
-    this.messages.push({ text, isUser: true });
-    this.isLoading = true;
-
-    if (this.currentMode === 'quiz' && text === 'ابدأ الاختبار') {
-      this.loadQuizFromServer();
-    } else {
-      setTimeout(() => {
-        const replies = {
-          summary: 'سأقوم بتحضير ملخص مفيد لهذا الدرس. هل هناك نقاط معينة تريد التركيز عليها؟',
-          general: 'سأحاول مساعدتك في هذا السؤال. هل يمكنك توضيح المزيد؟',
-          default: 'أنا أفهم سؤالك. سأقوم بمساعدتك في أقرب وقت ممكن.'
-        };
-        const reply = replies[this.currentMode as 'summary'|'general'] || replies.default;
-        this.messages.push({ text: reply, isUser: false });
-        this.isLoading = false;
-      }, 1500);
+  private showPowerupNotification(checkpointIndex: number) {
+    const messages = ['', 'بداية رائعة!', 'منتصف الطريق!', 'اقتربت من القمة!', 'مبروك!'];
+    if (checkpointIndex > 0 && checkpointIndex < messages.length) {
+      this.avatarMessage = messages[checkpointIndex];
+      this.showSparkles = true;
+      setTimeout(() => { this.showSparkles = false; this.avatarMessage = ''; }, 3000);
     }
   }
 
-  private loadQuizFromServer() {
-    console.log('[DEBUG] Loading static quiz data');
-    
-    // Load static quiz data directly
-    setTimeout(() => {
-      this.loadFallbackQuestions();
-    }, 500);
+  async sendQuickResponse(text: string) {
+    this.messages.push({ text: text, isUser: true });
+
+    if (this.currentMode === 'summary') {
+      try {
+        const response: any = await firstValueFrom(this.aiService.generateSummary(text, this.currentModule || 'General'));
+        this.messages.push({ text: response.summary || response.response || 'Summary generated.', isUser: false });
+      } catch (err) {
+        this.messages.push({ text: 'عذراً، حدث خطأ.', isUser: false });
+      }
+    } else if (text.includes('ابدأ') || text.includes('جاهز')) {
+      if (!this.inQuiz) {
+        this.messages.push({ text: 'الرجاء اختيار مستوى الصعوبة.', isUser: false });
+      }
+    } else {
+      try {
+        const response: any = await firstValueFrom(this.aiService.askQuestion(text));
+        this.messages.push({ text: response.answer || 'I am not sure.', isUser: false });
+      } catch (err) {
+        this.messages.push({ text: 'Error connecting to AI.', isUser: false });
+      }
+    }
   }
 
-  private loadFallbackQuestions() {
-    console.log('[DEBUG] Loading static questions');
+  async loadQuizFromServer() {
+    try {
+      this.isLoading = true;
+      const response: any = await firstValueFrom(this.aiService.generateQuiz(this.currentModule, 5, 5));
+
+      if (response && response.questions) {
+        this.questions = response.questions.map((q: any) => ({
+          ...q,
+          type: q.type === 'multiple-choice' ? 'mc' : (q.type === 'true-false' ? 'tf' : q.type),
+          a: q.correctAnswer || q.a
+        }));
+
+        this.totalQuestions = this.questions.length;
+        this.gameStatus = 'جاري اللعب';
+        this.inQuiz = true;
+        this.currentQuestionIndex = 0;
+        this.score = 0;
+        this.startTimer();
+      } else {
+        throw new Error('Invalid quiz format');
+      }
+    } catch (err) {
+      console.error('Failed to load quiz:', err);
+      // Fallback to friend's rich arabic questions
+      this.loadFallbackQuestions();
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  loadFallbackQuestions() {
+    // These are the rich Arabic questions from your friend's code
     this.questions = [
       {
-        q: "ما عاصمة تونس؟",
-        options: ["تونس", "سوسة", "بنزرت", "نابل"],
-        a: "تونس",
+        q: "ما هو العضو الذي يتنفس به السمك؟",
+        options: ["الخياشيم", "الرئتان", "الجلد", "الفم"],
+        a: "الخياشيم",
         type: "mc"
       },
       {
-        q: "هل البحر الأبيض المتوسط يحد تونس من الشمال؟",
+        q: "هل يتنفس الإنسان عن طريق الرئتين؟",
         options: ["صح", "خطأ"],
         a: "صح",
         type: "tf"
       },
       {
-        q: "كم عدد الولايات في تونس؟",
-        options: ["24", "23", "25", "22"],
-        a: "24",
+        q: "أي حيوان يتنفس عبر الجلد؟",
+        options: ["الضفدع", "الأسد", "الطائر", "القط"],
+        a: "الضفدع",
         type: "mc"
       },
       {
-        q: "ما هي أكبر جامعة في تونس؟",
-        options: ["جامعة تونس", "جامعة قرطاج", "جامعة منوبة", "جامعة سوسة"],
-        a: "جامعة تونس",
+        q: "ما هو الغاز الضروري للتنفس عند الحيوانات؟",
+        options: ["الأكسجين", "الهيدروجين", "النيتروجين", "ثاني أكسيد الكربون"],
+        a: "الأكسجين",
         type: "mc"
       },
       {
-        q: "هل تونس دولة عربية؟",
+        q: "هل تتنفس الحشرات بواسطة أنابيب صغيرة (قصبات هوائية)؟",
         options: ["صح", "خطأ"],
         a: "صح",
         type: "tf"
       },
       {
-        q: "ما هي العملة الرسمية لتونس؟",
-        options: ["الدينار التونسي", "الدرهم", "الريال", "الجنيه"],
-        a: "الدينار التونسي",
+        q: "أي من هذه الكائنات يتنفس بالرئتين؟",
+        options: ["الإنسان", "السمكة", "الحلزون البحري", "قنديل البحر"],
+        a: "الإنسان",
         type: "mc"
       },
       {
-        q: "ما هو اللون المميز في العلم التونسي؟",
-        options: ["الأحمر", "الأزرق", "الأخضر", "الأصفر"],
-        a: "الأحمر",
+        q: "كيف يتنفس الطائر؟",
+        options: ["الرئتان", "الخياشيم", "الجلد", "المسلّات"],
+        a: "الرئتان",
         type: "mc"
       },
       {
-        q: "في أي قارة تقع تونس؟",
-        options: ["أفريقيا", "آسيا", "أوروبا", "أمريكا"],
-        a: "أفريقيا",
+        q: "أين تعيش الحيوانات التي تتنفس بالخياشيم؟",
+        options: ["في الماء", "في البرّ", "في الهواء", "في الجبال"],
+        a: "في الماء",
         type: "mc"
       },
       {
-        q: "ما هو اسم الجبل الأعلى في تونس؟",
-        options: ["جبل الشعانبي", "جبل السرج", "جبل زغوان", "جبل برقو"],
-        a: "جبل الشعانبي",
-        type: "mc"
+        q: "هل يحتاج الحيوان إلى الأكسجين ليعيش؟",
+        options: ["نعم", "لا"],
+        a: "نعم",
+        type: "tf"
       },
       {
-        q: "ما هو البحر الذي يحد تونس من الشرق؟",
-        options: ["البحر الأبيض المتوسط", "البحر الأحمر", "بحر العرب", "بحر قزوين"],
-        a: "البحر الأبيض المتوسط",
+        q: "أي من هذه الحيوانات يتنفس عن طريق القصبات الهوائية؟",
+        options: ["النملة", "الطائر", "الضفدع", "الإنسان"],
+        a: "النملة",
         type: "mc"
       }
     ];
-    
     this.totalQuestions = this.questions.length;
     this.inQuiz = true;
-    this.gameStatus = 'في اللعب...';
     this.startTimer();
-    this.showQuestion();
-    this.isLoading = false;
-    console.log('[DEBUG] Static quiz loaded:', this.questions.length, 'questions');
   }
 
-  private showQuestion() {
-    this.questionAnimating = true;
+  showQuestion() {
     this.answerLocked = false;
-    
-    const q = this.questions[this.currentQuestionIndex];
-    this.messages.push({
-      text: `سؤال ${this.currentQuestionIndex + 1}: ${q.q}`,
-      isUser: false
-    });
-
-    // Reset question animation
-    setTimeout(() => {
-      this.questionAnimating = false;
-    }, 500);
+    this.feedbackMessage = '';
+    this.resetTimer();
+    this.startTimer();
+    this.gameProgressPercent = (this.currentQuestionIndex / this.totalQuestions) * 100;
+    this.dinoPosition = this.gameProgressPercent;
+    this.updateProgressCheckpoints();
   }
 
-  // Timer Management
-  private startTimer() {
+  startTimer() {
     this.resetTimer();
     this.gameTimer = setInterval(() => {
-      this.timeLeft--;
-      
-      if (this.timeLeft <= 10) {
-        // Warning state
-      }
-      
-      if (this.timeLeft <= 0) {
+      if (this.timeLeft > 0 && !this.answerLocked && !this.gameFinished) {
+        this.timeLeft--;
+      } else if (this.timeLeft === 0 && !this.answerLocked && !this.gameFinished) {
         this.handleTimeOut();
       }
     }, 1000);
   }
 
-  private resetTimer() {
-    if (this.gameTimer) {
-      clearInterval(this.gameTimer);
-    }
-    
+  resetTimer() {
+    if (this.gameTimer) clearInterval(this.gameTimer);
     switch (this.currentDifficulty) {
       case 'easy': this.timeLeft = 45; break;
-      case 'normal': this.timeLeft = 30; break;
       case 'expert': this.timeLeft = 20; break;
+      default: this.timeLeft = 30; break;
     }
   }
 
-  private handleTimeOut() {
+  handleTimeOut() {
     this.answerLocked = true;
     this.currentLives--;
+    this.lives.pop();
+    this.feedbackMessage = 'انتهى الوقت! ⏰';
+    this.feedbackClass = 'error';
     this.currentCombo = 0;
-    this.feedbackMessage = 'انتهى الوقت! 🕐';
-    this.feedbackIcon = '⏰';
-    this.feedbackClass = 'feedback-timeout';
-    this.lastAnswerCorrect = false;
-    
-    if (this.currentLives <= 0) {
-      this.gameOver();
-    } else {
-      this.moveToNextQuestion();
-    }
+    if (this.currentLives <= 0) setTimeout(() => this.finishGame(), 2000);
+    else setTimeout(() => this.moveToNextQuestion(), 2000);
   }
 
-  // Answer Handling
   answerQuestion(option: string) {
     if (this.answerLocked) return;
-    
     this.answerLocked = true;
-    this.messages.push({ text: option, isUser: true });
-    this.isLoading = true;
+    clearInterval(this.gameTimer);
 
-    setTimeout(() => {
-      const q = this.questions[this.currentQuestionIndex];
-      const isCorrect = (option === q.a);
-      this.lastAnswerCorrect = isCorrect;
-
-      if (isCorrect) {
-        this.handleCorrectAnswer();
-      } else {
-        this.handleIncorrectAnswer(q.a);
-      }
-
-      this.updateGameProgress();
-      this.isLoading = false;
-
-      setTimeout(() => {
-        if (this.currentQuestionIndex < this.questions.length - 1) {
-          this.moveToNextQuestion();
-        } else {
-          this.finishGame();
-        }
-      }, 2000);
-    }, 1000);
+    const q = this.questions[this.currentQuestionIndex];
+    if (option === q.a) {
+      this.handleCorrectAnswer();
+    } else {
+      this.handleIncorrectAnswer(option, q.a);
+    }
   }
 
-  private handleCorrectAnswer() {
+  handleCorrectAnswer() {
     this.score++;
     this.currentCombo++;
-    this.experience += 10 + (this.currentCombo * 2);
-    
-    if (this.currentCombo > this.maxComboReached) {
-      this.maxComboReached = this.currentCombo;
-    }
+    if (this.currentCombo > this.maxComboReached) this.maxComboReached = this.currentCombo;
+    this.feedbackMessage = 'إجابة صحيحة! 🎉';
+    this.feedbackClass = 'success';
+    this.lastAnswerCorrect = true;
 
-    // Enhanced feedback
-    this.feedbackMessage = this.getCorrectAnswerMessage();
-    this.feedbackIcon = '✅';
-    this.feedbackClass = 'feedback-correct';
-    this.showSparkles = true;
-    this.animateScore();
-    
-    // Special effects for combos
-    if (this.currentCombo >= 3) {
-      this.showStarBurst = true;
-      this.dinoMessage = 'رائع! 🔥';
-      setTimeout(() => {
-        this.showStarBurst = false;
-        this.dinoMessage = '';
-      }, 2000);
-    }
-
-    // Check achievements
-    this.checkAchievements();
-
+    // Friend feature: Push chat message on correct answer
     this.messages.push({
       text: '✔ إجابة صحيحة! ' + (this.currentCombo > 1 ? `متتالية × ${this.currentCombo}` : ''),
       isUser: false
     });
-  }
 
-  private handleIncorrectAnswer(correctAnswer: string) {
-    this.currentCombo = 0;
-    this.currentLives--;
-    
-    this.feedbackMessage = 'أوه! حاول مرة أخرى 💪';
-    this.feedbackIcon = '❌';
-    this.feedbackClass = 'feedback-incorrect';
-    this.showSparkles = false;
-
-    if (this.currentLives <= 0) {
-      this.gameOver();
-      return;
+    if (this.currentCombo >= 3) {
+      this.feedbackMessage += ' 🔥 Combo x' + this.currentCombo;
+      this.showConfetti = true;
+      setTimeout(() => this.showConfetti = false, 2000);
     }
-
-    this.messages.push({
-      text: `✘ إجابة خاطئة. الصحيح هو: ${correctAnswer}`,
-      isUser: false
-    });
+    this.experience += 10 + (this.currentCombo * 2);
+    if (this.experience >= this.experienceToNext) this.levelUp();
+    setTimeout(() => this.moveToNextQuestion(), 1500);
   }
 
-  private moveToNextQuestion() {
-    this.currentQuestionIndex++;
-    this.resetTimer();
-    this.startTimer();
-    this.showQuestion();
-    this.clearFeedback();
-    
-    // Reset hint state
-    this.hintActive = false;
-    this.correctAnswerIndex = -1;
-  }
-
-  private clearFeedback() {
-    setTimeout(() => {
-      this.feedbackMessage = '';
-      this.showSparkles = false;
-    }, 2000);
-  }
-
-  // Game Progress
-  private updateGameProgress() {
-    if (this.totalQuestions > 0) {
-      this.dinoPosition = ((this.currentQuestionIndex + 1) / this.totalQuestions) * 100;
-      this.gameProgressPercent = this.dinoPosition;
-      this.updateProgressCheckpoints();
-    }
-    
-    // Update experience
-    this.experiencePercent = (this.experience % this.experienceToNext) / this.experienceToNext * 100;
-    if (this.experience >= this.experienceToNext) {
-      this.levelUp();
-    }
-  }
-
-  private levelUp() {
+  levelUp() {
     this.currentLevel++;
     this.experience = 0;
-    this.experienceToNext += 50;
-    this.avatarMessage = `تهانينا! وصلت للمستوى ${this.currentLevel}! 🎉`;
-    
-    setTimeout(() => {
-      this.avatarMessage = '';
-    }, 3000);
+    this.experienceToNext = Math.floor(this.experienceToNext * 1.5);
+    this.powerupNotification.visible = true;
+    this.availablePowerups[0].count++;
   }
 
-  // Game Completion
-  private finishGame() {
-    clearInterval(this.gameTimer);
+  finishGame() {
     this.inQuiz = false;
     this.quizFinished = true;
     this.gameFinished = true;
-    this.gameStatus = 'انتهت اللعبة!';
-
-    let finalMessage = '';
-    if (this.score >= (this.totalQuestions * 0.8)) {
-      finalMessage = `مذهل! حصلت على ${this.score} من ${this.totalQuestions} نقاط! �`;
-      this.showConfetti = true;
-      this.triggerConfetti();
-    } else if (this.score >= (this.totalQuestions * 0.5)) {
-      finalMessage = `عمل جيد! حصلت على ${this.score} من ${this.totalQuestions} نقاط! 👏`;
-    } else {
-      finalMessage = `استمر في التعلم! حصلت على ${this.score} من ${this.totalQuestions} نقاط. �`;
-    }
+    clearInterval(this.gameTimer);
+    this.gameProgressPercent = 100;
 
     this.messages.push({
-      text: finalMessage,
+      text: `انتهت اللعبة! نتيجتك: ${this.score}/${this.totalQuestions}.`,
       isUser: false
     });
 
+    this.gamificationService.submitQuizResult(this.score, this.totalQuestions, this.currentModule || 'General')
+      .subscribe({
+        next: () => console.log('Score submitted'),
+        error: (err) => console.error('Error submitting score:', err)
+      });
     this.checkFinalAchievements();
   }
 
-  private gameOver() {
-    clearInterval(this.gameTimer);
-    this.gameFinished = true;
-    this.gameStatus = 'انتهت المحاولات!';
-    
-    this.messages.push({
-      text: `انتهت المحاولات! حصلت على ${this.score} من ${this.currentQuestionIndex + 1} نقاط.`,
-      isUser: false
-    });
-  }
-
-  // Power-ups
-  usePowerup(powerup: PowerUp) {
-    if (!powerup.available || powerup.count <= 0) return;
-
-    powerup.count--;
-    if (powerup.count <= 0) powerup.available = false;
-
-    switch (powerup.id) {
-      case 'hint':
-        this.showHint();
-        break;
-      case 'skip':
-        this.skipQuestion();
-        break;
-      case 'freeze':
-        this.freezeTime();
-        break;
+  checkFinalAchievements() {
+    if (this.score === this.totalQuestions) this.unlockAchievement('perfect_score');
+    if (this.maxComboReached >= 3) this.unlockAchievement('combo_3');
+    if (this.currentDifficulty === 'expert' && this.score > 0) this.unlockAchievement('expert_player');
+    if (this.newAchievements.length > 0) {
+      this.showStarBurst = true;
+      this.avatarMessage = 'فتح إنجاز جديد! 🏆';
     }
   }
 
-  private showHint() {
-    const currentQuestion = this.questions[this.currentQuestionIndex];
-    if (!currentQuestion || !currentQuestion.options) return;
-
-    // Find the correct answer index
-    this.correctAnswerIndex = currentQuestion.options.findIndex(option => option === currentQuestion.a);
-    
-    // Activate hint mode
-    this.hintActive = true;
-    
-    // Show hint message
-    this.avatarMessage = 'تلميح: الإجابة الصحيحة أصبحت حمراء! 💡🔴';
-    
-    // Auto-hide hint after 5 seconds
-    setTimeout(() => {
-      this.avatarMessage = '';
-      this.hintActive = false;
-      this.correctAnswerIndex = -1;
-    }, 5000);
+  unlockAchievement(id: string) {
+    const achievement = this.achievements.find(a => a.id === id);
+    if (achievement && !achievement.unlocked) {
+      achievement.unlocked = true;
+      this.newAchievements.push(achievement);
+      this.unlockedAchievements.push(achievement);
+    }
   }
 
-  skipQuestion() {
-    if (this.skipsUsed >= this.maxSkips) return;
-    
-    this.skipsUsed++;
-    this.currentQuestionIndex++;
-    this.updateGameProgress();
-    
-    if (this.currentQuestionIndex < this.questions.length) {
+  handleIncorrectAnswer(option: string, correctAnswer: string) {
+    this.currentCombo = 0;
+    this.feedbackMessage = `خطأ! الإجابة الصحيحة هي: ${correctAnswer}`;
+    this.feedbackClass = 'error';
+    this.lastAnswerCorrect = false;
+    this.currentLives--;
+    this.lives.pop();
+    if (this.currentLives <= 0) setTimeout(() => this.finishGame(), 2000);
+    else setTimeout(() => this.moveToNextQuestion(), 2500);
+  }
+
+  moveToNextQuestion() {
+    if (this.currentQuestionIndex < this.questions.length - 1) {
+      this.currentQuestionIndex++;
       this.showQuestion();
     } else {
       this.finishGame();
     }
   }
 
-  private freezeTime() {
-    clearInterval(this.gameTimer);
-    this.avatarMessage = 'الوقت متجمد لـ 10 ثوانِ! ❄️';
-    
-    setTimeout(() => {
-      this.startTimer();
-      this.avatarMessage = '';
-    }, 10000);
+  usePowerup(powerup: PowerUp) {
+    if (powerup.count <= 0 || !powerup.available || this.answerLocked) return;
+    powerup.count--;
+    switch (powerup.id) {
+      case 'hint': this.showHint(); break;
+      case 'skip': this.skipQuestion(); break;
+      case 'freeze': this.freezeTime(); break;
+    }
+    this.avatarMessage = 'تم تفعيل ' + powerup.name + '!';
+    setTimeout(() => this.avatarMessage = '', 2000);
   }
 
-  // UI Helper Methods
+  showHint() {
+    const q = this.currentQuestion;
+    if (!q || !q.options) return;
+    this.feedbackMessage = '💡 تلميح: حاول التركيز!';
+  }
+
+  skipQuestion() {
+    this.skipsUsed++;
+    this.currentQuestionIndex++;
+    if (this.currentQuestionIndex >= this.questions.length) this.finishGame();
+    else this.showQuestion();
+  }
+
+  freezeTime() {
+    this.timeLeft += 10;
+  }
+
   getOptionLetter(index: number): string {
-    return String.fromCharCode(65 + index); // A, B, C, D
+    const letters = ['أ', 'ب', 'ج', 'د'];
+    return letters[index] || '';
   }
 
-  onOptionHover(index: number) {
-    // Add hover effects or sounds here
+  getLivesArray() {
+    return new Array(this.currentLives).fill(0);
   }
 
-  getCorrectAnswerMessage(): string {
-    const messages = [
-      'ممتاز! 🌟',
-      'رائع جداً! ⭐',
-      'عمل مثالي! 💎',
-      'بطولي! 🏆',
-      'مدهش! ✨'
-    ];
-    return messages[Math.floor(Math.random() * messages.length)];
+  calculateProgress() {
+    return (this.currentQuestionIndex / this.totalQuestions) * 100;
   }
 
-  getAccuracyPercent(): number {
-    if (this.currentQuestionIndex === 0) return 0;
-    return Math.round((this.score / (this.currentQuestionIndex + 1)) * 100);
+  getAvatarExpression() {
+    if (this.lastAnswerCorrect) return 'happy';
+    if (this.currentLives <= 1) return 'worried';
+    return 'neutral';
   }
 
-  getPerformanceClass(): string {
-    const accuracy = this.getAccuracyPercent();
-    if (accuracy >= 90) return 'performance-excellent';
-    if (accuracy >= 70) return 'performance-good';
-    if (accuracy >= 50) return 'performance-average';
-    return 'performance-needs-improvement';
-  }
-
-  getPerformanceIcon(): string {
-    const accuracy = this.getAccuracyPercent();
-    if (accuracy >= 90) return '🏆';
-    if (accuracy >= 70) return '⭐';
-    if (accuracy >= 50) return '👍';
-    return '💪';
-  }
-
-  getFinalMessage(): string {
-    const accuracy = this.getAccuracyPercent();
-    if (accuracy >= 90) return 'أداء استثنائي! أنت نجم حقيقي! 🌟';
-    if (accuracy >= 70) return 'عمل رائع! تحسن مستمر! 📈';
-    if (accuracy >= 50) return 'بداية جيدة! استمر في التعلم! 📚';
-    return 'لا تستسلم! كل محاولة تقربك من النجاح! 💪';
-  }
-
-  // Animation Methods
-  private animateScore() {
-    this.scoreAnimating = true;
-    setTimeout(() => {
-      this.scoreAnimating = false;
-    }, 600);
-  }
-
-  private triggerConfetti() {
-    this.confettiParticles = [];
-    const colors = ['#FFD1E3', '#FFFAB7', '#5BBCFF', '#7EA1FF'];
-    
-    for (let i = 0; i < 50; i++) {
-      this.confettiParticles.push({
-        x: Math.random() * window.innerWidth,
-        y: 0,
-        delay: Math.random() * 3000,
-        color: colors[Math.floor(Math.random() * colors.length)]
-      });
-    }
-
-    setTimeout(() => {
-      this.showConfetti = false;
-      this.confettiParticles = [];
-    }, 5000);
-  }
-
-  // Achievement System
-  private checkAchievements() {
-    // First correct answer
-    if (this.score === 1 && !this.achievements[0].unlocked) {
-      this.unlockAchievement('first_correct');
-    }
-    
-    // Combo achievements
-    if (this.currentCombo === 3 && !this.achievements[1].unlocked) {
-      this.unlockAchievement('combo_3');
-    }
-  }
-
-  private checkFinalAchievements() {
-    // Perfect score
-    if (this.score === this.totalQuestions && !this.achievements[2].unlocked) {
-      this.unlockAchievement('perfect_score');
-    }
-    
-    // Expert difficulty completion
-    if (this.currentDifficulty === 'expert' && this.score >= this.totalQuestions * 0.7) {
-      this.unlockAchievement('expert_player');
-    }
-  }
-
-  private unlockAchievement(achievementId: string) {
-    const achievement = this.achievements.find(a => a.id === achievementId);
-    if (achievement && !achievement.unlocked) {
-      achievement.unlocked = true;
-      this.unlockedAchievements.push(achievement);
-      this.newAchievements.push(achievement);
-      
-      this.avatarMessage = `🏆 إنجاز جديد: ${achievement.name}!`;
-      setTimeout(() => this.avatarMessage = '', 4000);
-    }
-  }
-
-  // Game Actions
-  restartGame() {
-    this.resetGame();
-    this.newAchievements = [];
-  }
-
-  changeDifficulty() {
-    this.selectedDifficulty = null;
-    this.resetGame();
-  }
-
-  shareScore() {
-    const text = `حصلت على ${this.score} من ${this.totalQuestions} في مغامرة ديناصور الكلمات! 🎮`;
-    
-    if (navigator.share) {
-      navigator.share({
-        title: 'نتيجتي في مغامرة الكلمات',
-        text: text,
-        url: window.location.href
-      });
-    } else {
-      // Fallback for browsers that don't support Web Share API
-      navigator.clipboard.writeText(text).then(() => {
-        this.avatarMessage = 'تم نسخ النتيجة! 📋';
-        setTimeout(() => this.avatarMessage = '', 2000);
-      });
-    }
-  }
-
-  // Powerup Notification System
-  private showPowerupNotification(checkpointIndex: number) {
-    // Define powerups available at each checkpoint
-    const checkpointPowerups = [
-      null, // No powerup for first checkpoint (starting position)
-      { id: 'hint', name: 'تلميح ذكي', icon: '💡', count: 1, available: true, description: 'يعطيك تلميح مفيد للسؤال الحالي' },
-      { id: 'freeze', name: 'تجميد الوقت', icon: '❄️', count: 1, available: true, description: 'يوقف العداد الزمني لمدة 10 ثواني' },
-      { id: 'skip', name: 'تخطي السؤال', icon: '⏭️', count: 1, available: true, description: 'يتيح لك تخطي السؤال الصعب' },
-      { id: 'bonus', name: 'نقاط إضافية', icon: '🌟', count: 1, available: true, description: 'يضاعف نقاط الأسئلة القادمة' }
-    ];
-
-    const powerup = checkpointPowerups[checkpointIndex];
-    if (!powerup) return;
-
-    // Add the powerup to available powerups or increase count if exists
-    const existingPowerup = this.availablePowerups.find(p => p.id === powerup.id);
-    if (existingPowerup) {
-      existingPowerup.count++;
-      existingPowerup.available = true;
-    } else {
-      this.availablePowerups.push({ ...powerup });
-    }
-
-    // Show notification
-    this.powerupNotification = {
-      powerup: powerup,
-      visible: true,
-      message: `🎉 تهانينا! لقد وصلت إلى نقطة تفتيش وحصلت على: ${powerup.name}`
-    };
-
-    // Hide notification after 4 seconds
-    setTimeout(() => {
-      this.powerupNotification.visible = false;
-    }, 4000);
-
-    // Show confetti effect
-    this.showConfetti = true;
-    setTimeout(() => this.showConfetti = false, 2000);
-  }
-
-  // Method to dismiss notification manually
-  dismissPowerupNotification() {
-    this.powerupNotification.visible = false;
-  }
-
-  // Getter for current question to prevent template errors
-  get currentQuestion() {
-    return this.questions && this.questions.length > 0 && this.currentQuestionIndex >= 0 && this.currentQuestionIndex < this.questions.length 
-      ? this.questions[this.currentQuestionIndex] 
-      : null;
+  isCheckpointReached(index: number): boolean {
+    return this.checkpointsReached[index];
   }
 }

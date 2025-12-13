@@ -1,5 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap");
 
+/* Define the custom fonts used in your friend's UI */
 @font-face {
   font-family: 'FredFredburgerARAHeadBlack';
   src: url('/assets/fonts/19188-fred-fredburger-arabic.ttf') format('truetype');
@@ -8,16 +11,43 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'InkBrushArabic';
+  src: url('/assets/fonts/InkBrushArabic.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --app-font: 'FredFredburgerARAHeadBlack';
+  --app-font: 'FredFredburgerARAHeadBlack', 'Cairo', sans-serif;
 }
 
 html, body, app-root {
   height: 100%;
-  font-family: var(--app-font), sans-serif;
+  margin: 0;
+  font-family: var(--app-font);
 }
 
-/* Forcer la police partout afin d'uniformiser l'apparence (remplacer si besoin) */
+/* Force the font globally to ensure consistency across merged components */
 * {
-  font-family: var(--app-font), sans-serif !important;
+  font-family: var(--app-font) !important;
+}
+
+/* Scrollbar Styling for a polished look */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #5BBCFF;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7EA1FF;
 }

@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
-import { environment }                   from '../../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { AvatarComponent } from "../../shared/avatar/avatar.component";
 import { QuizService } from '../../services/quiz.service';
+import { AiService } from '../../services/ai.service';
+import { firstValueFrom } from 'rxjs';
 
 interface ModuleOption {
   name: string;
@@ -26,6 +28,7 @@ interface SubjectOption {
   styleUrls: ['./select-module.component.css']
 })
 export class SelectModuleComponent implements OnInit {
+  // Friend's Data Structure with Icons
   subjects: SubjectOption[] = [
     {
       name: 'أحياء',
@@ -57,12 +60,17 @@ export class SelectModuleComponent implements OnInit {
   currentMode: string | null = null;
 
   loading  = false;
-  result   : any = null;
   errorMsg : string | null = null;
 
-  private readonly summaryUrl  = environment.apiBase+'/summary';
+  // URL from your environment
+  private readonly summaryUrl = environment.apiBase + '/summary';
 
-  constructor(private router: Router, private route: ActivatedRoute, private quizService: QuizService) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private quizService: QuizService,
+    private aiService: AiService // In case you want to use the service instead of raw fetch
+  ) {}
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(p => {
@@ -73,37 +81,36 @@ export class SelectModuleComponent implements OnInit {
   selectSubject(subject: SubjectOption) {
     this.selectedSubject = subject;
     this.loading = false;
-    this.result  = null;
     this.errorMsg = null;
   }
 
   async selectModule(module: ModuleOption): Promise<void> {
     if (!this.selectedSubject || !this.currentMode) return;
 
-    const payload = {
-      subject: this.selectedSubject.value,
-      module: module.name
-    };
-
+    // --- LOGIC FROM FRONT 1 (Backend Connection) ---
     if (this.currentMode === 'summary') {
       this.loading  = true;
       this.errorMsg = null;
 
+      const payload = {
+        subject: this.selectedSubject.value,
+        module: module.name // Pass the module name to backend
+      };
+
       try {
+        // Option A: Using fetch (as in your original code)
         const resp = await fetch(this.summaryUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        const text = await resp.text();
-        let data: any;
-        try { data = JSON.parse(text); } catch {}
+
+        const data = await resp.json();
 
         if (!resp.ok) {
-          this.errorMsg = `HTTP ${resp.status}\n${text}`;
+          throw new Error(data.error || 'Server error');
         } else if (data?.data) {
-          this.result = data;
-
+          // Success! Navigate to Lesson Board
           await this.router.navigate(['/lesson'], {
             queryParams: {
               subject: this.selectedSubject.value,
@@ -113,59 +120,51 @@ export class SelectModuleComponent implements OnInit {
             },
             state: {
               summaryPath: data.path,
-              summaryData: data.data
+              summaryData: data.data // Pass generated slides
             }
           });
-        } else if (data?.error) {
-          this.errorMsg = 'Error: ' + data.error;
         } else {
-          this.errorMsg = 'Unexpected response:\n' + text;
+          throw new Error('No data received');
         }
       } catch (err: any) {
-        this.errorMsg = 'Fetch error: ' + err.message;
+        console.error(err);
+        // If backend fails, you might want to load fallback data here or show error
+        this.errorMsg = 'حدث خطأ في توليد الملخص. الرجاء المحاولة لاحقاً.';
       } finally {
         this.loading = false;
       }
 
     } else if (this.currentMode === 'quiz') {
-      this.loading  = true;
+      // Logic for Quiz Mode
+      this.loading = true;
       this.errorMsg = null;
 
-      try {
-        // Use static quiz service instead of fetch
-        const quizRequest = {
-          module: module.name,
-          num_mc: 6,
-          num_tf: 4
-        };
+      const quizRequest = {
+        module: module.name,
+        num_mc: 6,
+        num_tf: 4
+      };
 
-        this.quizService.generateQuiz(quizRequest).subscribe({
-          next: (data) => {
-            this.result = data;
-
-            this.router.navigate(['/chatbot-quiz'], {
-              queryParams: {
-                subject: this.selectedSubject!.value,
-                module:  module.value,
-                mode:    this.currentMode,
-                path:    'static'
-              },
-              state: {
-                quizPath: 'static',
-                quizData: data.data
-              }
-            });
-            this.loading = false;
-          },
-          error: (err) => {
-            this.errorMsg = 'Error loading quiz: ' + err.message;
-            this.loading = false;
-          }
-        });
-      } catch (err: any) {
-        this.errorMsg = 'Error: ' + err.message;
-        this.loading = false;
-      }
+      this.quizService.generateQuiz(quizRequest).subscribe({
+        next: (data) => {
+          this.router.navigate(['/chatbot-quiz'], {
+            queryParams: {
+              subject: this.selectedSubject!.value,
+              module:  module.value,
+              mode:    this.currentMode
+            },
+            state: {
+              quizData: data.data
+            }
+          });
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error(err);
+          this.errorMsg = 'حدث خطأ في توليد الاختبار.';
+          this.loading = false;
+        }
+      });
     }
   }
 

@@ -1,12 +1,28 @@
+# AI Pipeline/app/runtime.py
+
 # -*- coding: utf-8 -*-
-# config_files/api/runtime.py
 from __future__ import annotations
-from app.crew.tools import qdrant_tool 
+
+from crewai_tools import QdrantVectorSearchTool
+
 from app.crew.agents import build_llm, define_agents
 from app.pdf_report import SessionMemory
+from app.crew.config import settings  # Import the new settings
+from app.helpers import embed, configure_gemini
 
-TOOL = qdrant_tool
+# Configure Gemini once at startup so embed() has a valid API key
+configure_gemini()
+
+TOOL = QdrantVectorSearchTool(
+    qdrant_url=settings.QDRANT_URL,
+    qdrant_api_key=settings.QDRANT_API_KEY,
+    collection_name="etudeai",
+    limit=5,
+    score_threshold=0.35,
+    custom_embedding_fn=embed,
+    check_compatibility=False,
+)
+
 LLM = build_llm()
 SUMMARY_AGENT, QA_AGENT, QUIZ_AGENT, FEEDBACK_AGENT = define_agents(TOOL)
-# simple session memory you already use in pdf_report.py
 GLOBAL_MEM = SessionMemory()
