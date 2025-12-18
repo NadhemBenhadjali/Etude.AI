@@ -20,7 +20,7 @@ class PlannerCrew:
 
     @llm
     def llm_cfg(self) -> LLM:
-        return LLM(model="gemini/gemini-2.5-flash-lite", temperature=0.5, max_tokens=4000)
+        return LLM(model="mistral/mistral-large-latest", temperature=0.7, max_tokens=4000)
 
     @tool
     def lesson_retriever_tool(self) -> LessonRetrieverTool:

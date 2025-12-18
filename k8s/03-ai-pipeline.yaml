@@ -1,0 +1,191 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-pipeline
+  namespace: etude-ai
+  labels:
+    app: ai-pipeline
+    tier: application
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ai-pipeline
+  template:
+    metadata:
+      labels:
+        app: ai-pipeline
+        tier: application
+    spec:
+      containers:
+      - name: ai-pipeline
+        image: etude-ai-pipeline:v1.0.0
+        imagePullPolicy: IfNotPresent  # Use local image
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        # From ConfigMap
+        - name: NEO4J_URI
+          valueFrom:
+            configMapKeyRef:
+              name: etude-ai-config
+              key: NEO4J_URI
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: etude-ai-config
+              key: REDIS_URL
+        - name: QDRANT_URL
+          valueFrom:
+            configMapKeyRef:
+              name: etude-ai-config
+              key: QDRANT_URL
+        - name: ALLOWED_ORIGINS
+          valueFrom:
+            configMapKeyRef:
+              name: etude-ai-config
+              key: ALLOWED_ORIGINS
+        - name: LLM_MODEL
+          valueFrom:
+            configMapKeyRef:
+              name: etude-ai-config
+              key: LLM_MODEL
+        - name: EMBEDDING_MODEL
+          valueFrom:
+            configMapKeyRef:
+              name: etude-ai-config
+              key: EMBEDDING_MODEL
+        - name: APP_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: etude-ai-config
+              key: APP_ENV
+
+        # From Secrets
+        - name: NEO4J_USER
+          valueFrom:
+            secretKeyRef:
+              name: etude-ai-secrets
+              key: neo4j-user
+        - name: NEO4J_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: etude-ai-secrets
+              key: neo4j-password
+        - name: LLM_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: etude-ai-secrets
+              key: llm-api-key
+        - name: QDRANT_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: etude-ai-secrets
+              key: qdrant-api-key
+        - name: ELEVENLABS_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: etude-ai-secrets
+              key: elevenlabs-api-key
+        - name: NGROK_AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: etude-ai-secrets
+              key: ngrok-auth-token
+        - name: SENTRY_DSN
+          valueFrom:
+            secretKeyRef:
+              name: etude-ai-secrets
+              key: sentry-dsn
+        - name: ENVIRONMENT
+          valueFrom:
+            secretKeyRef:
+              name: etude-ai-secrets
+              key: environment
+        - name: RELEASE_VERSION
+          valueFrom:
+            secretKeyRef:
+              name: etude-ai-secrets
+              key: release-version
+
+        # Health checks
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+
+        # Resource limits
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+
+        # Lifecycle
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "sleep 15"]
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-pipeline
+  namespace: etude-ai
+  labels:
+    app: ai-pipeline
+spec:
+  selector:
+    app: ai-pipeline
+  ports:
+  - port: 80
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  type: ClusterIP
+
+---
+# Horizontal Pod Autoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ai-pipeline-hpa
+  namespace: etude-ai
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ai-pipeline
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+

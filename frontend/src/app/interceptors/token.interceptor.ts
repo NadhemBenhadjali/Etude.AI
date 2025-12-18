@@ -15,11 +15,17 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  // 2) Only attach tokens to calls going to your backend API
+  // 2) Skip Keycloak token refresh requests (they don't need our token)
+  if (req.url.includes('/realms/') || req.url.includes('/protocol/openid-connect/token')) {
+    return next(req);
+  }
+
+  // 3) Only attach tokens to calls going to your backend API
   const isApiCall =
     req.url.startsWith(apiBaseUrl) ||
     req.url.startsWith('http://localhost:8081/api') ||
     req.url.startsWith('/api/');
+
 
   if (!isApiCall) {
     return next(req);
@@ -27,7 +33,9 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
 
   return from(authService.getToken()).pipe(
     switchMap(token => {
+
       if (!token) {
+        console.warn('No authentication token available for request:', req.url);
         // Not logged in or no token → send request as is
         // Backend will return 401 for protected endpoints
         return next(req);

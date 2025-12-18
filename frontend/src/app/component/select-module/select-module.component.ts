@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { AvatarComponent } from "../../shared/avatar/avatar.component";
 import { QuizService } from '../../services/quiz.service';
 import { AiService } from '../../services/ai.service';
+import { AuthService } from '../../services/auth.service';
 import { firstValueFrom } from 'rxjs';
 
 interface ModuleOption {
@@ -69,7 +71,9 @@ export class SelectModuleComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private quizService: QuizService,
-    private aiService: AiService // In case you want to use the service instead of raw fetch
+    private aiService: AiService,
+    private http: HttpClient,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -98,18 +102,12 @@ export class SelectModuleComponent implements OnInit {
       };
 
       try {
-        // Option A: Using fetch (as in your original code)
-        const resp = await fetch(this.summaryUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+        // Use HttpClient instead of fetch to ensure token interceptor works
+        const data = await firstValueFrom(
+          this.http.post<any>(this.summaryUrl, payload)
+        );
 
-        const data = await resp.json();
-
-        if (!resp.ok) {
-          throw new Error(data.error || 'Server error');
-        } else if (data?.data) {
+        if (data?.data) {
           // Success! Navigate to Lesson Board
           await this.router.navigate(['/lesson'], {
             queryParams: {
@@ -128,8 +126,20 @@ export class SelectModuleComponent implements OnInit {
         }
       } catch (err: any) {
         console.error(err);
-        // If backend fails, you might want to load fallback data here or show error
-        this.errorMsg = 'حدث خطأ في توليد الملخص. الرجاء المحاولة لاحقاً.';
+
+        // Check if it's an authentication error
+        if (err instanceof HttpErrorResponse && err.status === 401) {
+          this.errorMsg = 'انتهت الجلسة. الرجاء تسجيل الدخول مرة أخرى.';
+          // Clear tokens and redirect to login after 2 seconds
+          this.authService.logout().then(() => {
+            setTimeout(() => {
+              this.router.navigate(['/signin']);
+            }, 2000);
+          });
+        } else {
+          // If backend fails, you might want to load fallback data here or show error
+          this.errorMsg = 'حدث خطأ في توليد الملخص. الرجاء المحاولة لاحقاً.';
+        }
       } finally {
         this.loading = false;
       }

@@ -44,6 +44,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    env_file:
+      - ../.env
     environment:
       - REDIS_URL=${REDIS_URL}
       - NEO4J_URI=${NEO4J_URI}
@@ -56,22 +58,21 @@ services:
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
     depends_on:
       - redis
-    command: ["python", "-m", "main"]
+    command: [ "python", "-m", "main" ]
     networks:
       - etudeai
-
-  tts-service:
-    build:
-      context: "../TTS-Integration"
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - "8002:8000"
-    environment:
-      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
-      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
-    networks:
-      - etudeai
+  #tts-service:
+  #  build:
+  #    context: "../TTS-Integration"
+  #    dockerfile: Dockerfile
+  #  restart: always
+  #  ports:
+  #    - "8002:8000"
+  #  environment:
+  #    - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+  #    - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+  #  networks:
+  #    - etudeai
 
   backend:
     build:
@@ -86,6 +87,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    env_file:
+      - ../.env
     environment:
       - SPRING_PROFILES_ACTIVE=production
       - POSTGRES_HOST=backend-db
@@ -102,7 +105,9 @@ services:
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
       - AI_PIPELINE_URL=${AI_PIPELINE_URL}
-      - SENTRY_DSN=${SENTRY_DSN}
+      - SENTRY_DSN_BACKEND=${SENTRY_DSN_BACKEND}
+      - ENVIRONMENT=${ENVIRONMENT}
+      - RELEASE_VERSION=${RELEASE_VERSION}
     depends_on:
       backend-db:
         condition: service_healthy

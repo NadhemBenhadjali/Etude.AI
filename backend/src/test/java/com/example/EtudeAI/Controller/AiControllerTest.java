@@ -28,13 +28,13 @@ public class AiControllerTest {
     @Test
     @WithMockUser
     void getSummary_ShouldReturnOk_WhenServiceReturnsResponse() {
-        when(aiPipelineService.getSummary(anyString(), anyString()))
+        when(aiPipelineService.getSummary(anyString(), anyString(), anyString()))
                 .thenReturn(Mono.just(Map.of("data", "summary content")));
 
         webTestClient.mutateWith(csrf())
                 .post().uri("/api/ai/summary")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(Map.of("module", "Test Module"))
+                .bodyValue(Map.of("subject", "Test Subject", "module", "Test Module"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()

@@ -1,5 +1,6 @@
 package com.example.EtudeAI.service;
 
+import com.example.EtudeAI.exception.ResourceNotFoundException;
 import com.example.EtudeAI.model.dto.UserDTO;
 import com.example.EtudeAI.model.entity.User;
 import com.example.EtudeAI.model.enums.Role;
@@ -143,14 +144,14 @@ public class UserService {
 
     public void deleteUser(String keycloakUserId) {
         if (!userRepository.existsByKeycloakUserId(keycloakUserId)) {
-            throw new EntityNotFoundException("User not found");
+            throw new ResourceNotFoundException("User", "keycloakUserId", keycloakUserId);
         }
         userRepository.deleteByKeycloakUserId(keycloakUserId);
     }
 
     public void updateElo(String keycloakUserId, int newElo) {
         User user = userRepository.findByKeycloakUserId(keycloakUserId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "keycloakUserId", keycloakUserId));
 
         user.setElo(Math.max(newElo, 0));
         userRepository.save(user);

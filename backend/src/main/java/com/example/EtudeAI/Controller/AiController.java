@@ -27,7 +27,18 @@ public class AiController {
                         @Parameter(description = "Session ID for tracking context") @RequestHeader(value = "X-Session-ID", required = false) String sessionId) {
                 String finalSessionId = (sessionId != null && !sessionId.isEmpty()) ? sessionId
                                 : UUID.randomUUID().toString();
-                return aiPipelineService.getSummary(payload.get("module"), finalSessionId)
+
+                String subject = payload.get("subject");
+                String module = payload.get("module");
+
+                if (subject == null || subject.isEmpty()) {
+                        throw new IllegalArgumentException("Subject is required");
+                }
+                if (module == null || module.isEmpty()) {
+                        throw new IllegalArgumentException("Module is required");
+                }
+
+                return aiPipelineService.getSummary(subject, module, finalSessionId)
                                 .map(response -> ResponseEntity.ok().header("X-Session-ID", finalSessionId)
                                                 .body(response));
         }

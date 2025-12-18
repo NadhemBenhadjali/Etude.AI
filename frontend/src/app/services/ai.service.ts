@@ -29,47 +29,27 @@ export interface TtsRequest {
 export class AiService {
     private apiUrl = environment.apiBase;
 
-    constructor(private http: HttpClient, private authService: AuthService) { }
-
-    private getHeaders(): Observable<HttpHeaders> {
-        return from(this.authService.getToken()).pipe(
-            map(token => new HttpHeaders({
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }))
-        );
-    }
+    constructor(private http: HttpClient) { }
 
     generatePlan(goal: string, time: string): Observable<any> {
-        return this.getHeaders().pipe(
-            switchMap(headers => this.http.post(`${this.apiUrl}/plan`, { goal, time }, { headers }))
-        );
+        return this.http.post(`${this.apiUrl}/plan`, { goal, time });
     }
 
     askQuestion(question: string): Observable<any> {
-        return this.getHeaders().pipe(
-            switchMap(headers => this.http.post(`${this.apiUrl}/qa`, { question }, { headers }))
-        );
+        return this.http.post(`${this.apiUrl}/qa`, { question });
     }
 
     generateSummary(subject: string, module: string): Observable<any> {
-        return this.getHeaders().pipe(
-            switchMap(headers => this.http.post(`${this.apiUrl}/summary`, { subject, module }, { headers }))
-        );
+        return this.http.post(`${this.apiUrl}/summary`, { subject, module });
     }
 
     generateQuiz(module: string, num_mc: number, num_tf: number): Observable<any> {
-        return this.getHeaders().pipe(
-            switchMap(headers => this.http.post(`${this.apiUrl}/quiz`, { module, num_mc, num_tf }, { headers }))
-        );
+        return this.http.post(`${this.apiUrl}/quiz`, { module, num_mc, num_tf });
     }
 
     generateTts(text: string): Observable<Blob> {
-        return this.getHeaders().pipe(
-            switchMap(headers => this.http.post(`${this.apiUrl}/tts`, { text }, {
-                headers,
-                responseType: 'blob'
-            }))
-        );
+        return this.http.post(`${this.apiUrl}/tts`, { text }, {
+            responseType: 'blob'
+        });
     }
 }

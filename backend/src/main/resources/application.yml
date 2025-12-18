@@ -4,6 +4,10 @@ server:
 spring:
   application:
     name: EtudeAI
+  mvc:
+    async:
+      request-timeout: 180s
+
 
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -62,10 +66,11 @@ management:
         enabled: true
 
 sentry:
-  dsn: ${SENTRY_DSN:}
-  environment: ${SPRING_PROFILES_ACTIVE:production}
+  dsn: ${SENTRY_DSN_BACKEND:}
+  environment: ${ENVIRONMENT:production}
   traces-sample-rate: 1.0
   enable-tracing: true
+  release: ${RELEASE_VERSION:unknown}
 
 otel:
   metrics:

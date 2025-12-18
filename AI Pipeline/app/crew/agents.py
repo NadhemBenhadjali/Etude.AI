@@ -1,9 +1,11 @@
 from crewai import Agent, LLM
 
-def build_llm() -> LLM:
-    return LLM(model="gemini/gemini-2.5-flash-lite", temperature=0, max_tokens="4000")
+from app.crew.config import settings
 
-def define_agents(tool) -> tuple[Agent, Agent, Agent, Agent, Agent]:
+def build_llm() -> LLM:
+    return LLM(model=settings.LLM_MODEL, temperature=0.7, max_tokens=4000)
+
+def define_agents(tool) -> tuple[Agent, Agent, Agent, Agent]:
     llm = build_llm()
     summary = Agent(
         role="ملخّص الدرس",
@@ -36,4 +38,5 @@ def define_agents(tool) -> tuple[Agent, Agent, Agent, Agent, Agent]:
         llm=llm,
         verbose=True,
     )
+
     return summary, qa, quiz, feedback

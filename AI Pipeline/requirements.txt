@@ -47,7 +47,11 @@ structlog
 # Testing
 pytest
 
+# Monitoring & Resilience
 prometheus_client
+litellm
+tenacity
+sentry-sdk[fastapi]
 
 # Database Construction (Optional - only needed for setup scripts)
 # PyMuPDF

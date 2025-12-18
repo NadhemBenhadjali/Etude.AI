@@ -27,6 +27,10 @@ out/
 .env.*.local
 *.env
 
+# Kubernetes Secrets (CRITICAL: Contains sensitive data)
+k8s/01-secrets.yaml
+k8s/*secrets*.yaml
+
 # Logs
 *.log
 npm-debug.log*

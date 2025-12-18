@@ -457,7 +457,6 @@ export class DashboardComponent implements OnInit {
 
   startSession(session: Session) {
     session.status = 'in-progress';
-    console.log('Starting session:', session);
     alert(`بدء الجلسة: ${session.sessionName}`);
     this.closeModal();
     this.generateCalendarDays();
@@ -609,7 +608,6 @@ export class DashboardComponent implements OnInit {
         this.chatMessagesContainer.nativeElement.scrollTop =
           this.chatMessagesContainer.nativeElement.scrollHeight;
       } catch {
-        console.log('Could not scroll to bottom');
       }
     }
   }

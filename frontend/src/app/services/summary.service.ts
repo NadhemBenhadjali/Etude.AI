@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface SummaryRequest {
   subject: string;
@@ -17,7 +18,7 @@ export interface SummaryResponse {
 
 @Injectable({ providedIn: 'root' })
 export class SummaryService {
-  private readonly url = '/summary';
+  private readonly url = `${environment.apiBase}/summary`;
 
   constructor(private http: HttpClient) {}
 

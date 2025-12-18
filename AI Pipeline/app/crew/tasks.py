@@ -1,4 +1,3 @@
-
 from crewai import Task
 
 def summary_task(sub_lessons_md,images_section, topic, branch,summary_agent) -> Task:

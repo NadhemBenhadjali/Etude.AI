@@ -20,4 +20,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "python -m app.crew.run && python -m main"]
+CMD ["python", "-m", "main"]

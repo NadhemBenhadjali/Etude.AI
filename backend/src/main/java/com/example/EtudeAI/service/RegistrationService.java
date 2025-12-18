@@ -1,5 +1,6 @@
 package com.example.EtudeAI.service;
 
+import com.example.EtudeAI.exception.KeycloakException;
 import com.example.EtudeAI.model.dto.UserDTO;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +49,10 @@ public class RegistrationService {
             // Create user in local DB
             userService.createUser(userId, userDTO);
         } else {
-            throw new RuntimeException("Failed to create user in Keycloak: " + response.getStatusInfo());
+            throw new KeycloakException(
+                    "Failed to create user in Keycloak: " + response.getStatusInfo(),
+                    response.getStatus()
+            );
         }
     }
 }

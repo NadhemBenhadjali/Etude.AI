@@ -39,7 +39,22 @@ export class SigninComponent {
 
       // Get return URL from query params or default to dashboard
       const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
-      await this.router.navigate([returnUrl]);
+
+      // Parse the returnUrl to handle query parameters correctly
+      if (returnUrl.includes('?')) {
+        const [path, queryString] = returnUrl.split('?');
+        const queryParams: any = {};
+
+        // Parse query string into object
+        queryString.split('&').forEach((param: string) => {
+          const [key, value] = param.split('=');
+          queryParams[decodeURIComponent(key)] = decodeURIComponent(value);
+        });
+
+        await this.router.navigate([path], { queryParams });
+      } else {
+        await this.router.navigate([returnUrl]);
+      }
     } catch (error: any) {
       console.error('Login failed', error);
       this.errorMessage = 'اسم المستخدم أو كلمة السر غير صحيحة';
