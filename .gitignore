@@ -131,9 +131,7 @@ bin/
 # Local DB Data / Docker Volumes
 backend_data/
 prometheus_data/
-grafana_data/
-backend/ops/keycloak/data/
-backend/ops/postgres/data/
+
 
 # ==============================================================================
 # FRONTEND (Angular / Node)

@@ -6,7 +6,8 @@ import os
 
 # Import for CORS middleware
 from fastapi.middleware.cors import CORSMiddleware
-from .tts_utils import elevenlabs_tts
+from tts_utils import elevenlabs_tts
+
 
 app = FastAPI()
 

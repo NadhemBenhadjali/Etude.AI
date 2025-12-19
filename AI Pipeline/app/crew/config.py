@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     LLM_MODEL: str = "mistral/mistral-large-latest"
     # IMPORTANT: must be 768-dim to match your existing Qdrant collection
     EMBEDDING_MODEL: str = "gemini/text-embedding-004"
+    MISTRAL_API_KEY: str = ""
 
     # Qdrant
     QDRANT_URL: str
@@ -79,6 +80,7 @@ os.environ["CHROMA_GOOGLE_GENAI_API_KEY"] = settings.CHROMA_GOOGLE_GENAI_API_KEY
 # Qdrant
 os.environ["QDRANT_URL"] = settings.QDRANT_URL
 os.environ["QDRANT_API_KEY"] = settings.QDRANT_API_KEY
+os.environ["MISTRAL_API_KEY"] = settings.MISTRAL_API_KEY
 
 # Models
 os.environ["LLM_MODEL"] = settings.LLM_MODEL

@@ -398,31 +398,97 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
   async loadQuizFromServer() {
     try {
       this.isLoading = true;
-      const response: any = await firstValueFrom(this.aiService.generateQuiz(this.currentModule, 5, 5));
+      this.gameStatus = 'جاري تحميل الأسئلة من الخادم...';
 
-      if (response && response.questions) {
-        this.questions = response.questions.map((q: any) => ({
-          ...q,
-          type: q.type === 'multiple-choice' ? 'mc' : (q.type === 'true-false' ? 'tf' : q.type),
-          a: q.correctAnswer || q.a
-        }));
+      console.log('🎯 Loading quiz from backend:', {
+        module: this.currentModule,
+        difficulty: this.currentDifficulty,
+        num_mc: 5,
+        num_tf: 5
+      });
 
-        this.totalQuestions = this.questions.length;
-        this.gameStatus = 'جاري اللعب';
-        this.inQuiz = true;
-        this.currentQuestionIndex = 0;
-        this.score = 0;
-        this.startTimer();
+      const response: any = await firstValueFrom(
+        this.aiService.generateQuiz(this.currentModule, 5, 5)
+      );
+
+      console.log('📦 Raw response from backend:', response);
+
+      // Handle different possible response formats
+      let questionsList: any[] = [];
+
+      if (response && Array.isArray(response)) {
+        // Response is directly an array of questions
+        questionsList = response;
+      } else if (response && response.questions && Array.isArray(response.questions)) {
+        // Response has a questions property
+        questionsList = response.questions;
+      } else if (response && response.data && response.data.questions && Array.isArray(response.data.questions)) {
+        // Response has nested data.questions property
+        questionsList = response.data.questions;
       } else {
-        throw new Error('Invalid quiz format');
+        console.error('❌ Unexpected response format:', response);
+        throw new Error('Invalid quiz format received from backend');
       }
-    } catch (err) {
-      console.error('Failed to load quiz:', err);
-      // Fallback to friend's rich arabic questions
+
+      if (questionsList.length === 0) {
+        throw new Error('No questions received from backend');
+      }
+
+      // Map the questions to the correct format
+      this.questions = questionsList.map((q: any, index: number) => {
+        console.log(`📝 Question ${index + 1}:`, q);
+
+        return {
+          q: q.q || q.question || q.text || '',
+          options: q.options || q.choices || [],
+          a: q.a || q.answer || q.correctAnswer || q.correct_answer || '',
+          type: this.normalizeQuestionType(q.type)
+        };
+      });
+
+      console.log('✅ Processed questions:', this.questions);
+
+      this.totalQuestions = this.questions.length;
+      this.gameStatus = 'جاري اللعب';
+      this.inQuiz = true;
+      this.currentQuestionIndex = 0;
+      this.score = 0;
+      this.showQuestion();
+
+      console.log(`🎮 Quiz loaded successfully: ${this.questions.length} questions`);
+    } catch (err: any) {
+      console.error('❌ Failed to load quiz from backend:', err);
+      console.error('Error details:', {
+        message: err.message,
+        stack: err.stack
+      });
+
+      this.gameStatus = 'فشل تحميل الأسئلة من الخادم';
+      this.messages.push({
+        text: '⚠️ عذراً، حدث خطأ في تحميل الأسئلة من الخادم. جاري استخدام أسئلة احتياطية...',
+        isUser: false
+      });
+
+      // Fallback to static questions
       this.loadFallbackQuestions();
     } finally {
       this.isLoading = false;
     }
+  }
+
+  private normalizeQuestionType(type: string): 'mc' | 'tf' {
+    if (!type) return 'mc';
+
+    const normalizedType = type.toLowerCase().trim();
+
+    if (normalizedType === 'tf' ||
+        normalizedType === 'true-false' ||
+        normalizedType === 'true_false' ||
+        normalizedType === 'boolean') {
+      return 'tf';
+    }
+
+    return 'mc';
   }
 
   loadFallbackQuestions() {

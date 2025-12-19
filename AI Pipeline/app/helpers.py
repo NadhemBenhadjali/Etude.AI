@@ -223,6 +223,7 @@ def embed(text: str, use_cache: bool = True) -> List[float]:
                 response = litellm.embedding(
                     model=model,
                     input=[text],
+                    api_key=settings.MISTRAL_API_KEY,
                     timeout=15.0,  # 15 second timeout
                 )
                 embedding = response["data"][0]["embedding"]
@@ -230,7 +231,7 @@ def embed(text: str, use_cache: bool = True) -> List[float]:
                 return embedding
 
             # Legacy for Google text-embedding-004
-            if model == "text-embedding-004":
+            if model == "gemini/text-embedding-004":
                 configure_gemini()
                 res = genai.embed_content(model=model, content=text)
                 emb = res.get("embedding")
