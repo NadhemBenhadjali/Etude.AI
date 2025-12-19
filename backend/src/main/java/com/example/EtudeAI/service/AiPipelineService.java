@@ -9,10 +9,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
-
-import java.time.Duration;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Service
@@ -26,8 +23,7 @@ public class AiPipelineService {
     }
 
     public Mono<Map> getSummary(String subject, String module, String sessionId) {
-        log.info("Calling AI Pipeline /summary with subject='{}', module='{}', sessionId='{}'",
-                subject, module, sessionId);
+        log.info("Calling AI Pipeline /summary with subject='{}', module='{}', sessionId='{}'", subject, module, sessionId);
 
         Map<String, String> requestBody = Map.of("subject", subject, "module", module);
         log.debug("Request body: {}", requestBody);
@@ -38,31 +34,17 @@ public class AiPipelineService {
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(Map.class)
-
-                // IMPORTANT: AI pipeline takes ~47s in your logs, so 180s is safe
-                .timeout(Duration.ofSeconds(180))
-
                 .doOnSuccess(response -> log.info("Successfully received summary response"))
                 .doOnError(error -> log.error("Error calling AI Pipeline: {}", error.getMessage()))
-
                 .onErrorMap(WebClientResponseException.class, e -> {
                     String errorBody = e.getResponseBodyAsString();
                     log.error("AI Pipeline error while generating summary: Status={}, Response body: {}",
                             e.getStatusCode(), errorBody);
-
                     String errorMessage = String.format("AI Pipeline returned %s: %s",
                             e.getStatusCode(),
                             errorBody.isEmpty() ? e.getMessage() : errorBody);
-
                     return new AiServiceException("Summary", errorMessage, e);
                 })
-
-                // Map client-side timeout to a friendly domain exception
-                .onErrorMap(TimeoutException.class, e ->
-                        new AiServiceException("Summary", "AI Pipeline took too long to respond", e)
-                )
-
-                // Keep your generic mapper last
                 .onErrorMap(e -> !(e instanceof AiServiceException), e -> {
                     log.error("Unexpected error while generating summary: {}", e.getMessage());
                     return new AiServiceException("Summary", "Failed to generate summary", e);

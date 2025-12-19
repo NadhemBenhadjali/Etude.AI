@@ -1,5 +1,6 @@
 package com.example.EtudeAI.config;
 
+import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,14 +25,17 @@ public class KeycloakConfig {
     @Value("${keycloak.admin.password}")
     private String password;
 
+    @Value("${keycloak.client-secret}")
+    private String clientSecret;
+
     @Bean
     public Keycloak keycloak() {
         return KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
-                .realm("master")
+                .realm(realm)
                 .clientId(clientId)
-                .username(username)
-                .password(password)
+                .clientSecret(clientSecret)
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
                 .build();
     }
 }

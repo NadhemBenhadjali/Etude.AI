@@ -42,7 +42,8 @@ spring:
 keycloak:
   auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8083}
   realm: ${KEYCLOAK_REALM:etudeai}
-  resource: ${KEYCLOAK_RESOURCE:etudeai-backend}
+  resource: ${KEYCLOAK_RESOURCE:backend}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET:}
   admin:
     username: ${KEYCLOAK_ADMIN:admin}
     password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
