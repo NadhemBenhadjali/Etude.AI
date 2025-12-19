@@ -2,33 +2,37 @@
   <h2>🌟اعمل حساب جديد🌟</h2>
 
   <div class="input-group">
-    <input type="text" id="firstName" name="firstName" [(ngModel)]="name" required placeholder=" " />
+    <input type="text" id="firstName" name="firstName" [(ngModel)]="name" required placeholder=" "
+      autocomplete="given-name" />
     <label for="firstName">الاسم</label>
   </div>
 
   <div class="input-group">
-    <input type="text" id="lastName" name="lastName" [(ngModel)]="lastName" required placeholder=" " />
+    <input type="text" id="lastName" name="lastName" [(ngModel)]="lastName" required placeholder=" "
+      autocomplete="family-name" />
     <label for="lastName">اللقب</label>
   </div>
 
   <div class="input-group">
-    <input type="email" id="email" name="email" [(ngModel)]="email" required placeholder=" " />
+    <input type="email" id="email" name="email" [(ngModel)]="email" required placeholder=" " autocomplete="email" />
     <label for="email">الإيميل</label>
   </div>
 
   <div class="input-group">
-    <input type="password" id="password" name="password" [(ngModel)]="password" required placeholder=" " />
+    <input type="password" id="password" name="password" [(ngModel)]="password" required placeholder=" "
+      autocomplete="new-password" />
     <label for="password">كلمة السر</label>
   </div>
 
   <div class="input-group">
     <input type="password" id="confirmPassword" name="confirmPassword" [(ngModel)]="confirmPassword" required
-      placeholder=" " />
+      placeholder=" " autocomplete="new-password" />
     <label for="confirmPassword">أكّد كلمة السر</label>
   </div>
 
   <div class="input-group">
-    <input type="date" id="birthDate" name="birthDate" [(ngModel)]="birthDate" required placeholder=" " />
+    <input type="date" id="birthDate" name="birthDate" [(ngModel)]="birthDate" required placeholder=" "
+      autocomplete="bday" />
     <label for="birthDate">تاريخ الميلاد 🎂</label>
   </div>
 

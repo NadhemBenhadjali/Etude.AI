@@ -7,10 +7,10 @@
     <h2>🌟 تسجيل الدخول 🌟</h2>
 
     <label for="username">📧 اسم المستخدم</label>
-    <input type="text" id="username" name="username" [(ngModel)]="username" placeholder="اسم المستخدم" required />
+    <input type="text" id="username" name="username" [(ngModel)]="username" placeholder="اسم المستخدم" required autocomplete="username" />
 
     <label for="password">🔒 كلمة السر</label>
-    <input type="password" id="password" name="password" [(ngModel)]="password" placeholder="********" required />
+    <input type="password" id="password" name="password" [(ngModel)]="password" placeholder="********" required autocomplete="current-password" />
 
     <div *ngIf="errorMessage" class="error-message" style="color: red; margin-bottom: 10px;">
       {{ errorMessage }}
