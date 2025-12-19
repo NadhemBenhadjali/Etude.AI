@@ -61,18 +61,18 @@ services:
     command: [ "python", "-m", "main" ]
     networks:
       - etudeai
-  #tts-service:
-  #  build:
-  #    context: "../TTS-Integration"
-  #    dockerfile: Dockerfile
-  #  restart: always
-  #  ports:
-  #    - "8002:8000"
-  #  environment:
-  #    - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
-  #    - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
-  #  networks:
-  #    - etudeai
+  tts-service:
+    build:
+      context: "../TTS-Integration"
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8002:8000"
+    environment:
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+    networks:
+      - etudeai
 
   backend:
     build:
