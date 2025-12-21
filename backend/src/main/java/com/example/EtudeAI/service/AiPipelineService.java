@@ -18,7 +18,7 @@ public class AiPipelineService {
     private final WebClient webClient;
 
     public AiPipelineService(WebClient.Builder webClientBuilder,
-            @Value("${AI_PIPELINE_URL:http://localhost:8000}") String aiPipelineUrl) {
+            @Value("${ai-pipeline.url}") String aiPipelineUrl) {
         this.webClient = webClientBuilder.baseUrl(aiPipelineUrl).build();
     }
 

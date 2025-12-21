@@ -116,3 +116,17 @@ class FinishRequest(BaseModel):
         v = re.sub(r'\s+', ' ', v)
         return v
 
+class TTSRequest(BaseModel):
+    text: str = Field(..., min_length=1, max_length=5000)
+    voice_id: str | None = None
+    model_id: str | None = None
+    stability: float = Field(0.5, ge=0.0, le=1.0)
+    similarity_boost: float = Field(0.75, ge=0.0, le=1.0)
+
+    @field_validator("text")
+    @classmethod
+    def strip_text(cls, v: str) -> str:
+        v2 = v.strip()
+        if not v2:
+            raise ValueError("text cannot be empty")
+        return v2

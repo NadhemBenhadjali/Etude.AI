@@ -4,59 +4,36 @@ metadata:
   name: etude-ai-ingress
   namespace: etude-ai
   annotations:
-    # Use appropriate ingress controller annotations
-    # For nginx ingress controller:
     kubernetes.io/ingress.class: "nginx"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"  # If using cert-manager
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
 spec:
   tls:
-  - hosts:
-    - api.yourdomain.com
-    - ai.yourdomain.com
-    secretName: etude-ai-tls
+    - hosts:
+        - etude.ai
+      secretName: etude-ai-tls
   rules:
-  # Backend API
-  - host: api.yourdomain.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: backend
-            port:
-              number: 80
-
-  # AI Pipeline
-  - host: ai.yourdomain.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: ai-pipeline
-            port:
-              number: 80
-
-  # Monitoring (optional, restrict access!)
-  - host: monitoring.yourdomain.com
-    http:
-      paths:
-      - path: /grafana
-        pathType: Prefix
-        backend:
-          service:
-            name: grafana
-            port:
-              number: 80
-      - path: /prometheus
-        pathType: Prefix
-        backend:
-          service:
-            name: prometheus
-            port:
-              number: 9090
-
+    - host: etude.ai
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 80
+          - path: /auth
+            pathType: Prefix
+            backend:
+              service:
+                name: keycloak
+                port:
+                  number: 8080
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80

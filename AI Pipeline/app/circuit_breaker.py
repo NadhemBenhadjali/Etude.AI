@@ -205,3 +205,11 @@ qdrant_circuit = CircuitBreaker(
     expected_exception=Exception,
 )
 
+tts_circuit = CircuitBreaker(
+    name="tts",
+    failure_threshold=5,
+    recovery_timeout=30,
+    expected_exception=Exception,
+)
+
+

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'; // Import OnDestroy
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
-import { HttpClientModule, HttpClient, HttpResponse } from '@angular/common/http';
+import {  HttpClient, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { firstValueFrom } from 'rxjs';
@@ -17,7 +17,7 @@ interface Slide {
 @Component({
   selector: 'app-lesson-board',
   standalone: true,
-  imports: [CommonModule, RouterModule, HttpClientModule, AvatarComponent],
+  imports: [CommonModule, RouterModule,  AvatarComponent],
   templateUrl: './lesson-board.component.html',
   styleUrls: ['./lesson-board.component.css']
 })
@@ -31,7 +31,7 @@ export class LessonBoardComponent implements OnInit, OnDestroy { // Implement On
   boardImage = '/assets/images/S.png';
 
   /** Your FastAPI backend base URL */
-  private readonly backendBase = environment.apiBase2;
+  private readonly backendBase = environment.apiBase;
 
   // TTS related properties
   audioPlayer: HTMLAudioElement | undefined;

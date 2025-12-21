@@ -33,8 +33,8 @@ class Settings(BaseSettings):
     NEO4J_USER: str
     NEO4J_PASSWORD: str
 
-    # Ngrok
-    NGROK_AUTH_TOKEN: str | None = None
+    # ElevenLabs TTS
+    ELEVENLABS_API_KEY: str
 
     # Redis
     REDIS_URL: str = "redis://redis:6379/0"
@@ -85,6 +85,10 @@ os.environ["MISTRAL_API_KEY"] = settings.MISTRAL_API_KEY
 # Models
 os.environ["LLM_MODEL"] = settings.LLM_MODEL
 os.environ["EMBEDDING_MODEL"] = settings.EMBEDDING_MODEL
+
+#ElevenLabs TTS
+os.environ["ELEVENLABS_API_KEY"] = settings.ELEVENLABS_API_KEY
+
 
 # Export Sentry configuration
 if settings.SENTRY_DSN:

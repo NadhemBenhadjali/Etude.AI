@@ -8,13 +8,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError as PydanticValidationError
-
+import uuid
 from app.crew.config import URI, USER, PASSWORD
 from app.crew.knowledge_graph import Neo4jKG
 from app.crew.planner_crew import PlannerCrew
 from app.pdf_report import render_pdf
 from app.handlers import generate_summary_json, handle_qa, generate_quiz_json
-from app.models import SummaryRequest, QARequest, QuizRequest, FinishRequest, PlanRequest
+from app.models import SummaryRequest, QARequest, QuizRequest, FinishRequest, PlanRequest, TTSRequest
 from app.exceptions import (
     EtudeAIException,
     TopicNotFoundError,
@@ -22,6 +22,7 @@ from app.exceptions import (
     LLMQuotaExhaustedError,
     Neo4jConnectionError,
     RedisConnectionError,
+    TTSServiceError
 )
 
 from crewai import Crew, Task
@@ -44,6 +45,9 @@ from prometheus_client import (
     generate_latest,
     CONTENT_TYPE_LATEST,
 )
+
+from app.tts.elevenlabs import synthesize_tts_bytes
+
 
 # -------------------------------------------------------------------
 # Logging setup
@@ -640,6 +644,40 @@ async def plan_endpoint(request: Request, body: PlanRequest):
     finally:
         duration = time.time() - start_time
         PLAN_GENERATION_DURATION.labels(status=status).observe(duration)
+
+
+@app.post(
+    "/tts",
+    summary="Text to Speech",
+    description="Generates speech audio (mp3) from text using ElevenLabs.",
+    tags=["Audio"],
+)
+@limiter.limit("20/minute")
+def tts_endpoint(request: Request, body: TTSRequest):
+    session_id = get_session_id(request)
+
+    voice_id = body.voice_id or os.getenv("ELEVENLABS_VOICE_ID", "JjTirzdD7T3GMLkwdd3a")
+    model_id = body.model_id or os.getenv("ELEVENLABS_MODEL_ID", "eleven_multilingual_v2")
+
+    logger.info("tts_request", session_id=session_id, voice_id=voice_id, model_id=model_id)
+
+    audio = synthesize_tts_bytes(
+        text=body.text,
+        voice_id=voice_id,
+        model_id=model_id,
+        stability=body.stability,
+        similarity_boost=body.similarity_boost,
+    )
+
+    filename = f"tts_{uuid.uuid4().hex}.mp3"
+    logger.info("tts_success", session_id=session_id, bytes=len(audio))
+
+    return Response(
+        content=audio,
+        media_type="audio/mpeg",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
 
 
 @app.post(

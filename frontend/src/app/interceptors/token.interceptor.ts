@@ -1,14 +1,14 @@
-import { HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
-import { AuthService } from '../services/auth.service';
-import { from } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
-import { environment } from '../../environments/environment'; // adjust path if needed
+import {HttpInterceptorFn} from '@angular/common/http';
+import {inject} from '@angular/core';
+import {AuthService} from '../services/auth.service';
+import {from} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
+import {environment} from '../../environments/environment'; // adjust path if needed
 
 export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
 
-  const apiBaseUrl = environment.apiUrl ?? 'http://localhost:8081/api';
+  const apiBaseUrl = environment.apiUrl;
 
   // 1) Skip Angular assets (icons, scripts, etc.)
   if (req.url.startsWith('assets/')) {
@@ -20,11 +20,7 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  // 3) Only attach tokens to calls going to your backend API
-  const isApiCall =
-    req.url.startsWith(apiBaseUrl) ||
-    req.url.startsWith('http://localhost:8081/api') ||
-    req.url.startsWith('/api/');
+  const isApiCall = req.url === '/api' || req.url.startsWith('/api/');
 
 
   if (!isApiCall) {

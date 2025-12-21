@@ -5,15 +5,16 @@ import { KeycloakService } from 'keycloak-angular';
 import { tokenInterceptor } from './interceptors/token.interceptor';
 
 import { routes } from './app.routes';
+import {environment} from '../environments/environment';
 
 function initializeKeycloak(keycloak: KeycloakService) {
   return () =>
     keycloak.init({
-      config: {
-        url: 'http://localhost:8083',
-        realm: 'etudeai',
-        clientId: 'front'
-      },
+            config: {
+              url: `${window.location.origin}${environment.keycloakUrl}`,
+              realm: environment.keycloakRealm,
+              clientId: environment.keycloakClientId,
+            },
       initOptions: {
         checkLoginIframe: false,
         // Don't check SSO - we use custom direct login

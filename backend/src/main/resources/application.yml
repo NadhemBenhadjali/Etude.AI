@@ -30,8 +30,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${KEYCLOAK_PUBLIC_URL:http://localhost:8083}/realms/${KEYCLOAK_REALM:etudeai}
-          jwk-set-uri: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8083}/realms/${KEYCLOAK_REALM:etudeai}/protocol/openid-connect/certs
+          issuer-uri: ${KEYCLOAK_PUBLIC_URL}/realms/${KEYCLOAK_REALM}
+          jwk-set-uri: ${KEYCLOAK_AUTH_SERVER_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
 
   # Redis Configuration
   data:
@@ -40,17 +40,17 @@ spring:
       port: ${REDIS_PORT:6379}
 
 keycloak:
-  auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8083}
-  realm: ${KEYCLOAK_REALM:etudeai}
-  resource: ${KEYCLOAK_RESOURCE:backend}
+  auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL}
+  realm: ${KEYCLOAK_REALM}
+  resource: ${KEYCLOAK_RESOURCE}
   client-secret: ${KEYCLOAK_CLIENT_SECRET:}
   admin:
-    username: ${KEYCLOAK_ADMIN:admin}
-    password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
+    username: ${KEYCLOAK_ADMIN}
+    password: ${KEYCLOAK_ADMIN_PASSWORD}
 
 # Application Custom Config
 ai-pipeline:
-  url: ${AI_PIPELINE_URL:http://localhost:8000}
+  url: ${AI_PIPELINE_URL}
 
 # Observability
 management:
@@ -68,10 +68,10 @@ management:
 
 sentry:
   dsn: ${SENTRY_DSN_BACKEND:}
-  environment: ${ENVIRONMENT:production}
+  environment: ${ENVIRONMENT}
   traces-sample-rate: 1.0
   enable-tracing: true
-  release: ${RELEASE_VERSION:unknown}
+  release: ${RELEASE_VERSION}
 
 otel:
   metrics:

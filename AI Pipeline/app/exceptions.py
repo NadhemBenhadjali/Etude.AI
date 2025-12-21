@@ -82,3 +82,6 @@ class EmbeddingError(LLMServiceError):
     """Embedding generation failed."""
     pass
 
+class TTSServiceError(ServiceUnavailableError):
+    """ElevenLabs / TTS provider failure."""
+    pass

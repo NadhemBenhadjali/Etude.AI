@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import {environment} from '../../environments/environment';
 
 export interface UserDTO {
     id?: string;
@@ -56,41 +57,41 @@ export interface AchievementDTO {
 })
 export class UserService {
     private http = inject(HttpClient);
-    private apiUrl = 'http://localhost:8081/api/users';
+    private apiUrl = environment.apiUrl;
 
     createUser(user: Partial<UserDTO>): Observable<string> {
         return this.http.post<string>(this.apiUrl, user);
     }
 
     getCurrentUser(): Observable<UserDTO> {
-        return this.http.get<UserDTO>(`${this.apiUrl}/me`);
+        return this.http.get<UserDTO>(`${this.apiUrl}/users/me`);
     }
 
     updateUser(user: Partial<UserDTO>): Observable<UserDTO> {
-        return this.http.put<UserDTO>(`${this.apiUrl}/me`, user);
+        return this.http.put<UserDTO>(`${this.apiUrl}/users/me`, user);
     }
 
     deleteUser(): Observable<void> {
-        return this.http.delete<void>(`${this.apiUrl}/me`);
+        return this.http.delete<void>(`${this.apiUrl}/users/me`);
     }
 
     getUserSessions(page: number = 0, size: number = 10): Observable<PageResponse<SessionDTO>> {
-        return this.http.get<PageResponse<SessionDTO>>('http://localhost:8081/api/sessions', {
+        return this.http.get<PageResponse<SessionDTO>>(`${this.apiUrl}/sessions`, {
             params: { page: page.toString(), size: size.toString() }
         });
     }
 
     getUserAchievements(): Observable<AchievementDTO[]> {
-        return this.http.get<AchievementDTO[]>('http://localhost:8081/api/achievements/me');
+        return this.http.get<AchievementDTO[]>(`${this.apiUrl}/achievements/me`);
     }
 
     registerUser(registrationData: RegistrationData): Observable<string> {
-        return this.http.post<string>('http://localhost:8081/api/public/register', registrationData, {
+        return this.http.post<string>(`${this.apiUrl}/public/register`, registrationData, {
             responseType: 'text' as 'json'
         });
     }
   changePassword(payload: ChangePasswordRequest): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/me/change-password`, payload);
+    return this.http.post<void>(`${this.apiUrl}/users/me/change-password`, payload);
   }
 }
 

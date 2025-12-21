@@ -2,14 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { KeycloakService } from 'keycloak-angular';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly keycloakUrl = 'http://localhost:8083';
-  private readonly realm = 'etudeai';
-  private readonly clientId = 'front';
+private readonly keycloakUrl = window.location.origin + '/auth';
+  private readonly realm = environment.keycloakRealm;
+  private readonly clientId = environment.keycloakClientId;
 
   private readonly TOKEN_KEY = 'etude_access_token';
   private readonly REFRESH_TOKEN_KEY = 'etude_refresh_token';

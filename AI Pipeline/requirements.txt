@@ -2,7 +2,7 @@
 fastapi==0.120.0
 uvicorn==0.38.0
 python-multipart
-
+python-dotenv
 # Rate Limiting
 slowapi
 
@@ -53,6 +53,14 @@ litellm
 tenacity
 sentry-sdk[fastapi]
 
+
+elevenlabs>=0.2.3
+
 # Database Construction (Optional - only needed for setup scripts)
 # PyMuPDF
 # pytesseract
+
+
+
+
+
