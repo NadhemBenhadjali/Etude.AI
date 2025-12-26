@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import {environment} from '../../environments/environment';
+import { environment } from '../../environments/environment';
 
 export interface UserDTO {
     id?: string;
@@ -10,7 +10,7 @@ export interface UserDTO {
     firstname: string;
     lastname: string;
     birthDate: string;
-    level:     'FIRST'| 'SECOND'|  'THIRD'|  'FOURTH'| 'FIFTH'|  'SIXTH'
+    level: 'FIRST' | 'SECOND' | 'THIRD' | 'FOURTH' | 'FIFTH' | 'SIXTH'
     elo?: number;
     role?: string;
     avatar?: string;
@@ -21,8 +21,8 @@ export interface UserDTO {
 }
 
 export interface ChangePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
+    currentPassword: string;
+    newPassword: string;
 }
 
 export interface PageResponse<T> {
@@ -35,18 +35,48 @@ export interface PageResponse<T> {
 
 export interface SessionDTO {
     id: string;
+    level?: string;
+    subject?: string;
+    module?: string;
+    lesson?: string;
+    status: string;
+    createdAt?: string;
+    startedAt?: string;
+    completedAt?: string;
+    summaryPointsOfFocus?: string[];
+    quizPointsOfFocus?: string[];
+    quizScore?: number;
+    summary?: string;
+    sessionFeedback?: string;
+    lessonContent?: string;
+    quizElements?: QuizElementDTO[];
+    qnaElements?: QnAElementDTO[];
+    // Deprecated/Mapped fields locally
     topic?: string;
     selectedModule?: string;
     notes?: string;
-    status: string;
-    createdAt: string;
-    updatedAt: string;
+    updatedAt?: string;
+}
+
+export interface QuizElementDTO {
+    id?: string;
+    quizType: 'MULTIPLE_CHOICE' | 'TRUE_FALSE' | 'OPEN_ENDED' | 'CODING' | 'FILL_IN_THE_BLANK';
+    question: string;
+    options: string[];
+    answer: string;
+    answered: boolean;
+}
+
+export interface QnAElementDTO {
+    id?: string;
+    question: string;
+    answer: string;
 }
 
 export interface AchievementDTO {
     id: string;
     name: string;
-    icon : string;
+    icon: string;
     description: string;
     unlocked: boolean;
     unlockedAt?: string;
@@ -90,9 +120,17 @@ export class UserService {
             responseType: 'text' as 'json'
         });
     }
-  changePassword(payload: ChangePasswordRequest): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/users/me/change-password`, payload);
-  }
+    changePassword(payload: ChangePasswordRequest): Observable<void> {
+        return this.http.post<void>(`${this.apiUrl}/users/me/change-password`, payload);
+    }
+
+    saveSession(session: SessionDTO): Observable<SessionDTO> {
+        return this.http.post<SessionDTO>(`${this.apiUrl}/sessions/save`, session);
+    }
+
+    getSessionById(id: string): Observable<SessionDTO> {
+        return this.http.get<SessionDTO>(`${this.apiUrl}/sessions/${id}`);
+    }
 }
 
 export interface RegistrationData {

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { UserService, UserDTO } from '../../services/user.service';
 import { GamificationService, Achievement } from '../../services/gamification.service';
+import { AuthService } from '../../services/auth.service';
 
 interface Activity {
   icon: string;
@@ -19,6 +20,7 @@ interface Activity {
 export class ProfileComponent implements OnInit {
   private userService = inject(UserService);
   private gamificationService = inject(GamificationService);
+  private authService = inject(AuthService);
 
   // Front2 Data Fields
   username = 'Loading...';
@@ -96,5 +98,9 @@ export class ProfileComponent implements OnInit {
 
   getXpPercentage(): number {
     return (this.xp / this.xpToNextLevel) * 100;
+  }
+
+  logout() {
+    this.authService.logout();
   }
 }

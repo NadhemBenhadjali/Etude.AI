@@ -1,21 +1,49 @@
-.avatar {
-  position: absolute; /* Ensures it stays in place relative to the viewport */
-  top: 20px;       /* Distance from the top of the viewport */
-  right: 20px;     /* Distance from the right of the viewport */
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  border: 3px solid #FFFAB7;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  object-fit: cover;
-  background-color: white;
-  cursor: pointer; /* Keeps the cursor pointer property */
-  z-index: 1000;   /* Optional: Ensures it stays above other content if needed */
+.avatar-container {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
 }
 
-@media (max-width: 600px) {
-  .avatar {
-    width: 60px;
-    height: 60px;
-  }
+.avatar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+}
+
+.logout-btn {
+  background: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e74c3c;
+  /* Red color for logout */
+}
+
+.logout-btn:hover {
+  transform: scale(1.1);
+  background: #f8f9fa;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }

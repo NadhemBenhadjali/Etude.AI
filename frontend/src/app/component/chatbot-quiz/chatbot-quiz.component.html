@@ -1,6 +1,6 @@
 <nav class="navbar">
   <ul>
-    <li><a routerLink="/">  الرئيسية </a></li>
+    <li><a routerLink="/"> الرئيسية </a></li>
     <li><a routerLink="/about"> شكون احنا؟</a></li>
     <li><a routerLink="/contact">كلمنا</a></li>
   </ul>
@@ -38,9 +38,8 @@
         <span class="time-value">{{ timeLeft }}</span>
       </div>
       <div class="lives-display">
-        <span *ngFor="let life of lives; let i = index"
-              class="life-heart"
-              [class.life-lost]="i >= currentLives">❤️</span>
+        <span *ngFor="let life of lives; let i = index" class="life-heart"
+          [class.life-lost]="i >= currentLives">❤️</span>
       </div>
     </div>
   </div>
@@ -79,22 +78,17 @@
       <div class="progress-track">
         <div class="track-background"></div>
         <div class="progress-line" [style.width.%]="gameProgressPercent"></div>
-        <div class="checkpoint"
-             *ngFor="let checkpoint of progressCheckpoints; let i = index"
-             [style.left.%]="checkpoint.position"
-             [class.checkpoint-reached]="checkpoint.reached"
-             [class.checkpoint-current]="checkpoint.current">
+        <div class="checkpoint" *ngFor="let checkpoint of progressCheckpoints; let i = index"
+          [style.left.%]="checkpoint.position" [class.checkpoint-reached]="checkpoint.reached"
+          [class.checkpoint-current]="checkpoint.current">
           <span class="checkpoint-icon">{{ checkpoint.icon }}</span>
         </div>
       </div>
 
       <!-- Enhanced Dino Character -->
       <div class="dino-container" [style.left.%]="dinoPosition">
-        <img src="/assets/images/dino.png" alt="Dinosaur"
-             class="dino-character"
-             [class.dino-happy]="lastAnswerCorrect"
-             [class.dino-thinking]="isLoading"
-             [class.dino-celebrating]="showConfetti">
+        <img src="/assets/images/dino.png" alt="Dinosaur" class="dino-character" [class.dino-happy]="lastAnswerCorrect"
+          [class.dino-thinking]="isLoading" [class.dino-celebrating]="showConfetti">
         <div class="dino-power-aura" *ngIf="currentCombo > 3"></div>
         <div class="dino-speech" *ngIf="dinoMessage">{{ dinoMessage }}</div>
       </div>
@@ -111,10 +105,8 @@
       </div>
 
       <!-- Powerups -->
-      <div class="powerup-item"
-           *ngFor="let powerup of availablePowerups"
-           (click)="usePowerup(powerup)"
-           [class.powerup-available]="powerup.available">
+      <div class="powerup-item" *ngFor="let powerup of availablePowerups" (click)="usePowerup(powerup)"
+        [class.powerup-available]="powerup.available">
         <span class="powerup-icon">{{ powerup.icon }}</span>
         <span class="powerup-count">{{ powerup.count }}</span>
       </div>
@@ -122,18 +114,14 @@
 
     <!-- Enhanced Feedback System -->
     <div class="feedback-system">
-      <div *ngIf="feedbackMessage"
-           class="feedback-message"
-           [class]="feedbackClass">
+      <div *ngIf="feedbackMessage" class="feedback-message" [class]="feedbackClass">
         <div class="feedback-content">
           <span class="feedback-icon">{{ feedbackIcon }}</span>
           <span class="feedback-text">{{ feedbackMessage }}</span>
         </div>
         <div class="feedback-particles" *ngIf="showFeedbackParticles">
-          <span *ngFor="let particle of feedbackParticles"
-                class="particle"
-                [style.left.px]="particle.x"
-                [style.animationDelay.ms]="particle.delay">{{ particle.emoji }}</span>
+          <span *ngFor="let particle of feedbackParticles" class="particle" [style.left.px]="particle.x"
+            [style.animationDelay.ms]="particle.delay">{{ particle.emoji }}</span>
         </div>
       </div>
     </div>
@@ -157,15 +145,9 @@
       </div>
 
       <div class="answer-options">
-        <button
-          *ngFor="let opt of currentQuestion?.options; let i = index"
-          class="answer-option"
-          [class]="'option-' + (i + 1)"
-          [class.hint-correct]="hintActive && i === correctAnswerIndex"
-          (click)="answerQuestion(opt)"
-          [disabled]="isLoading || answerLocked"
-          (mouseover)="onOptionHover(i)"
-        >
+        <button *ngFor="let opt of currentQuestion?.options; let i = index" class="answer-option"
+          [class]="'option-' + (i + 1)" [class.hint-correct]="hintActive && i === correctAnswerIndex"
+          (click)="answerQuestion(opt)" [disabled]="isLoading || answerLocked" (mouseover)="onOptionHover(i)">
           <span class="option-letter">{{ getOptionLetter(i) }}</span>
           <span class="option-text">{{ opt }}</span>
           <div class="option-glow"></div>
@@ -174,9 +156,7 @@
 
       <!-- Skip Option for Hard Questions -->
       <div class="question-actions" *ngIf="currentDifficulty === 'expert'">
-        <button class="skip-button"
-                (click)="skipQuestion()"
-                [disabled]="skipsUsed >= maxSkips">
+        <button class="skip-button" (click)="skipQuestion()" [disabled]="skipsUsed >= maxSkips">
           <span class="skip-icon">⏭️</span>
           تخطي ({{ maxSkips - skipsUsed }} متبقي)
         </button>
@@ -194,23 +174,20 @@
         <div class="difficulty-selection">
           <h4>اختر مستوى التحدي:</h4>
           <div class="difficulty-options">
-            <button class="difficulty-btn difficulty-easy"
-                    (click)="setDifficulty('easy')"
-                    [class.selected]="selectedDifficulty === 'easy'">
+            <button class="difficulty-btn difficulty-easy" (click)="setDifficulty('easy')"
+              [class.selected]="selectedDifficulty === 'easy'">
               <span class="diff-icon">🌱</span>
               <span class="diff-name">مبتدئ</span>
               <span class="diff-desc">سهل ومريح</span>
             </button>
-            <button class="difficulty-btn difficulty-normal"
-                    (click)="setDifficulty('normal')"
-                    [class.selected]="selectedDifficulty === 'normal'">
+            <button class="difficulty-btn difficulty-normal" (click)="setDifficulty('normal')"
+              [class.selected]="selectedDifficulty === 'normal'">
               <span class="diff-icon">⚡</span>
               <span class="diff-name">متوسط</span>
               <span class="diff-desc">تحدي متوازن</span>
             </button>
-            <button class="difficulty-btn difficulty-expert"
-                    (click)="setDifficulty('expert')"
-                    [class.selected]="selectedDifficulty === 'expert'">
+            <button class="difficulty-btn difficulty-expert" (click)="setDifficulty('expert')"
+              [class.selected]="selectedDifficulty === 'expert'">
               <span class="diff-icon">🔥</span>
               <span class="diff-name">خبير</span>
               <span class="diff-desc">تحدي قصوى</span>
@@ -218,11 +195,7 @@
           </div>
         </div>
 
-        <button
-          class="start-game-button"
-          (click)="startGameWithDifficulty()"
-          [disabled]="!selectedDifficulty"
-        >
+        <button class="start-game-button" (click)="startGameWithDifficulty()" [disabled]="!selectedDifficulty">
           <span class="start-icon">🚀</span>
           ابدأ المغامرة!
         </button>
@@ -279,6 +252,14 @@
             <span class="action-icon">🔄</span>
             العب مرة أخرى!
           </button>
+
+          <!-- Manual Save / Finish Button -->
+          <button class="action-button save-button" (click)="saveSessionToServer(); router.navigate(['/dashboard'])"
+            style="background: #48BB78; color: white;">
+            <span class="action-icon">💾</span>
+            احفظ و أنهي
+          </button>
+
           <button class="action-button difficulty-button" (click)="changeDifficulty()">
             <span class="action-icon">⚙️</span>
             غير المستوى
@@ -304,21 +285,15 @@
   <div class="particle-container">
     <!-- Confetti Effect -->
     <div *ngIf="showConfetti" class="confetti-system">
-      <div *ngFor="let confetti of confettiParticles"
-           class="confetti-piece"
-           [style.left.px]="confetti.x"
-           [style.animationDelay.ms]="confetti.delay"
-           [style.backgroundColor]="confetti.color">
+      <div *ngFor="let confetti of confettiParticles" class="confetti-piece" [style.left.px]="confetti.x"
+        [style.animationDelay.ms]="confetti.delay" [style.backgroundColor]="confetti.color">
       </div>
     </div>
 
     <!-- Star Burst Effect -->
     <div *ngIf="showStarBurst" class="starburst-system">
-      <div *ngFor="let star of starBurstParticles"
-           class="star-particle"
-           [style.left.px]="star.x"
-           [style.top.px]="star.y"
-           [style.animationDelay.ms]="star.delay">⭐</div>
+      <div *ngFor="let star of starBurstParticles" class="star-particle" [style.left.px]="star.x"
+        [style.top.px]="star.y" [style.animationDelay.ms]="star.delay">⭐</div>
     </div>
   </div>
 

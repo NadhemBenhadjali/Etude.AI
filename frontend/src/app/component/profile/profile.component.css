@@ -17,7 +17,7 @@
   z-index: 10;
   font-family: 'FredFredburgerARAHeadBlack', sans-serif;
   direction: rtl;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 .profile-box {
@@ -34,8 +34,15 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 /* Profile Header */
@@ -177,6 +184,32 @@
   background: #5BBCFF;
   color: white;
   transform: translateY(-2px);
+}
+
+.logout-button {
+  background: linear-gradient(135deg, #FF5252 0%, #F44336 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+  width: 100%;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.logout-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+  background: linear-gradient(135deg, #FF1744 0%, #D32F2F 100%);
 }
 
 
@@ -328,9 +361,17 @@
 }
 
 @keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 @media (max-width: 768px) {
@@ -358,7 +399,8 @@
     width: 100%;
   }
 
-  .start-button, .user-management-button {
+  .start-button,
+  .user-management-button {
     width: 100%;
   }
 

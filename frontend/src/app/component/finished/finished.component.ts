@@ -1,10 +1,16 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { environment } from '../../../environments/environment';
-import { AvatarComponent } from "../../shared/avatar/avatar.component";
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
-const NGROK_BASE = environment.apiBase;
+import { environment } from '../../../environments/environment';
+import { AvatarComponent } from '../../shared/avatar/avatar.component';
+
+type FinishResponse = { pdf_url: string };
+
+const BASE = environment.apiBase; // '/api/ai'
+
 @Component({
   selector: 'app-finished',
   standalone: true,
@@ -13,42 +19,11 @@ const NGROK_BASE = environment.apiBase;
   styleUrls: ['./finished.component.css']
 })
 export class FinishedComponent {
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
-  goHome() {
-  fetch(`${NGROK_BASE}/finish`, {
-    method: 'POST',
-    headers: {
-      'ngrok-skip-browser-warning': 'true'  
-    }
-  })
-    .then(res => {
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      }
-      return res.json();
-    })
-    .then(data => {
-      let pdfUrl = data.pdf_url;
-      if (!/^https?:\/\//i.test(pdfUrl)) {
-        pdfUrl = NGROK_BASE.replace(/\/$/, '') + pdfUrl;
-      }
-
-      // Create temporary <a> element with "download"
-      const link = document.createElement('a');
-      link.href = pdfUrl;
-      link.download = 'session_report.pdf'; // suggested file name
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      // Optionally navigate after download
-      this.router.navigate(['/']);
-    })
-    .catch(err => {
-      console.error('❌ Error fetching PDF URL:', err);
-      this.router.navigate(['/']);
-    });
-}
-
+  async goHome() {
+    // Session is already saved in the previous step (ChatbotQuizComponent)
+    // Just navigate to dashboard
+    await this.router.navigate(['/dashboard']);
   }
+}

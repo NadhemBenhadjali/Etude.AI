@@ -3,9 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AiService } from '../../services/ai.service';
 import { UserService } from '../../services/user.service';
+import { AuthService } from '../../services/auth.service';
 import { firstValueFrom } from 'rxjs';
-import { RouterModule } from '@angular/router';
-import {AvatarComponent} from '../../shared/avatar/avatar.component';
+import { RouterModule, Router } from '@angular/router';
+import { AvatarComponent } from '../../shared/avatar/avatar.component';
+import { GamificationService } from '../../services/gamification.service';
 
 interface StudentData {
   name: string;
@@ -24,12 +26,12 @@ interface Activity {
   icon: string;
 }
 const levelMap = {
-  FIRST:  'السنة الاولى',
+  FIRST: 'السنة الاولى',
   SECOND: 'السنة الثانية',
-  THIRD:  'السنة الثالثة',
+  THIRD: 'السنة الثالثة',
   FOURTH: 'السنة الرابعة',
-  FIFTH:  'السنة الخامسة',
-  SIXTH:  'السنة السادسة',
+  FIFTH: 'السنة الخامسة',
+  SIXTH: 'السنة السادسة',
 };
 
 interface Achievement {
@@ -42,11 +44,12 @@ interface Achievement {
 }
 
 interface Session {
-  id: string;
+  id?: string;
   sessionName: string;
   chapterName: string;
   description: string;
-  date: string;
+  date: string; // Keep for fallback or display string
+  createdAt?: string; // Add this field for ISO parsing
   time?: string;
   status: 'completed' | 'in-progress' | 'pending';
 }
@@ -144,40 +147,8 @@ export class DashboardComponent implements OnInit {
   ];
 
   // Achievements - Initialized with Friend's Arabic Fallback Data
-  achievements: Achievement[] = [
-    {
-      id: '1',
-      title: 'قارئ ماهر',
-      description: 'قرأ 10 قصص هذا الشهر',
-      icon: '📚',
-      earned: true,
-      progress: 100
-    },
-    {
-      id: '2',
-      title: 'عبقري الرياضيات',
-      description: 'حل 50 مسألة رياضية',
-      icon: '🧮',
-      earned: false,
-      progress: 78
-    },
-    {
-      id: '3',
-      title: 'مستكشف العلوم',
-      description: 'أكمل 5 تجارب علمية',
-      icon: '🔬',
-      earned: false,
-      progress: 40
-    },
-    {
-      id: '4',
-      title: 'نجم اللغة',
-      description: 'كتب 20 موضوع إنشاء',
-      icon: '✍️',
-      earned: true,
-      progress: 100
-    }
-  ];
+  // Initial empty state, will load from backend
+  achievements: Achievement[] = [];
 
   // Calendar
   currentDate = new Date();
@@ -268,23 +239,38 @@ export class DashboardComponent implements OnInit {
   ];
 
   constructor(
+    private userService: UserService,
+    public authService: AuthService, // Make public to use or use in method
     private aiService: AiService,
-    private userService: UserService
+    private gamificationService: GamificationService,
+    private router: Router
   ) { }
 
-  async ngOnInit() {
+  ngOnInit() {
     this.updateCurrentMonthYear();
-
-    // These will overwrite the hardcoded arabic data IF the backend is running and returns data.
-    // If backend fails, the beautiful arabic data remains.
-    await this.loadUserData();
-    await this.loadSessions();
-    await this.loadAchievements();
-
     this.generateCalendarDays();
+    this.loadSessions();
+    this.fetchAchievements();
+    this.loadUserData(); // Ensure user data is also loaded
   }
 
   // ===== Data loading =====
+
+  fetchAchievements() {
+    this.gamificationService.getMyAchievements().subscribe({
+      next: (data) => {
+        this.achievements = data.map(item => ({
+          id: item.id,
+          title: item.name,
+          description: item.description,
+          icon: item.icon,
+          earned: item.unlocked,
+          progress: item.unlocked ? 100 : 0
+        }));
+      },
+      error: (err) => console.error('Failed to fetch achievements', err)
+    });
+  }
 
   async loadUserData() {
     try {
@@ -421,8 +407,23 @@ export class DashboardComponent implements OnInit {
   }
 
   getSessionsForDate(date: Date): Session[] {
-    const dateString = date.toISOString().split('T')[0];
-    return this.sessionsData.filter(session => session.date === dateString);
+    // FIX: Use local time explicitly to avoid UTC shifts (which caused +1 day error)
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateString = `${year}-${month}-${day}`;
+
+    return this.sessionsData.filter(session => {
+      // Handle both full ISO strings and YYYY-MM-DD
+      if (session.createdAt) {
+        const sessionDate = new Date(session.createdAt);
+        const sYear = sessionDate.getFullYear();
+        const sMonth = String(sessionDate.getMonth() + 1).padStart(2, '0');
+        const sDay = String(sessionDate.getDate()).padStart(2, '0');
+        return `${sYear}-${sMonth}-${sDay}` === dateString;
+      }
+      return session.date === dateString;
+    });
   }
 
   isSameDay(date1: Date, date2: Date): boolean {
@@ -456,10 +457,25 @@ export class DashboardComponent implements OnInit {
   }
 
   startSession(session: Session) {
-    session.status = 'in-progress';
-    alert(`بدء الجلسة: ${session.sessionName}`);
+    console.log('START SESSION CLICKED:', session);
+    // If completed or in-progress, view history
+    if (session.status === 'completed' || session.status === 'in-progress') { // Treat in-progress as viewable for now, or check ID
+      if (session.id) {
+        this.router.navigate(['/session-history', session.id]);
+        this.closeModal();
+        return;
+      }
+    }
+
+    // Fallback or logic for starting a pending session
+    // session.status = 'in-progress'; // Only if starting new
+    // alert(`بدء الجلسة: ${session.sessionName}`);
     this.closeModal();
-    this.generateCalendarDays();
+    // this.generateCalendarDays();
+  }
+
+  logout() {
+    this.authService.logout();
   }
 
   // ===== Chat Methods =====

@@ -2,13 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { KeycloakService } from 'keycloak-angular';
-import {environment} from '../../environments/environment';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-private readonly keycloakUrl = window.location.origin + '/auth';
+  // Fallback to localhost:8080/auth in dev if origin is 4200 (Angular) and no proxy
+  private readonly keycloakUrl = (environment.production || window.location.origin.includes('8080'))
+    ? window.location.origin + '/auth'
+    : 'http://localhost:8080/auth';
   private readonly realm = environment.keycloakRealm;
   private readonly clientId = environment.keycloakClientId;
 
@@ -18,7 +21,7 @@ private readonly keycloakUrl = window.location.origin + '/auth';
   constructor(
     private keycloak: KeycloakService, // still useful for SSO login/logout if needed
     private http: HttpClient
-  ) {}
+  ) { }
 
   // -------------------------------
   // Token storage
@@ -240,16 +243,31 @@ private readonly keycloakUrl = window.location.origin + '/auth';
   /**
    * Logout: clear local tokens + attempt SSO logout.
    */
-  async logout(redirectUrl?: string): Promise<void> {
-    this.clearStoredTokens();
+async logout(redirectUrl?: string): Promise<void> {
+  const redirectUri = window.location.origin + (redirectUrl ?? '/signin');
+  const refreshToken = this.getStoredRefreshToken();
 
-    const redirectUri = window.location.origin + (redirectUrl ?? '/signin');
+  try {
+    if (refreshToken) {
+      const logoutUrl = `${this.keycloakUrl}/realms/${this.realm}/protocol/openid-connect/logout`;
+      const body = new URLSearchParams({
+        client_id: this.clientId,
+        refresh_token: refreshToken,
+      });
 
-    try {
-      await this.keycloak.logout(redirectUri);
-    } catch (error: any) {
-      console.error('Keycloak logout failed, falling back to client redirect', error);
-      window.location.href = redirectUri;
+      await firstValueFrom(
+        this.http.post(logoutUrl, body.toString(), {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        })
+      );
     }
+  } catch (e) {
+    // Even if Keycloak logout fails, still clear local tokens
+    console.warn('Token-based logout failed', e);
+  } finally {
+    this.clearStoredTokens();
+    window.location.href = redirectUri;
   }
+}
+
 }

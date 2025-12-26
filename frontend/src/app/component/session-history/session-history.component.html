@@ -1,0 +1,163 @@
+<div class="history-page" dir="rtl">
+    <!-- Nav Bar (Simulated or Imported) -->
+    <nav class="history-nav">
+        <button class="nav-back-btn" routerLink="/dashboard">
+            <span class="btn-icon">↩️</span>
+            <span>العودة للوحة القيادة</span>
+        </button>
+        <h1 class="page-title">🏆 سجل المغامرات 🏆</h1>
+    </nav>
+
+    @if (loading) {
+    <div class="loading-state">
+        <div class="bouncer">🤖</div>
+        <p>جاري استرجاع ذكريات المغامرة...</p>
+    </div>
+    } @else if (error) {
+    <div class="error-state">
+        <div class="error-icon">⚠️</div>
+        <p>{{ error }}</p>
+        <button class="retry-btn" routerLink="/dashboard">حاول مرة أخرى</button>
+    </div>
+    } @else {
+    <div class="content-container">
+
+        <!-- Hero Card -->
+        <div class="hero-card">
+            <div class="hero-content">
+                <div class="session-badge">📝 {{ session?.lesson || session?.module }}</div>
+                <h2 class="session-date">📅 {{ session?.createdAt | date:'fullDate':'':'ar-TN' }}</h2>
+                <p class="session-summary">
+                    ✨ {{ session?.summary || 'مغامرة تعليمية ممتعة!' }}
+                </p>
+            </div>
+
+            <div class="score-badge floating-anim">
+                <div class="score-title">النتيجة</div>
+                <div class="score-number">{{ session?.quizScore }}<span class="score-max">/10</span></div>
+                <div class="score-label" [class]="getGradeClass()">{{ getGradeLabel() }}</div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs-container">
+            <button class="tab-btn" [class.active]="activeTab === 'summary'" (click)="setActiveTab('summary')">
+                <span class="tab-icon">📜</span>
+                ملخص الرحلة
+            </button>
+            <button class="tab-btn" [class.active]="activeTab === 'quiz'" (click)="setActiveTab('quiz')">
+                <span class="tab-icon">✅</span>
+                نتائج الاختبار
+            </button>
+            <button class="tab-btn" [class.active]="activeTab === 'chat'" (click)="setActiveTab('chat')">
+                <span class="tab-icon">💬</span>
+                سجل المحادثة
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content-area">
+
+            <!-- Summary Tab -->
+            @if (activeTab === 'summary') {
+            <div class="animate-enter">
+                <div class="info-grid">
+
+                    <!-- Points of Focus -->
+                    @if (session?.summaryPointsOfFocus?.length) {
+                    <div class="info-card points-card">
+                        <h3 class="card-title">🌟 ماذا تعلمنا؟</h3>
+                        <ul class="points-list">
+                            @for (point of session?.summaryPointsOfFocus; track $index) {
+                            <li>
+                                <span class="bullet">🔹</span>
+                                {{ point }}
+                            </li>
+                            }
+                        </ul>
+                    </div>
+                    }
+
+                    <!-- Feedback -->
+                    <div class="info-card feedback-card">
+                        <h3 class="card-title">🤖 ملاحظات المساعد الذكي</h3>
+                        <div class="feedback-text">
+                            "{{ session?.sessionFeedback || 'أنت بطل! استمر في التقدم.' }}"
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            }
+
+            <!-- Quiz Tab -->
+            @if (activeTab === 'quiz') {
+            <div class="animate-enter quiz-review-list">
+                @if (!session?.quizElements?.length) {
+                <div class="empty-state">
+                    <span>🤷‍♂️</span>
+                    <p>لم نقم باختبار في هذه الجلسة.</p>
+                </div>
+                }
+
+                @for (item of session?.quizElements; track $index) {
+                <div class="quiz-item-card" [class.correct]="item.answer === item.options[0]" [class.wrong]="false">
+                    <!-- Ideally verify correctness properly -->
+
+                    <div class="quiz-question-header">
+                        <span class="question-num">سؤال {{ $index + 1 }}</span>
+                        <p class="question-text">{{ item.question }}</p>
+                    </div>
+
+                    <div class="options-grid">
+                        @for (opt of item.options; track opt) {
+                        <div class="option-pill" [class.is-answer]="opt === item.answer"
+                            [class.is-correct-answer]="opt === item.answer"> <!-- Visualize correct answer -->
+                            @if (opt === item.answer) { <span class="opt-icon">✅</span> }
+                            {{ opt }}
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+            }
+
+            <!-- Chat Tab -->
+            @if (activeTab === 'chat') {
+            <div class="animate-enter chat-history-view">
+                @if (!session?.qnaElements?.length) {
+                <div class="empty-state">
+                    <span>🤐</span>
+                    <p>لم يكن هناك محادثة.</p>
+                </div>
+                }
+
+                <div class="chat-bubbles">
+                    @for (msg of session?.qnaElements; track $index) {
+                    <div class="chat-pair">
+                        <div class="bubble user-bubble">
+                            <div class="bubble-avatar">👤</div>
+                            <div class="bubble-content">
+                                <div class="sender-name">أنت</div>
+                                {{ msg.question }}
+                            </div>
+                        </div>
+
+                        <div class="bubble bot-bubble">
+                            <div class="bubble-avatar">🤖</div>
+                            <div class="bubble-content">
+                                <div class="sender-name">المساعد</div>
+                                {{ msg.answer }}
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+
+        </div>
+    </div>
+    }
+</div>

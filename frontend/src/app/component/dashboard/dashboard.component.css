@@ -29,6 +29,27 @@
   gap: 1rem;
 }
 
+.logout-btn-header {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-left: 15px;
+  transition: all 0.2s ease;
+}
+
+.logout-btn-header:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
+}
+
 .student-info {
   display: flex;
   align-items: center;
@@ -123,7 +144,8 @@
   box-shadow: 0 4px 15px rgba(91, 188, 255, 0.3);
 }
 
-.chat-toggle:hover, .chat-toggle.active {
+.chat-toggle:hover,
+.chat-toggle.active {
   transform: scale(1.1);
   background: #7EA1FF;
 }
@@ -196,7 +218,8 @@
   transition: all 0.3s ease;
 }
 
-.view-toggle-btn.active, .view-toggle-btn:hover {
+.view-toggle-btn.active,
+.view-toggle-btn:hover {
   background: #5BBCFF;
   color: white;
   transform: scale(1.05);
@@ -1014,7 +1037,8 @@
   margin-top: 1rem;
 }
 
-.approve-btn, .reject-btn {
+.approve-btn,
+.reject-btn {
   padding: 0.8rem 2rem;
   border: none;
   border-radius: 20px;
@@ -1033,7 +1057,8 @@
   color: white;
 }
 
-.approve-btn:hover, .reject-btn:hover {
+.approve-btn:hover,
+.reject-btn:hover {
   transform: scale(1.05);
 }
 
@@ -1274,19 +1299,41 @@
 
 /* Animations */
 @keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* Responsive Design */
@@ -1355,7 +1402,8 @@
     border-radius: 0;
   }
 
-  .activity-item, .list-session-item {
+  .activity-item,
+  .list-session-item {
     flex-direction: column;
     text-align: center;
   }
@@ -1391,6 +1439,7 @@
     font-size: 1rem;
   }
 }
+
 /* Modal Overlay */
 .modal-overlay {
   position: fixed;
@@ -1573,6 +1622,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -1583,6 +1633,7 @@
     transform: scale(0.8);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;

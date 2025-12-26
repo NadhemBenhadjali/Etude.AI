@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'; // Import OnDestroy
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
-import {  HttpClient, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { firstValueFrom } from 'rxjs';
+import { UserService, SessionDTO } from '../../services/user.service';
 
 import fallbackData from '../../../assets/lesson.json';
 
@@ -17,7 +18,7 @@ interface Slide {
 @Component({
   selector: 'app-lesson-board',
   standalone: true,
-  imports: [CommonModule, RouterModule,  AvatarComponent],
+  imports: [CommonModule, RouterModule, AvatarComponent],
   templateUrl: './lesson-board.component.html',
   styleUrls: ['./lesson-board.component.css']
 })
@@ -41,7 +42,8 @@ export class LessonBoardComponent implements OnInit, OnDestroy { // Implement On
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private http: HttpClient
+    private http: HttpClient,
+    private userService: UserService
   ) { }
 
   ngOnInit(): void {
@@ -239,5 +241,41 @@ export class LessonBoardComponent implements OnInit, OnDestroy { // Implement On
         this.currentAudioUrl = null;
       }
     }
+  }
+
+  finishLesson() {
+    this.stopSummary();
+
+    // Create Session Info
+    const sessionDTO: SessionDTO = {
+      id: crypto.randomUUID(),
+      level: 'FIRST',
+      subject: 'General',
+      module: this.title || 'Lesson',
+      lesson: this.title || 'Lesson Content',
+      status: 'COMPLETED',
+      createdAt: new Date().toISOString(),
+      startedAt: new Date().toISOString(),
+      completedAt: new Date().toISOString(),
+      summaryPointsOfFocus: [],
+      quizPointsOfFocus: [],
+      quizScore: 10, // Completion score (10/10)
+      summary: 'Completed lesson: ' + this.title,
+      sessionFeedback: 'Great job completing the lesson!',
+      lessonContent: this.slides.map(s => s.text).join('\n'), // Store content
+      quizElements: [],
+      qnaElements: []
+    };
+
+    this.userService.saveSession(sessionDTO).subscribe({
+      next: () => {
+        alert('تم حفظ الدرس بنجاح! 💾');
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        console.error('Error saving lesson:', err);
+        alert('فشل حفظ الدرس!');
+      }
+    });
   }
 }

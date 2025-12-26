@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/sessions")
@@ -46,6 +48,16 @@ public class SessionController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/save")
+    @Operation(summary = "Save Session", description = "Saves the current session state, including generated content.")
+    public ResponseEntity<com.example.EtudeAI.model.dto.SessionDTO> saveSession(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestBody com.example.EtudeAI.model.dto.SessionDTO sessionDTO) {
+        String keycloakUserId = jwt.getSubject();
+        com.example.EtudeAI.model.dto.SessionDTO savedSession = sessionService.saveSession(sessionDTO, keycloakUserId);
+        return ResponseEntity.ok(savedSession);
+    }
+
     @GetMapping
     @Operation(summary = "Get User Sessions", description = "Retrieves a paginated list of study sessions for the current user.")
     public ResponseEntity<org.springframework.data.domain.Page<com.example.EtudeAI.model.dto.SessionDTO>> getUserSessions(
@@ -55,5 +67,15 @@ public class SessionController {
         org.springframework.data.domain.Page<com.example.EtudeAI.model.dto.SessionDTO> sessions = sessionService
                 .getUserSessions(keycloakUserId, pageable);
         return ResponseEntity.ok(sessions);
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get Session Details", description = "Retrieves full details of a specific session.")
+    public ResponseEntity<com.example.EtudeAI.model.dto.SessionDTO> getSession(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable UUID id) {
+        String keycloakUserId = jwt.getSubject();
+        com.example.EtudeAI.model.dto.SessionDTO session = sessionService.getSessionById(id, keycloakUserId);
+        return ResponseEntity.ok(session);
     }
 }

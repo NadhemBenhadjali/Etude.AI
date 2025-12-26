@@ -73,7 +73,7 @@ public class Session {
     private List<String> quizPointsOfFocus;
 
     @Min(value = 0, message = "Quiz score cannot be negative")
-    @Max(value = 10, message = "Quiz score cannot exceed 10")
+    @Max(value = 100, message = "Quiz score cannot exceed 100")
     private Integer quizScore;
 
     @Column(columnDefinition = "TEXT")
@@ -85,13 +85,27 @@ public class Session {
     @Column(columnDefinition = "TEXT")
     private String lessonContent;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "session_id")
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderColumn(name = "idx")
     private List<QuizElement> quizElements;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "session_id")
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderColumn(name = "idx")
     private List<QnAElement> qnaElements;
+
+    public void addQuizElement(QuizElement element) {
+        if (quizElements == null) {
+            quizElements = new java.util.ArrayList<>();
+        }
+        quizElements.add(element);
+        element.setSession(this);
+    }
+
+    public void addQnAElement(QnAElement element) {
+        if (qnaElements == null) {
+            qnaElements = new java.util.ArrayList<>();
+        }
+        qnaElements.add(element);
+        element.setSession(this);
+    }
 }

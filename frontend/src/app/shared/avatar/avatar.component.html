@@ -1,5 +1,10 @@
 <div class="avatar-container">
-  <a routerLink="/profile" class="avatar-link">
-    <img src="assets/images/panda.png" alt="User Avatar" class="avatar" (click)="goToProfile()" />
-  </a>
+  <div class="avatar-actions">
+    <button class="logout-btn" (click)="logout()" title="تسجيل الخروج">
+      🚪
+    </button>
+    <a routerLink="/profile" class="avatar-link">
+      <img src="assets/images/panda.png" alt="User Avatar" class="avatar" (click)="goToProfile()" />
+    </a>
+  </div>
 </div>

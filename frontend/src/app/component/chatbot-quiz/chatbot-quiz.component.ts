@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AvatarComponent } from "../../shared/avatar/avatar.component";
 import { QuizService, QuizQuestion } from '../../services/quiz.service';
 import { AiService } from '../../services/ai.service';
 import { GamificationService } from '../../services/gamification.service';
+import { UserService, SessionDTO, QuizElementDTO, QnAElementDTO } from '../../services/user.service';
 import { firstValueFrom } from 'rxjs';
 
 interface Achievement {
@@ -55,9 +56,11 @@ interface PowerupNotification {
 })
 export class ChatbotQuizComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
+  public router = inject(Router); // Made public for template
   private quizService = inject(QuizService);
   private aiService = inject(AiService);
   private gamificationService = inject(GamificationService);
+  private userService = inject(UserService);
 
   messages: { text: string; isUser: boolean }[] = [];
   isLoading = false;
@@ -482,9 +485,9 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
     const normalizedType = type.toLowerCase().trim();
 
     if (normalizedType === 'tf' ||
-        normalizedType === 'true-false' ||
-        normalizedType === 'true_false' ||
-        normalizedType === 'boolean') {
+      normalizedType === 'true-false' ||
+      normalizedType === 'true_false' ||
+      normalizedType === 'boolean') {
       return 'tf';
     }
 
@@ -607,6 +610,9 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
     clearInterval(this.gameTimer);
 
     const q = this.questions[this.currentQuestionIndex];
+    q.userAnswer = option;
+    q.answered = true;
+
     if (option === q.a) {
       this.handleCorrectAnswer();
     } else {
@@ -663,7 +669,67 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
         next: () => console.log('Score submitted'),
         error: (err) => console.error('Error submitting score:', err)
       });
+
+    this.saveSessionToServer();
     this.checkFinalAchievements();
+  }
+
+  saveSessionToServer() {
+    // 1. Convert QuizQuestions to QuizElementDTOs
+    const quizElements: QuizElementDTO[] = this.questions.map(q => ({
+      // FIX: Map to exact Backend Enum names
+      quizType: (q.type === 'mc' ? 'MULTIPLE_CHOICE' : 'TRUE_FALSE') as any,
+      question: q.q,
+      options: q.options || [],
+      answer: q.a,
+      answered: !!q.answered
+    }));
+
+    // 2. Convert Chat Messages to QnAElementDTOs
+    // Assume pairing: User message followed by Agent message
+    const qnaElements: QnAElementDTO[] = [];
+    for (let i = 0; i < this.messages.length - 1; i++) {
+      const msg = this.messages[i];
+      const nextMsg = this.messages[i + 1];
+      if (msg.isUser && !nextMsg.isUser) {
+        qnaElements.push({
+          question: msg.text,
+          answer: nextMsg.text
+        });
+      }
+    }
+
+    // 3. Construct SessionDTO
+    const sessionDTO: SessionDTO = {
+      id: crypto.randomUUID(), // New session ID
+      level: 'FIRST', // Default or get from user service
+      subject: this.currentModule || 'General',
+      module: this.currentModule || 'General',
+      lesson: 'Quiz Session',
+      status: 'COMPLETED',
+      createdAt: new Date().toISOString(),
+      startedAt: new Date().toISOString(), // Should track start time properly
+      completedAt: new Date().toISOString(),
+      summaryPointsOfFocus: [],
+      quizPointsOfFocus: [],
+      quizScore: this.score,
+      summary: 'Completed quiz on ' + (this.currentModule || 'General'),
+      sessionFeedback: this.getFinalMessage(),
+      lessonContent: '',
+      quizElements: quizElements,
+      qnaElements: qnaElements
+    };
+
+    this.userService.saveSession(sessionDTO).subscribe({
+      next: (res) => {
+        console.log('Session saved successfully:', res);
+        this.avatarMessage = 'تم حفظ الجلسة بنجاح! 💾';
+      },
+      error: (err) => {
+        console.error('Error saving session:', err);
+        this.avatarMessage = 'فشل حفظ الجلسة ⚠️';
+      }
+    });
   }
 
   checkFinalAchievements() {

@@ -17,7 +17,9 @@ import { ChatbotQuizComponent } from './component/chatbot-quiz/chatbot-quiz.comp
 import { ProfileComponent } from './component/profile/profile.component';
 import { DashboardComponent } from './component/dashboard/dashboard.component';
 import { UserManagementComponent } from './component/user-management/user-management.component';
+import { SessionHistoryComponent } from './component/session-history/session-history.component';
 import { AuthGuard } from './guards/auth.guard';
+import { GuestGuard } from './guards/guest.guard';
 
 
 export const routes: Routes = [
@@ -25,8 +27,8 @@ export const routes: Routes = [
   { path: 'select-class', component: SelectClassComponent, canActivate: [AuthGuard] },
   { path: 'select-subject', component: SelectSubjectComponent, canActivate: [AuthGuard] },
   { path: 'welcome', component: WelcomeComponent },
-  { path: 'signin', component: SigninComponent },
-  { path: 'signup', component: SignupComponent },
+  { path: 'signin', component: SigninComponent, canActivate: [GuestGuard] },
+  { path: 'signup', component: SignupComponent, canActivate: [GuestGuard] },
   { path: 'landing', component: LandingComponent },
   { path: 'finished', component: FinishedComponent, canActivate: [AuthGuard] },
   { path: 'about', component: AboutComponent },
@@ -39,5 +41,6 @@ export const routes: Routes = [
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'user-management', component: UserManagementComponent, canActivate: [AuthGuard] },
+  { path: 'session-history/:id', component: SessionHistoryComponent, canActivate: [AuthGuard] },
   { path: '', redirectTo: 'home', pathMatch: 'full' }
 ];

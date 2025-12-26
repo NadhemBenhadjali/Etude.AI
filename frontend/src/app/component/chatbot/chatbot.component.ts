@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AiService } from '../../services/ai.service';
+import { UserService, SessionDTO, QnAElementDTO } from '../../services/user.service';
 import { AvatarComponent } from "../../shared/avatar/avatar.component";
 import { firstValueFrom } from 'rxjs';
 
@@ -22,7 +23,8 @@ export class ChatbotComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private aiService: AiService
+    private aiService: AiService,
+    private userService: UserService
   ) { }
 
   ngOnInit() {
@@ -95,5 +97,50 @@ export class ChatbotComponent implements OnInit {
   sendQuickResponse(text: string) {
     this.userInput = text;
     this.sendMessage();
+  }
+
+  saveSession() {
+    if (this.messages.length === 0) return;
+
+    // Convert pairs to QnA
+    const qnaElements: QnAElementDTO[] = [];
+    for (let i = 0; i < this.messages.length - 1; i++) {
+      const msg = this.messages[i];
+      const nextMsg = this.messages[i + 1];
+      if (msg.isUser && !nextMsg.isUser) {
+        qnaElements.push({
+          question: msg.text,
+          answer: nextMsg.text
+        });
+      }
+    }
+
+    const sessionDTO: SessionDTO = {
+      id: crypto.randomUUID(),
+      level: 'FIRST', // Default
+      subject: 'General',
+      module: this.currentMode || 'General',
+      lesson: 'Chat Session',
+      status: 'COMPLETED',
+      createdAt: new Date().toISOString(),
+      startedAt: new Date().toISOString(),
+      completedAt: new Date().toISOString(),
+      summaryPointsOfFocus: [],
+      quizPointsOfFocus: [],
+      quizScore: 0,
+      summary: 'Chat session (' + this.currentMode + ')',
+      sessionFeedback: 'Completed successfully',
+      lessonContent: '',
+      quizElements: [],
+      qnaElements: qnaElements
+    };
+
+    this.userService.saveSession(sessionDTO).subscribe({
+      next: () => {
+        alert('تم حفظ الجلسة بنجاح!');
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => console.error('Failed to save session', err)
+    });
   }
 }

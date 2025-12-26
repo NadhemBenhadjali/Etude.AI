@@ -7,6 +7,8 @@ export interface QuizQuestion {
   options?: string[];
   a: string;
   category?: string;
+  userAnswer?: string;
+  answered?: boolean;
 }
 
 export interface QuizRequest {
@@ -102,7 +104,7 @@ export class QuizService {
     }
   ];
 
-  constructor() {}
+  constructor() { }
 
   /**
    * Generate a quiz from static data
