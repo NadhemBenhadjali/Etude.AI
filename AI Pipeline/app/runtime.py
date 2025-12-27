@@ -51,14 +51,16 @@ def _get_existing_payload_schema(client: QdrantClient) -> set[str]:
 
 
 def ensure_qdrant_payload_indexes() -> None:
-    if not settings.QDRANT_URL or not settings.QDRANT_API_KEY:
-        logger.warning("qdrant_indexing_skipped", reason="missing_qdrant_settings")
+    if not settings.QDRANT_URL:
+        logger.warning("qdrant_indexing_skipped", reason="missing_qdrant_url")
         return
 
     try:
+        # API key is optional for local Docker deployments
+        api_key = settings.QDRANT_API_KEY if settings.QDRANT_API_KEY else None
         client = QdrantClient(
             url=settings.QDRANT_URL,
-            api_key=settings.QDRANT_API_KEY,
+            api_key=api_key,
             timeout=15.0,
         )
     except Exception as e:
@@ -100,9 +102,12 @@ def ensure_qdrant_payload_indexes() -> None:
 
 ensure_qdrant_payload_indexes()
 
+# API key is optional for local Docker deployments
+qdrant_api_key = settings.QDRANT_API_KEY if settings.QDRANT_API_KEY else None
+
 TOOL = QdrantVectorSearchTool(
     qdrant_url=settings.QDRANT_URL,
-    qdrant_api_key=settings.QDRANT_API_KEY,
+    qdrant_api_key=qdrant_api_key,
     collection_name=COLLECTION_NAME,
     limit=5,
     score_threshold=0.35,

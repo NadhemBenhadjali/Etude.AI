@@ -19,6 +19,7 @@ export class ChatbotComponent implements OnInit {
   userInput = '';
   isLoading = false;
   currentMode = '';
+  private storageKey = 'chatbot_messages';
 
   constructor(
     private router: Router,
@@ -30,8 +31,35 @@ export class ChatbotComponent implements OnInit {
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
       this.currentMode = params['mode'] || '';
-      this.initializeChat();
+      this.loadMessages();
+      if (this.messages.length === 0) {
+        this.initializeChat();
+      }
     });
+  }
+
+  private getStorageKey(): string {
+    return `${this.storageKey}_${this.currentMode || 'default'}`;
+  }
+
+  private saveMessages() {
+    try {
+      localStorage.setItem(this.getStorageKey(), JSON.stringify(this.messages));
+    } catch (e) {
+      console.error('Failed to save messages to localStorage', e);
+    }
+  }
+
+  private loadMessages() {
+    try {
+      const saved = localStorage.getItem(this.getStorageKey());
+      if (saved) {
+        this.messages = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error('Failed to load messages from localStorage', e);
+      this.messages = [];
+    }
   }
 
   initializeChat() {
@@ -47,6 +75,7 @@ export class ChatbotComponent implements OnInit {
     }
 
     this.messages.push({ text: greeting, isUser: false });
+    this.saveMessages();
   }
 
   async sendMessage() {
@@ -54,13 +83,13 @@ export class ChatbotComponent implements OnInit {
     if (!txt) return;
 
     this.messages.push({ text: txt, isUser: true });
+    this.saveMessages();
     this.isLoading = true;
     this.userInput = '';
 
     try {
       let data: any;
       if (this.currentMode === 'summary') {
-        // Assuming the user input is "Subject: Module" or just "Module"
         data = await firstValueFrom(this.aiService.generateSummary('General', txt));
       } else {
         data = await firstValueFrom(this.aiService.askQuestion(txt));
@@ -75,13 +104,13 @@ export class ChatbotComponent implements OnInit {
         reply = JSON.stringify(data, null, 2);
       }
 
-      // Clean up formatting
       reply = reply.replace(/\*\*(.+?)\*\*/g, '$1')
         .replace(/\\n/g, '<br>')
         .replace(/"/g, '')
         .replace(/\\(.+?)\\/g, '<strong>$1</strong>');
 
       this.messages.push({ text: reply, isUser: false });
+      this.saveMessages();
 
     } catch (err) {
       console.error(err);
@@ -89,6 +118,7 @@ export class ChatbotComponent implements OnInit {
         text: '⚠️ حدث خطأ عند الاتصال بالخادم. حاول مرة أخرى.',
         isUser: false
       });
+      this.saveMessages();
     } finally {
       this.isLoading = false;
     }

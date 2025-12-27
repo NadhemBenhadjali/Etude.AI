@@ -172,7 +172,8 @@ def add_images_from_csv(driver: Driver, csv_path: Path) -> None:
     csv_path = csv_path.expanduser().resolve()
     print("CSV:", csv_path)
     if not csv_path.exists():
-        raise FileNotFoundError(f"CSV not found: {csv_path}")
+        print(f"⚠️  CSV not found: {csv_path} - skipping image import")
+        return
 
     # Many Arabic CSV exports need utf-8-sig
     df = pd.read_csv(csv_path, encoding="utf-8-sig")
@@ -230,7 +231,8 @@ def embed_lessons(driver: Driver, model_name: str) -> None:
     print("✅ embeddings stored")
 
 
-if __name__ == "__main__":
+def main():
+    """Main function to build the knowledge graph."""
     driver = get_driver()
     try:
         kg_writer = KGWriter(driver)
@@ -246,3 +248,8 @@ if __name__ == "__main__":
         print("🎉 pipeline finished")
     finally:
         driver.close()
+
+
+if __name__ == "__main__":
+    main()
+

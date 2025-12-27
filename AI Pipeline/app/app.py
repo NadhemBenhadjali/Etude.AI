@@ -1,7 +1,7 @@
 import os
 import time
 from pathlib import Path
-
+import requests
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -394,13 +394,32 @@ async def readiness():
         details["redis"] = f"not ready: {str(e)[:100]}"
         ready = False
 
+    qdrant_url = os.getenv("QDRANT_URL")
+    qdrant_api_key = os.getenv("QDRANT_API_KEY")
+
+    if not qdrant_url:
+        details["qdrant"] = "not ready: QDRANT_URL not set"
+        ready = False
+    else:
+        try:
+            headers = {"api-key": qdrant_api_key} if qdrant_api_key else {}
+            resp = requests.get(f"{qdrant_url}/healthz", headers=headers, timeout=2)
+            if resp.status_code == 200:
+                details["qdrant"] = "ready"
+            else:
+                details["qdrant"] = f"not ready: status {resp.status_code}"
+                ready = False
+        except Exception as e:
+            details["qdrant"] = f"not ready: {str(e)[:100]}"
+            ready = False
     # Circuit breaker states
     try:
-        from app.circuit_breaker import neo4j_circuit, redis_circuit, llm_circuit
+        from app.circuit_breaker import neo4j_circuit, redis_circuit, llm_circuit, qdrant_circuit
         details["circuit_breakers"] = {
             "neo4j": neo4j_circuit.state.value,
             "redis": redis_circuit.state.value,
             "llm": llm_circuit.state.value,
+            "qdrant": qdrant_circuit.state.value,
         }
     except Exception:
         pass

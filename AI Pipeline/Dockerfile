@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg62-turbo-dev \
     zlib1g-dev \
     curl \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt ./
@@ -18,6 +19,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Copy and make entrypoint executable
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 EXPOSE 8000
 
-CMD ["python", "-m", "main"]
+# Use entrypoint script that checks/populates databases before starting
+ENTRYPOINT ["/docker-entrypoint.sh"]

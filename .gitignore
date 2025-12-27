@@ -26,9 +26,9 @@ out/
 .env.local
 .env.*.local
 *.env
-
+backend/ops/keycloak/data/h2
 # Kubernetes Secrets (CRITICAL: Contains sensitive data)
-./k8s/01-secrets.yaml
+k8s/01-secrets.yaml
 # Logs
 *.log
 npm-debug.log*

@@ -88,4 +88,12 @@ public class AiController {
                                 .map(response -> ResponseEntity.ok().header("X-Session-ID", finalSessionId)
                                                 .body(response));
         }
+        @GetMapping("/health")
+        @Operation(
+        summary = "AI Health Check",
+        description = "Checks the AI pipeline service health and returns its status." )
+        public Mono<ResponseEntity<Map>> health() {
+            return aiPipelineService.health()
+                    .map(ResponseEntity::ok);
+        }
 }

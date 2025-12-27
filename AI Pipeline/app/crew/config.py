@@ -26,7 +26,7 @@ class Settings(BaseSettings):
 
     # Qdrant
     QDRANT_URL: str
-    QDRANT_API_KEY: str
+    QDRANT_API_KEY: str = ""  # Optional - not needed for local Docker
 
     # Neo4j
     NEO4J_URI: str

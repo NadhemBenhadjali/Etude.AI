@@ -44,16 +44,42 @@ def load_json_items(json_path: str) -> list[tuple[str, dict]]:
 
 
 def recreate_collection_safe(client: QdrantClient, name: str, dim: int) -> None:
+    """Recreate collection, handling cases where it may already exist."""
     try:
-        if client.collection_exists(name):
-            client.delete_collection(name)
-    except Exception as e:
-        print("collection_exists check failed (continuing):", repr(e))
+        # Try to check if collection exists
+        exists = False
+        try:
+            client.get_collection(name)
+            exists = True
+            print(f"Collection '{name}' already exists, deleting...")
+        except:
+            exists = False
 
-    client.create_collection(
-        collection_name=name,
-        vectors_config=VectorParams(size=dim, distance=Distance.COSINE),
-    )
+        # Delete if it exists
+        if exists:
+            try:
+                client.delete_collection(name)
+                print(f"Deleted existing collection '{name}'")
+            except Exception as e:
+                print(f"Could not delete collection: {repr(e)}")
+                # If delete fails but collection exists, raise the error
+                raise
+    except Exception as e:
+        print(f"collection_exists check failed (continuing): {repr(e)}")
+
+    # Create the collection
+    try:
+        client.create_collection(
+            collection_name=name,
+            vectors_config=VectorParams(size=dim, distance=Distance.COSINE),
+        )
+        print(f"Created collection '{name}' with dimension {dim}")
+    except Exception as e:
+        # If creation fails because collection exists, that's actually okay
+        if "already exists" in str(e).lower():
+            print(f"Collection '{name}' already exists, will use existing collection")
+        else:
+            raise
 
 
 def index_payload_fields(client: QdrantClient, name: str) -> None:
@@ -69,12 +95,15 @@ def index_payload_fields(client: QdrantClient, name: str) -> None:
 
 
 def get_qdrant_client() -> QdrantClient:
-    if not settings.QDRANT_URL or not settings.QDRANT_API_KEY:
-        raise RuntimeError("QDRANT_URL or QDRANT_API_KEY missing in .env")
+    if not settings.QDRANT_URL:
+        raise RuntimeError("QDRANT_URL missing in .env")
+
+    # API key is optional for local Docker deployments
+    api_key = settings.QDRANT_API_KEY if settings.QDRANT_API_KEY else None
 
     return QdrantClient(
         url=settings.QDRANT_URL,
-        api_key=settings.QDRANT_API_KEY,
+        api_key=api_key,
         timeout=15.0,
     )
 

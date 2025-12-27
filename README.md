@@ -9,6 +9,11 @@ Etude.AI is a **backend service** that uses multi-agent LLMs, a Neo4j knowledge 
 
 This repo contains **only the backend, data pipelines, and planner logic** – not the frontend UI.
 
+> **🐳 Docker Setup:** This project runs Neo4j and Qdrant locally in Docker with **automatic database initialization**!
+> - Quick start: Update `.env`, then run `cd backend && docker-compose up -d`
+> - See [DOCKER_DATABASE_INIT.md](DOCKER_DATABASE_INIT.md) for how auto-init works
+> - See [MIGRATION_SUMMARY.md](MIGRATION_SUMMARY.md) for migration from cloud
+
 ---
 
 ## System Overview

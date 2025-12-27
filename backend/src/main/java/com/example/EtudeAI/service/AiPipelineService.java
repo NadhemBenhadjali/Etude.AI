@@ -108,6 +108,13 @@ public class AiPipelineService {
                 });
     }
 
+    public Mono<Map> health() {
+    return webClient
+            .get()
+            .uri("/health")
+            .retrieve()
+            .bodyToMono(Map.class);}
+
     public Mono<Map> generatePlan(String goal, String time, String sessionId) {
         return webClient.post()
                 .uri("/plan")
