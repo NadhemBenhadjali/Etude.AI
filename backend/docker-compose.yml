@@ -265,4 +265,3 @@ volumes:
   neo4j_logs:
   qdrant_data:
   redis_data:
-

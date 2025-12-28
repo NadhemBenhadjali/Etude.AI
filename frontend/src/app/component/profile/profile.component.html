@@ -1,106 +1,140 @@
 <div class="profile-container" dir="rtl">
   <div class="profile-box">
+
+    <!-- HERO HEADER -->
     <div class="profile-header">
+
+      <!-- Avatar -->
       <div class="profile-avatar">
         <img [src]="avatar" alt="Profile Avatar" />
-        <div class="level-badge" [style.background-color]="getLevelColor()">
-          ⭐ المستوى {{ level }}
-        </div>
+
+        <div class="level-badge" [style.background-color]="getLevelColor()"> ⭐ المستوى {{ level }} </div>
       </div>
+
+      <!-- Info -->
       <div class="profile-info">
         <h1>{{ username }}</h1>
         <p class="email" *ngIf="email">{{ email }}</p>
-        <p class="rank">
-          👑 {{ rank }}
-        </p>
-        <div class="streak">
-          🔥 {{ streak }} يوم متتالي
+
+        <div class="badges-row">
+          <span class="rank-badge">
+            <img class="mini-badge-icon" src="assets/images/crown.png" alt="rank" />
+            {{ rank }}
+          </span>
+
+          <span class="streak-badge">
+            <img class="mini-badge-icon" src="assets/images/fire.png" alt="streak" />
+            {{ streak }} يوم متتالي
+          </span>
         </div>
       </div>
 
-      <!-- Action Buttons from Front2 -->
-      <div class="start-learning">
-        <button class="start-button" routerLink="/select-mode">
-          <span>ابدأ تعلم</span>
+      <!-- Action Dock -->
+      <nav class="action-dock" aria-label="قائمة الإجراءات العائمة">
+        <a class="dock-item start" routerLink="/select-mode" aria-label="ابدأ تعلم">
+          <img class="dock-icon" src="assets/images/learn.png" alt="ابدأ تعلم" />
+          <span class="dock-label">ابدأ تعلم</span>
+        </a>
+
+        <a class="dock-item" routerLink="/dashboard" aria-label="لوحة القيادة">
+          <img class="dock-icon" src="assets/images/dashboard.png" alt="لوحة القيادة" />
+          <span class="dock-label">لوحة القيادة</span>
+        </a>
+
+        <a class="dock-item" routerLink="/user-management" aria-label="إدارة الحساب">
+          <img class="dock-icon" src="assets/images/gear.png" alt="إدارة الحساب" />
+          <span class="dock-label">إدارة الحساب</span>
+        </a>
+
+        <button class="dock-item danger" (click)="logout()" aria-label="تسجيل الخروج" type="button">
+          <img class="dock-icon" src="assets/images/check-out.png" alt="تسجيل الخروج" />
+          <span class="dock-label">تسجيل الخروج</span>
         </button>
-        <br>
-        <button class="start-button" routerLink="/dashboard">
-          <span>لوحة القيادة</span>
-        </button>
-        <!-- Added User Management Button -->
-        <button class="user-management-button" routerLink="/user-management">
-          <span>⚙️ إدارة الحساب</span>
-        </button>
-        <br>
-        <button class="logout-button" (click)="logout()">
-          <span>🚪 تسجيل الخروج</span>
-        </button>
-      </div>
+      </nav>
+
     </div>
 
+    <!-- XP -->
     <div class="xp-progress">
       <div class="xp-header">
-        <span class="section-icon">📈</span>
-        <h3>خبرتك </h3>
+        <img class="section-icon-img" src="assets/images/xp.png" alt="خبرتك" />
+        <h3>خبرتك</h3>
       </div>
+
       <div class="xp-bar">
         <div class="xp-fill" [style.width.%]="getXpPercentage()"></div>
       </div>
+
       <div class="xp-text">
         <span>{{ xp }}</span> / <span>{{ xpToNextLevel }}</span> نقطة
       </div>
     </div>
 
+    <!-- Stats -->
     <div class="stats-container">
       <div class="stat-card">
-        <span class="stat-icon">📚</span>
+        <img class="stat-img" src="assets/images/book.png" alt="الدروس" />
         <h3>الدروس إلي كملتهم</h3>
         <p class="stat-value">{{ completedLessons }}</p>
       </div>
+
       <div class="stat-card">
-        <span class="stat-icon">✍️</span>
+        <img class="stat-img" src="assets/images/quiz.png" alt="الاختبارات" />
         <h3>الاختبارات إلي كملتهم</h3>
         <p class="stat-value">{{ completedQuizzes }}</p>
       </div>
+
       <div class="stat-card">
-        <span class="stat-icon">🔥</span>
+        <img class="stat-img" src="assets/images/fire.png" alt="التتابع" />
         <h3>أعلى تتابع</h3>
         <p class="stat-value">{{ highestStreak }} يوم</p>
       </div>
     </div>
 
+    <!-- Achievements -->
     <div class="achievements-section">
       <div class="section-header">
-        <span class="section-icon">🏆</span>
+        <img class="section-icon-img" src="assets/images/trophy.png" alt="الإنجازات" />
         <h2>الإنجازات</h2>
       </div>
+
       <div class="achievements-grid">
-        <div class="achievement-card" *ngFor="let achievement of achievements" [class.locked]="!achievement.unlocked">
-          <!-- Handle both icon name string and google font icons -->
-          <span class="achievement-icon">
-            {{ achievement.icon }}
-          </span>
+        <div class="achievement-card"
+             *ngFor="let achievement of achievements"
+             [class.locked]="!achievement.unlocked">
+
+          <!-- achievement icon can be image too -->
+          <img
+            class="achievement-icon-img"
+            [src]="'assets/images/achievements/' + achievement.icon + '.png'"
+            [alt]="achievement.name"
+          />
+
 
           <h3>{{ achievement.name }}</h3>
           <p>{{ achievement.description }}</p>
+
           <div class="achievement-badge" *ngIf="achievement.unlocked">
-            🔓
+            <img class="mini-badge-icon" src="assets/images/unlocked.png" alt="unlocked" />
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Recent Activity -->
     <div class="recent-activity">
       <div class="section-header">
-        <span class="section-icon">📝</span>
-        <h3>نشاطك لخراني </h3>
+        <img class="section-icon-img" src="assets/images/activity.png" alt="نشاطك" />
+        <h3>نشاطك لخراني</h3>
       </div>
+
       <div class="activity-list">
         <div class="activity-item" *ngFor="let activity of recentActivities">
-          <span class="activity-icon">{{ activity.icon }}</span>
+          <img class="activity-img" [src]="activity.icon" alt="activity icon" />
           <span class="activity-text">{{ activity.text }}</span>
         </div>
       </div>
     </div>
+
   </div>
 </div>

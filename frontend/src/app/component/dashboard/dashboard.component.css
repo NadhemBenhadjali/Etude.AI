@@ -9,17 +9,261 @@
 }
 
 /* Header Styles */
+/* ==============================
+   ✅ DASHBOARD HEADER (PREMIUM)
+============================== */
+
 .dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   background: rgba(255, 255, 255, 0.95);
   border-radius: 30px;
   padding: 2rem;
   margin-bottom: 2rem;
+
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   border: 8px solid #FFFAB7;
+
   animation: float 6s ease-in-out infinite;
+  position: relative;
+}
+
+/* ==============================
+   Student info (kept clean)
+============================== */
+
+.student-info {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.student-avatar {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.student-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #FFFAB7;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.status-indicator {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ccc;
+  border: 3px solid white;
+}
+
+.status-indicator.online {
+  background: #4CAF50;
+  animation: pulse 2s infinite;
+}
+
+.student-details h1 {
+  font-size: 2rem;
+  margin: 0;
+  color: #5BBCFF;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.class-info {
+  color: #666;
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+}
+
+/* ==============================
+   ✅ last activity with image
+============================== */
+
+.last-activity {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #FF6F91;
+  font-size: 1rem;
+}
+
+.mini-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+/* ==============================
+   ✅ ACTION DOCK (RIGHT SIDE)
+============================== */
+
+.dashboard-dock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  justify-content: flex-start;
+  align-items: center;
+}
+
+/* ✅ Dock Item */
+.dock-item {
+  width: 56px;
+  height: 56px;
+
+  border-radius: 18px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+
+  display: grid;
+  place-items: center;
+
+  position: relative;
+  background: rgba(255, 255, 255, 0.92);
+  border: 2px solid rgba(255, 250, 183, 0.9);
+
+  box-shadow: 0 14px 24px rgba(0, 0, 0, 0.10);
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  backdrop-filter: blur(10px);
+}
+
+.dock-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.14);
+}
+
+.dock-item:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+/* ✅ image icon */
+.dock-icon {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+/* ✅ Tooltip label (shows left of button because RTL) */
+.dock-label {
+  position: absolute;
+  right: 65px;
+  top: 50%;
+  transform: translateY(-50%) translateX(10px);
+  opacity: 0;
+
+  background: rgba(255, 255, 255, 0.97);
+  border: 2px solid rgba(255, 250, 183, 0.95);
+  box-shadow: 0 16px 26px rgba(0, 0, 0, 0.12);
+
+  padding: 8px 12px;
+  border-radius: 14px;
+  font-weight: 900;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.75);
+  white-space: nowrap;
+
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
+.dock-item:hover .dock-label {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* ✅ Chat highlight */
+.dock-item.start {
+  background: rgba(91, 188, 255, 0.14);
+  border: 2px solid rgba(91, 188, 255, 0.55);
+}
+
+.dock-item.start:hover {
+  background: rgba(91, 188, 255, 0.22);
+}
+
+/* ✅ active state */
+.dock-item.active {
+  transform: scale(1.06);
+  box-shadow: 0 18px 34px rgba(91, 188, 255, 0.25);
+}
+
+/* ✅ danger logout */
+.dock-item.danger {
+  background: rgba(255, 111, 145, 0.14);
+  border: 2px solid rgba(255, 111, 145, 0.48);
+}
+
+.dock-item.danger:hover {
+  background: rgba(255, 111, 145, 0.24);
+}
+
+/* ✅ notification badge */
+.dock-notification {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #FF6F91;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 0.8rem;
+  font-weight: 900;
+  border: 2px solid white;
+}
+
+/* ==============================
+   ✅ RESPONSIVE
+============================== */
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.6rem;
+  }
+
+  .student-info {
+    flex-direction: column;
+    gap: 1.4rem;
+    text-align: center;
+  }
+
+  .dashboard-dock {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .dock-label {
+    display: none;
+  }
+}
+
+/* Animations (already existed in your file) */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 /* Header Actions - Contains Chat Toggle & Profile Button */
@@ -200,13 +444,7 @@
 }
 
 /* Calendar View Toggle */
-.calendar-view-toggle {
-  display: flex;
-  gap: 0.5rem;
-  background: rgba(91, 188, 255, 0.1);
-  border-radius: 25px;
-  padding: 0.25rem;
-}
+
 
 .view-toggle-btn {
   background: none;
@@ -226,19 +464,6 @@
 }
 
 /* Month View Calendar */
-.calendar-container {
-  background: white;
-  border-radius: 15px;
-  padding: 1.5rem;
-  border: 2px solid #FFFAB7;
-}
-
-.calendar-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
 
 .nav-btn {
   background: #5BBCFF;
@@ -256,16 +481,6 @@
   background: #7EA1FF;
 }
 
-.calendar-grid {
-  width: 100%;
-}
-
-.calendar-header {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
 
 .day-header {
   text-align: center;
@@ -280,53 +495,384 @@
   gap: 0.5rem;
 }
 
-.calendar-day {
+
+/* ==============================
+   ✅ PREMIUM CALENDAR SECTION
+============================== */
+
+.calendar-section {
   position: relative;
-  min-height: 100px;
-  border: 2px solid transparent;
-  border-radius: 10px;
+  overflow: hidden;
+  padding: 2.3rem;
+  border-radius: 28px;
+
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+
+  border: 4px solid rgba(255, 250, 183, 0.9);
+  box-shadow:
+    0 18px 45px rgba(0, 0, 0, 0.10),
+    inset 0 0 40px rgba(91, 188, 255, 0.12);
+}
+
+/* Soft light bubbles background */
+.calendar-section::before,
+.calendar-section::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.calendar-section::before {
+  width: 350px;
+  height: 350px;
+  top: -120px;
+  right: -100px;
+  background: rgba(91, 188, 255, 0.45);
+}
+
+.calendar-section::after {
+  width: 300px;
+  height: 300px;
+  bottom: -120px;
+  left: -100px;
+  background: rgba(255, 111, 145, 0.35);
+}
+
+/* everything above bubbles */
+.calendar-section > * {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* ==============================
+   ✅ Section Header
+============================== */
+
+.calendar-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.calendar-section .section-header h2 {
+  font-size: 1.9rem;
+  font-weight: 900;
+  color: #222;
+  letter-spacing: 0.5px;
+}
+
+.calendar-section .section-icon {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.08));
+}
+
+
+/* ==============================
+   ✅ CALENDAR VIEW TOGGLE (PREMIUM)
+============================== */
+
+.calendar-view-toggle {
+  display: flex;
+  gap: 0.45rem;
+  background: rgba(91, 188, 255, 0.12);
+  border-radius: 999px;
+  padding: 0.35rem;
+  border: 2px solid rgba(91,188,255,0.25);
+}
+
+.view-toggle-btn {
+  border: none;
+  background: transparent;
   cursor: pointer;
+  padding: 0.65rem 1.05rem;
+  border-radius: 999px;
+  font-size: 1.25rem;
+  transition: all 0.25s ease;
+  font-weight: 900;
+  color: rgba(0,0,0,0.65);
+}
+
+.view-toggle-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 250, 183, 0.7);
+}
+
+.view-toggle-btn.active {
+  background: #5BBCFF;
+  color: white;
+  box-shadow: 0 12px 20px rgba(91, 188, 255, 0.35);
+  transform: scale(1.05);
+}
+
+
+/* ==============================
+   ✅ MONTH VIEW CONTAINER
+============================== */
+
+.calendar-container {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 24px;
+  padding: 2rem;
+  border: 3px solid rgba(255, 250, 183, 0.9);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.03);
+}
+
+
+/* ==============================
+   ✅ Month Navigation (PREMIUM)
+============================== */
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.2rem;
+  border-radius: 999px;
+
+  background: rgba(229, 249, 255, 0.85);
+  border: 2px solid rgba(91,188,255,0.25);
+
+  box-shadow: 0 14px 26px rgba(0,0,0,0.08);
+  margin-bottom: 2rem;
+}
+
+.calendar-nav h3 {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #222;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.nav-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+
+  background: rgba(91, 188, 255, 0.95);
+  color: white;
+  font-size: 1.6rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  box-shadow: 0 12px 20px rgba(91,188,255,0.25);
+}
+
+.nav-btn:hover {
+  transform: translateY(-3px) scale(1.08);
+  box-shadow: 0 18px 30px rgba(91,188,255,0.35);
+}
+
+.nav-btn:active {
+  transform: translateY(-1px) scale(0.98);
+}
+
+
+/* ==============================
+   ✅ DAYS GRID
+============================== */
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.8rem;
+}
+
+/* Day header */
+.calendar-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.day-header {
+  text-align: center;
+  font-weight: 900;
+  color: rgba(0,0,0,0.6);
+  padding: 0.65rem;
+  background: rgba(255, 250, 183, 0.75);
+  border-radius: 14px;
+  border: 2px solid rgba(255, 250, 183, 1);
+}
+
+
+/* ==============================
+   ✅ Day Card (PREMIUM)
+============================== */
+
+.calendar-day {
+  min-height: 105px;
+  border-radius: 18px;
+  cursor: pointer;
+  padding: 0.7rem 0.55rem;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0.5rem 0.25rem;
-  transition: all 0.3s ease;
+  gap: 0.3rem;
+
+  background: rgba(255,255,255,0.88);
+  border: 2px solid rgba(91,188,255,0.12);
+
+  box-shadow: 0 10px 18px rgba(0,0,0,0.06);
+  transition: all 0.25s ease;
 }
 
 .calendar-day:hover {
-  border-color: #5BBCFF;
+  transform: translateY(-4px) scale(1.02);
+  border-color: rgba(91,188,255,0.55);
+  box-shadow: 0 14px 28px rgba(0,0,0,0.10);
 }
 
+/* Today highlight */
 .calendar-day.today {
-  background: #5BBCFF;
+  background: linear-gradient(135deg, rgba(91,188,255,0.95), rgba(126,161,255,0.9));
+  color: white;
+  border: 2px solid rgba(255,255,255,0.75);
+  box-shadow: 0 16px 35px rgba(91,188,255,0.35);
+}
+
+.calendar-day.today .day-number {
   color: white;
 }
 
-.calendar-day.completed {
-  background: #E5FFE5;
-}
-
-.calendar-day.incomplete {
-  background: #FFE5E5;
-}
-
-.calendar-day.mixed {
-  background: #FFF5E5;
-}
-
+/* other month */
 .calendar-day.other-month {
-  opacity: 0.3;
+  opacity: 0.35;
+  filter: grayscale(0.7);
 }
 
-.calendar-day.has-sessions {
-  border-color: #FF6F91;
-}
-
+/* Day number */
 .day-number {
-  font-weight: bold;
-  margin-bottom: 0.25rem;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  font-weight: 1000;
+  color: rgba(0,0,0,0.72);
 }
+
+
+/* ==============================
+   ✅ Sessions inside Day
+============================== */
+
+.day-sessions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.3rem;
+}
+
+.session-item {
+  padding: 0.25rem 0.45rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 900;
+
+  background: rgba(229,249,255,0.85);
+  border: 1px solid rgba(91,188,255,0.25);
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* session status colors */
+.session-item.completed {
+  background: rgba(76, 175, 80, 0.12);
+  border: 1px solid rgba(76, 175, 80, 0.4);
+  color: #2e7d32;
+}
+
+.session-item.in-progress {
+  background: rgba(255, 152, 0, 0.12);
+  border: 1px solid rgba(255, 152, 0, 0.4);
+  color: #ef6c00;
+}
+
+.session-item.pending {
+  background: rgba(244, 67, 54, 0.12);
+  border: 1px solid rgba(244, 67, 54, 0.4);
+  color: #c62828;
+}
+
+/* More sessions badge */
+.more-sessions {
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 1000;
+  padding: 0.25rem;
+  border-radius: 10px;
+  background: rgba(255, 250, 183, 0.75);
+  border: 1px solid rgba(255, 250, 183, 1);
+  color: rgba(0,0,0,0.75);
+}
+
+
+/* ==============================
+   ✅ PREMIUM SCROLLBARS (list/card view)
+============================== */
+
+.sessions-list::-webkit-scrollbar,
+.cards-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.sessions-list::-webkit-scrollbar-track,
+.cards-container::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.04);
+  border-radius: 999px;
+}
+
+.sessions-list::-webkit-scrollbar-thumb,
+.cards-container::-webkit-scrollbar-thumb {
+  background: rgba(91,188,255,0.55);
+  border-radius: 999px;
+}
+
+.sessions-list::-webkit-scrollbar-thumb:hover,
+.cards-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(91,188,255,0.85);
+}
+
+
+/* ==============================
+   ✅ RESPONSIVE PREMIUM
+============================== */
+
+@media (max-width: 768px) {
+  .calendar-container {
+    padding: 1.3rem;
+  }
+
+  .calendar-days {
+    gap: 0.45rem;
+  }
+
+  .calendar-day {
+    min-height: 85px;
+    padding: 0.55rem 0.35rem;
+  }
+
+  .day-number {
+    font-size: 0.95rem;
+  }
+}
+
+
 
 .day-sessions {
   width: 100%;
@@ -344,6 +890,10 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   border-left: 3px solid #ccc;
+}
+.calendar-day.has-sessions {
+  border: 2px solid rgba(255, 111, 145, 0.55);
+  box-shadow: 0 14px 26px rgba(255,111,145,0.15);
 }
 
 .session-item.completed {
@@ -679,70 +1229,247 @@
 }
 
 /* Recent Activities */
+/* ==============================
+   ✅ RECENT ACTIVITIES (PREMIUM)
+============================== */
+
+/* Section style upgrade */
+.recent-activities {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255,255,255,0.94);
+  border-radius: 26px;
+  border: 3px solid rgba(255,250,183,0.95);
+  box-shadow: 0 18px 45px rgba(0,0,0,0.10);
+}
+
+/* Soft glow background bubbles */
+.recent-activities::before,
+.recent-activities::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.recent-activities::before {
+  width: 240px;
+  height: 240px;
+  background: rgba(91,188,255,0.35);
+  top: -80px;
+  left: -80px;
+}
+
+.recent-activities::after {
+  width: 260px;
+  height: 260px;
+  background: rgba(255,111,145,0.30);
+  bottom: -90px;
+  right: -90px;
+}
+
+
+/* ==============================
+   ✅ Activities list
+============================== */
+
 .activities-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.3rem;
 }
+
+
+/* ==============================
+   ✅ Activity Card (PREMIUM)
+============================== */
 
 .activity-item {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  background: #E5F9FF;
-  border-radius: 15px;
-  border: 2px solid #FFFAB7;
-  transition: transform 0.3s ease;
+  gap: 1.4rem;
+
+  padding: 1.5rem 1.7rem;
+  border-radius: 20px;
+
+  background: rgba(229,249,255,0.75);
+  border: 2px solid rgba(255,250,183,0.9);
+
+  box-shadow: 0 14px 30px rgba(0,0,0,0.07);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+  position: relative;
+  overflow: hidden;
 }
 
+/* ✨ hover effect */
 .activity-item:hover {
-  transform: translateX(-5px);
+  transform: translateX(-6px) scale(1.01);
+  box-shadow: 0 20px 38px rgba(0,0,0,0.12);
 }
 
-.activity-item.completed {
-  background: #E5FFE5;
+/* subtle shine overlay */
+.activity-item::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.45) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  transform: skewX(-20deg);
+  animation: activityShine 3.5s ease-in-out infinite;
+  opacity: 0.25;
 }
 
-.activity-item.in-progress {
-  background: #FFF5E5;
+@keyframes activityShine {
+  0% { left: -60%; opacity: 0; }
+  20% { opacity: 0.45; }
+  50% { opacity: 0.25; }
+  100% { left: 130%; opacity: 0; }
 }
 
-.activity-item.pending {
-  background: #FFE5E5;
-}
+
+/* ==============================
+   ✅ Icon Bubble
+============================== */
 
 .activity-icon-wrapper {
-  width: 50px;
-  height: 50px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.8);
+
+  background: rgba(255,255,255,0.95);
+  border: 3px solid rgba(91,188,255,0.35);
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  box-shadow: 0 14px 25px rgba(0,0,0,0.10);
+  flex-shrink: 0;
+
+  animation: floatIcon 4.5s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
 }
 
 .activity-emoji {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
 }
+
+
+/* ==============================
+   ✅ Content
+============================== */
 
 .activity-content {
   flex: 1;
 }
 
 .activity-content h3 {
-  margin: 0 0 0.5rem 0;
-  color: #333;
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 1000;
+  color: rgba(0,0,0,0.78);
 }
 
 .activity-content p {
-  margin: 0 0 0.5rem 0;
-  color: #666;
+  margin: 0.4rem 0 0.6rem;
+  font-size: 0.95rem;
+  color: rgba(0,0,0,0.55);
+  line-height: 1.5;
 }
 
 .activity-time {
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: rgba(0,0,0,0.45);
+
+  background: rgba(255,250,183,0.65);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  display: inline-block;
+}
+
+
+/* ==============================
+   ✅ Status Badge (PREMIUM)
+============================== */
+
+.status-badge {
+  padding: 0.55rem 1.2rem;
+  border-radius: 999px;
   font-size: 0.9rem;
-  color: #999;
+  font-weight: 1000;
+
+  box-shadow: 0 12px 22px rgba(0,0,0,0.08);
+  white-space: nowrap;
+}
+
+/* Completed */
+.status-badge.completed {
+  background: rgba(76,175,80,0.9);
+  color: white;
+}
+
+/* In progress */
+.status-badge.in-progress {
+  background: rgba(255,152,0,0.9);
+  color: white;
+}
+
+/* Pending */
+.status-badge.pending {
+  background: rgba(244,67,54,0.85);
+  color: white;
+}
+
+
+/* ==============================
+   ✅ Card Colors by Status
+============================== */
+
+.activity-item.completed {
+  background: rgba(229,255,229,0.65);
+  border: 2px solid rgba(76,175,80,0.30);
+}
+
+.activity-item.in-progress {
+  background: rgba(255,245,229,0.65);
+  border: 2px solid rgba(255,152,0,0.30);
+}
+
+.activity-item.pending {
+  background: rgba(255,229,229,0.65);
+  border: 2px solid rgba(244,67,54,0.30);
+}
+
+
+/* ==============================
+   ✅ Responsive
+============================== */
+
+@media (max-width: 768px) {
+  .activity-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .activity-time {
+    margin-top: 0.5rem;
+  }
 }
 
 .status-badge {
@@ -768,162 +1495,535 @@
 }
 
 /* Achievements */
+/* ==============================
+   ✅ ACHIEVEMENTS (PREMIUM)
+============================== */
+
+.achievements {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 26px;
+  border: 3px solid rgba(255, 250, 183, 0.95);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.10);
+}
+
+/* soft glow bubbles */
+.achievements::before,
+.achievements::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(75px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.achievements::before {
+  width: 260px;
+  height: 260px;
+  background: rgba(255, 111, 145, 0.35);
+  top: -90px;
+  left: -90px;
+}
+
+.achievements::after {
+  width: 300px;
+  height: 300px;
+  background: rgba(91, 188, 255, 0.30);
+  bottom: -110px;
+  right: -110px;
+}
+
+
+/* ✅ GRID */
 .achievements-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.6rem;
 }
+
+
+/* ==============================
+   ✅ Achievement Card
+============================== */
 
 .achievement-card {
-  background: #F0E5FF;
-  padding: 2rem;
-  border-radius: 15px;
-  text-align: center;
-  border: 2px solid #FFFAB7;
   position: relative;
-  transition: transform 0.3s ease;
+  padding: 2rem 1.6rem;
+  border-radius: 22px;
+
+  background: rgba(229, 249, 255, 0.60);
+  border: 2px solid rgba(255, 250, 183, 0.85);
+
+  text-align: center;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
 }
 
+/* hover effect */
 .achievement-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-7px) scale(1.02);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
 }
 
-.achievement-card.earned {
-  background: #E5FFE5;
+/* subtle shine */
+.achievement-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.45) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  transform: skewX(-18deg);
+  opacity: 0.25;
+  animation: achievementShine 3.8s ease-in-out infinite;
 }
+
+@keyframes achievementShine {
+  0% { left: -70%; opacity: 0; }
+  20% { opacity: 0.45; }
+  100% { left: 140%; opacity: 0; }
+}
+
+
+/* ==============================
+   ✅ Achievement Icon (IMAGE)
+============================== */
 
 .achievement-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 1.2rem;
+
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+
+  border: 4px solid rgba(91,188,255,0.25);
+  box-shadow: 0 18px 30px rgba(0,0,0,0.10);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  animation: achievementFloat 4.5s ease-in-out infinite;
 }
 
+@keyframes achievementFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ✅ image icon */
+.achievement-img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+
+/* ==============================
+   ✅ Title + Description
+============================== */
+
 .achievement-card h3 {
-  color: #333;
-  margin: 0 0 0.5rem 0;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 1000;
+  color: rgba(0,0,0,0.78);
+}
+
+.achievement-card p {
+  margin: 0.5rem 0 1.2rem;
+  font-size: 0.95rem;
+  color: rgba(0,0,0,0.55);
+  line-height: 1.45;
+}
+
+
+/* ==============================
+   ✅ Progress Bar (PREMIUM)
+============================== */
+
+.achievement-progress {
+  width: 100%;
 }
 
 .progress-bar {
   width: 100%;
-  height: 8px;
-  background: #eee;
-  border-radius: 4px;
+  height: 10px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 999px;
   overflow: hidden;
-  margin: 1rem 0 0.5rem 0;
+  border: 2px solid rgba(255,250,183,0.8);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.12);
 }
 
 .progress-fill {
   height: 100%;
+  width: 0;
   background: linear-gradient(90deg, #FF6F91, #FF9671);
-  transition: width 0.3s ease;
+  border-radius: 999px;
+  transition: width 0.6s ease;
+  box-shadow: 0 0 14px rgba(255,111,145,0.5);
 }
+
+.progress-text {
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 1000;
+  color: rgba(0,0,0,0.55);
+}
+
+
+/* ==============================
+   ✅ Earned Badge (PREMIUM)
+============================== */
 
 .earned-badge {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #4CAF50;
-  color: white;
+  top: 14px;
+  right: 14px;
+
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
+
+  background: rgba(76,175,80,0.95);
+  color: white;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
+
+  font-weight: 1000;
+  font-size: 1rem;
+
+  border: 3px solid rgba(255,250,183,0.9);
+  box-shadow: 0 14px 24px rgba(0,0,0,0.12);
+
+  animation: earnedPulse 1.8s ease-in-out infinite;
 }
+
+@keyframes earnedPulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+
+/* ==============================
+   ✅ Locked / Not Earned Style
+============================== */
+
+.achievement-card:not(.earned) {
+  opacity: 0.75;
+  filter: grayscale(0.3);
+}
+
+.achievement-card:not(.earned) .achievement-icon {
+  border: 4px solid rgba(0,0,0,0.10);
+  opacity: 0.85;
+}
+
+.achievement-card:not(.earned):hover {
+  opacity: 1;
+  filter: grayscale(0);
+}
+
+
+/* ==============================
+   ✅ Earned Style Boost
+============================== */
+
+.achievement-card.earned {
+  background: rgba(229, 255, 229, 0.65);
+  border: 2px solid rgba(76,175,80,0.30);
+}
+
 
 /* Difficulties */
-.ai-analysis {
-  display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
+/* ==============================
+   ✅ DIFFICULTIES SECTION (PREMIUM AI)
+============================== */
+
+.difficulties {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255,255,255,0.93);
+  border-radius: 26px;
+  border: 3px solid rgba(255,250,183,0.95);
+  box-shadow: 0 18px 45px rgba(0,0,0,0.10);
 }
 
-.ai-avatar {
-  width: 60px;
-  height: 60px;
+/* ✅ background glow bubbles */
+.difficulties::before,
+.difficulties::after {
+  content: "";
+  position: absolute;
   border-radius: 50%;
-  background: #E5F9FF;
+  filter: blur(75px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.difficulties::before {
+  width: 280px;
+  height: 280px;
+  background: rgba(255, 111, 145, 0.35);
+  top: -80px;
+  left: -80px;
+}
+
+.difficulties::after {
+  width: 320px;
+  height: 320px;
+  background: rgba(91,188,255,0.30);
+  bottom: -100px;
+  right: -100px;
+}
+
+/* ==============================
+   ✅ Section Title Icon
+============================== */
+
+.section-title-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0,0,0,0.12));
+}
+
+/* ==============================
+   ✅ Premium AI Card
+============================== */
+
+.premium-ai-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.6rem;
+
+  padding: 2rem;
+  border-radius: 24px;
+
+  background: rgba(229,249,255,0.65);
+  border: 2px solid rgba(91,188,255,0.25);
+  box-shadow: 0 18px 38px rgba(0,0,0,0.10);
+
+  position: relative;
+  overflow: hidden;
+
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.premium-ai-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 24px 45px rgba(0,0,0,0.14);
+}
+
+/* ✅ subtle shine sweep */
+.premium-ai-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.55) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  transform: skewX(-18deg);
+  opacity: 0.25;
+  animation: aiCardShine 4s ease-in-out infinite;
+}
+
+@keyframes aiCardShine {
+  0% { left: -60%; opacity: 0; }
+  20% { opacity: 0.45; }
+  100% { left: 140%; opacity: 0; }
+}
+
+/* ==============================
+   ✅ AI Avatar Image
+============================== */
+
+.ai-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+
+  background: rgba(255,255,255,0.95);
+  border: 4px solid rgba(255,250,183,0.85);
+  box-shadow: 0 14px 28px rgba(0,0,0,0.12);
+
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  border: 3px solid #FFFAB7;
+
+  flex-shrink: 0;
+  animation: aiFloat 4.5s ease-in-out infinite;
 }
+
+@keyframes aiFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.ai-avatar img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+
+/* ==============================
+   ✅ AI Text Content
+============================== */
 
 .analysis-content {
   flex: 1;
 }
 
 .analysis-content h3 {
-  color: #5BBCFF;
-  margin: 0 0 1rem 0;
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 1000;
+  color: rgba(0,0,0,0.78);
 }
 
-.analysis-content p {
-  color: #666;
-  line-height: 1.6;
-  margin-bottom: 1rem;
+.analysis-text {
+  margin: 0.9rem 0 1.4rem;
+  font-size: 1rem;
+  color: rgba(0,0,0,0.58);
+  line-height: 1.65;
+  font-weight: 600;
 }
+
+/* ==============================
+   ✅ Difficulty Tags (Premium Pills)
+============================== */
 
 .difficulty-tags {
   display: flex;
-  gap: 0.5rem;
   flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .difficulty-tag {
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: bold;
+  padding: 0.65rem 1.2rem;
+  border-radius: 999px;
+
+  font-size: 0.95rem;
+  font-weight: 1000;
+
+  border: 2px solid rgba(255,250,183,0.9);
+  box-shadow: 0 12px 20px rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.75);
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: default;
 }
 
+.difficulty-tag:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 16px 26px rgba(0,0,0,0.12);
+}
+
+/* ✅ Severity Colors */
 .difficulty-tag.high {
-  background: #FFE5E5;
+  background: rgba(255,111,145,0.18);
   color: #f44336;
+  border-color: rgba(255,111,145,0.35);
 }
 
 .difficulty-tag.medium {
-  background: #FFF5E5;
+  background: rgba(255,152,0,0.18);
   color: #FF9800;
+  border-color: rgba(255,152,0,0.35);
 }
 
 .difficulty-tag.low {
-  background: #E5FFE5;
+  background: rgba(76,175,80,0.18);
   color: #4CAF50;
+  border-color: rgba(76,175,80,0.35);
 }
 
-/* Chat Window */
+
+/* ==============================
+   ✅ Responsive Fix
+============================== */
+
+@media (max-width: 768px) {
+  .premium-ai-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .analysis-text {
+    text-align: center;
+  }
+
+  .difficulty-tags {
+    justify-content: center;
+  }
+}
+
+/* ==============================
+   ✅ PREMIUM CHAT WINDOW
+============================== */
+
 .chat-window {
   position: fixed;
   top: 2rem;
-  right: -400px;
-  width: 380px;
+  right: -450px;
+
+  width: 420px;
   height: calc(100vh - 4rem);
-  background: white;
-  border-radius: 20px 0 0 20px;
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
-  transition: right 0.3s ease;
-  z-index: 1000;
+
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(18px);
+
+  border-radius: 26px 0 0 26px;
+  border: 3px solid rgba(255,250,183,0.9);
+
+  box-shadow: -20px 0 60px rgba(0,0,0,0.22);
+  transition: right 0.45s cubic-bezier(.2,.8,.2,1);
+
+  z-index: 2000;
   display: flex;
   flex-direction: column;
-  border: 3px solid #FFFAB7;
+  overflow: hidden;
 }
 
+/* ✅ open state */
 .chat-window.open {
   right: 0;
 }
+
+/* ==============================
+   ✅ CHAT HEADER PREMIUM
+============================== */
 
 .chat-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem;
-  border-bottom: 2px solid #f0f0f0;
-  background: #5BBCFF;
+
+  padding: 1.4rem 1.6rem;
+  background: linear-gradient(90deg, #5BBCFF, #7EA1FF);
   color: white;
-  border-radius: 17px 0 0 0;
+
+  border-bottom: 2px solid rgba(255,255,255,0.25);
 }
 
 .chat-agent-info {
@@ -933,174 +2033,335 @@
 }
 
 .agent-avatar {
-  width: 40px;
-  height: 40px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  background: white;
+  border: 4px solid rgba(255,250,183,0.85);
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 12px 20px rgba(0,0,0,0.14);
+
   display: flex;
-  align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  align-items: center;
+}
+
+.agent-avatar img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
 }
 
 .agent-details h3 {
   margin: 0;
   font-size: 1rem;
+  font-weight: 1000;
 }
 
 .agent-status {
-  font-size: 0.8rem;
-  opacity: 0.8;
+  font-size: 0.85rem;
+  opacity: 0.92;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
 }
 
-.close-chat {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
+/* ✅ online dot */
+.dot-online {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #4CAF50;
+  box-shadow: 0 0 10px rgba(76,175,80,0.8);
+  animation: pulseDot 1.8s infinite;
 }
+
+@keyframes pulseDot {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.25); opacity: 0.65; }
+}
+
+/* ✅ close button image */
+.close-chat {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+
+  background: rgba(255,255,255,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.close-chat img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.close-chat:hover {
+  transform: scale(1.08);
+  background: rgba(255,255,255,0.28);
+}
+
+
+/* ==============================
+   ✅ CHAT MESSAGES PREMIUM
+============================== */
 
 .chat-messages {
   flex: 1;
-  padding: 1rem;
+  padding: 1.4rem;
   overflow-y: auto;
+
+  background: rgba(229,249,255,0.55);
   direction: rtl;
 }
 
+/* ✅ scrollbar premium */
+.chat-messages::-webkit-scrollbar {
+  width: 7px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(91,188,255,0.45);
+  border-radius: 999px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.45);
+}
+
+/* ✅ message layout */
 .message {
-  margin-bottom: 1rem;
+  display: flex;
+  gap: 0.9rem;
+  margin-bottom: 1.2rem;
+  align-items: flex-end;
 }
 
-.message.user .message-content {
-  background: #5BBCFF;
-  color: white;
-  margin-left: 3rem;
+.message.user {
+  flex-direction: row-reverse;
 }
 
-.message.agent .message-content {
-  background: #f0f0f0;
-  margin-right: 3rem;
+/* ✅ avatar */
+.message-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  overflow: hidden;
+
+  border: 3px solid rgba(255,250,183,0.9);
+  background: white;
+  flex-shrink: 0;
+
+  box-shadow: 0 10px 20px rgba(0,0,0,0.10);
 }
 
+.message-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ✅ bubble */
 .message-content {
-  padding: 1rem;
-  border-radius: 15px;
+  max-width: 75%;
+  padding: 1rem 1.2rem;
+  border-radius: 20px;
+
+  background: rgba(255,255,255,0.9);
+  border: 2px solid rgba(255,250,183,0.85);
+
+  box-shadow: 0 14px 26px rgba(0,0,0,0.08);
+
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.5;
   position: relative;
 }
 
-.message-time {
-  font-size: 0.8rem;
-  opacity: 0.7;
-  display: block;
-  margin-top: 0.5rem;
+/* ✅ user bubble */
+.message.user .message-content {
+  background: linear-gradient(90deg, rgba(91,188,255,0.95), rgba(126,161,255,0.90));
+  color: white;
+  border-color: rgba(255,255,255,0.35);
 }
 
-/* Suggested Plan */
-.suggested-plan {
-  background: #E5F9FF;
-  border-radius: 15px;
+/* ✅ time */
+.message-time {
+  font-size: 0.75rem;
+  opacity: 0.75;
+  margin-top: 0.5rem;
+  display: block;
+  font-weight: 900;
+}
+
+/* ==============================
+   ✅ PREMIUM PLAN CARD
+============================== */
+
+.premium-plan {
+  margin-top: 1.5rem;
+  border-radius: 22px;
   padding: 1.5rem;
-  margin: 1rem 0;
-  border: 2px solid #5BBCFF;
+
+  background: rgba(255,250,183,0.55);
+  border: 2px solid rgba(255,209,227,0.65);
+
+  box-shadow: 0 18px 34px rgba(0,0,0,0.10);
 }
 
 .plan-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.8rem;
   margin-bottom: 1rem;
 }
 
+.plan-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
 .plan-header h4 {
-  color: #5BBCFF;
   margin: 0;
+  font-size: 1.1rem;
+  font-weight: 1000;
+  color: rgba(0,0,0,0.75);
+}
+
+.plan-content p {
+  margin: 0 0 1rem;
+  font-weight: 700;
+  color: rgba(0,0,0,0.62);
 }
 
 .plan-content ul {
-  margin: 1rem 0;
-  padding-right: 1.5rem;
+  margin: 0;
+  padding-right: 1.3rem;
 }
 
 .plan-content li {
-  margin-bottom: 0.5rem;
-  color: #666;
+  margin-bottom: 0.6rem;
+  font-weight: 800;
+  color: rgba(0,0,0,0.7);
 }
 
+/* ✅ plan buttons */
 .plan-actions {
   display: flex;
-  gap: 1rem;
   justify-content: center;
-  margin-top: 1rem;
+  gap: 1rem;
+  margin-top: 1.2rem;
 }
 
 .approve-btn,
 .reject-btn {
-  padding: 0.8rem 2rem;
   border: none;
-  border-radius: 20px;
+  border-radius: 16px;
   cursor: pointer;
-  font-weight: bold;
-  transition: transform 0.3s ease;
+  padding: 0.75rem 1.4rem;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-weight: 1000;
+  font-size: 0.95rem;
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.btn-mini-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
 
 .approve-btn {
   background: #4CAF50;
   color: white;
+  box-shadow: 0 16px 26px rgba(76,175,80,0.35);
 }
 
 .reject-btn {
   background: #f44336;
   color: white;
+  box-shadow: 0 16px 26px rgba(244,67,54,0.30);
 }
 
 .approve-btn:hover,
 .reject-btn:hover {
-  transform: scale(1.05);
+  transform: translateY(-3px) scale(1.05);
 }
 
-/* Chat Input */
-.chat-input {
-  display: flex;
-  align-items: flex-end;
+/* ==============================
+   ✅ INPUT PREMIUM
+============================== */
+
+.premium-input {
   padding: 1rem;
-  border-top: 2px solid #f0f0f0;
-  gap: 0.5rem;
+  background: rgba(255,255,255,0.95);
+  border-top: 2px solid rgba(255,250,183,0.85);
+
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
 }
 
-.chat-input textarea {
+.premium-input textarea {
   flex: 1;
-  border: 2px solid #ddd;
-  border-radius: 15px;
-  padding: 0.75rem 1rem;
-  resize: none;
-  min-height: 20px;
-  max-height: 100px;
+  border-radius: 18px;
+  border: 2px solid rgba(91,188,255,0.35);
+  padding: 0.85rem 1rem;
   font-family: inherit;
-  direction: rtl;
-  line-height: 1.4;
+
+  font-weight: 800;
+  font-size: 0.95rem;
+  resize: none;
+  max-height: 120px;
+
+  background: rgba(229,249,255,0.6);
+  outline: none;
+  transition: border 0.25s ease, box-shadow 0.25s ease;
+}
+
+.premium-input textarea:focus {
+  border-color: rgba(91,188,255,0.75);
+  box-shadow: 0 0 0 4px rgba(91,188,255,0.22);
 }
 
 .send-btn {
-  background: #5BBCFF;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
   border: none;
-  color: white;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
   cursor: pointer;
-  font-size: 1.2rem;
+
+  background: linear-gradient(90deg, #FF6F91, #FF9671);
+  box-shadow: 0 16px 28px rgba(255,111,145,0.35);
+
   display: flex;
-  align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  align-items: center;
+
+  transition: transform 0.25s ease;
+}
+
+.send-btn img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
 
 .send-btn:hover:not(:disabled) {
-  background: #7EA1FF;
+  transform: translateY(-3px) scale(1.05);
 }
 
 .send-btn:disabled {
@@ -1108,57 +2369,7 @@
   cursor: not-allowed;
 }
 
-/* Chat Overlay */
-.chat-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.3);
-  z-index: 999;
-}
-
 /* Day Details Modal */
-.day-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 2000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-}
-
-.day-modal {
-  background: white;
-  border-radius: 20px;
-  width: 100%;
-  max-width: 600px;
-  max-height: 80vh;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  border: 3px solid #FFFAB7;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 2rem;
-  background: #5BBCFF;
-  color: white;
-  border-radius: 17px 17px 0 0;
-}
-
-.modal-header h2 {
-  margin: 0;
-  font-size: 1.5rem;
-}
 
 .close-modal {
   background: none;
@@ -1187,31 +2398,6 @@
   direction: rtl;
 }
 
-.session-card {
-  background: #F8F9FF;
-  border-radius: 15px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  border: 2px solid #FFFAB7;
-  transition: transform 0.3s ease;
-}
-
-.session-card:hover {
-  transform: translateY(-2px);
-}
-
-.session-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-}
-
-.session-info h3 {
-  margin: 0 0 0.5rem 0;
-  color: #333;
-  font-size: 1.2rem;
-}
 
 .chapter-name {
   color: #666;
@@ -1285,17 +2471,345 @@
   transform: scale(1.05);
 }
 
+/* ==============================
+   ✅ PREMIUM MODAL OVERLAY
+============================== */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+
+  z-index: 3000;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 2rem;
+  animation: fadeInModal 0.35s ease;
+}
+
+/* smooth fade */
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+
+/* ==============================
+   ✅ PREMIUM MODAL BOX
+============================== */
+
+.day-modal {
+  width: 100%;
+  max-width: 650px;
+  max-height: 82vh;
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 30px;
+
+  border: 4px solid rgba(255, 250, 183, 0.95);
+  box-shadow: 0 25px 70px rgba(0,0,0,0.35);
+
+  animation: slideUpModal 0.35s ease;
+  position: relative;
+}
+
+@keyframes slideUpModal {
+  from { transform: translateY(30px) scale(0.95); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+
+/* ==============================
+   ✅ HEADER (PREMIUM GRADIENT)
+============================== */
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 1.5rem 2rem;
+  border-radius: 26px 26px 0 0;
+
+  background: linear-gradient(135deg, #5BBCFF, #7EA1FF);
+  color: white;
+
+  box-shadow: 0 12px 25px rgba(91,188,255,0.35);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 1000;
+  letter-spacing: 0.3px;
+}
+
+.close-modal {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+
+  font-size: 2rem;
+  font-weight: 900;
+
+  color: white;
+  background: rgba(255, 255, 255, 0.18);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.close-modal:hover {
+  transform: rotate(10deg) scale(1.12);
+  background: rgba(255, 255, 255, 0.35);
+}
+
+
+/* ==============================
+   ✅ MODAL CONTENT
+============================== */
+
+.modal-content {
+  padding: 2rem;
+  max-height: 480px;
+  overflow-y: auto;
+  direction: rtl;
+}
+
+
+/* ✅ premium scrollbar */
+.modal-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.04);
+  border-radius: 999px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: rgba(91,188,255,0.55);
+  border-radius: 999px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(91,188,255,0.9);
+}
+
+
+/* ==============================
+   ✅ SESSION CARD (PREMIUM)
+============================== */
+
+.session-card {
+  background: rgba(255,255,255,0.95);
+  border-radius: 22px;
+  padding: 1.6rem;
+  margin-bottom: 1.4rem;
+
+  border: 2px solid rgba(91,188,255,0.15);
+  box-shadow: 0 14px 26px rgba(0,0,0,0.08);
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+}
+
+.session-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 20px 38px rgba(0,0,0,0.12);
+}
+
+/* status border highlight */
+.session-card.completed {
+  border: 2px solid rgba(76,175,80,0.35);
+  background: rgba(229,255,229,0.55);
+}
+
+.session-card.in-progress {
+  border: 2px solid rgba(255,152,0,0.35);
+  background: rgba(255,245,229,0.55);
+}
+
+.session-card.pending {
+  border: 2px solid rgba(244,67,54,0.35);
+  background: rgba(255,229,229,0.55);
+}
+
+
+/* ==============================
+   ✅ SESSION HEADER
+============================== */
+
+.session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.session-info h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 1000;
+  color: #111;
+}
+
+.chapter-name {
+  margin: 0.4rem 0 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgba(0,0,0,0.55);
+}
+
+/* status badge */
+.session-status {
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+
+  font-weight: 1000;
+  font-size: 0.85rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 12px 22px rgba(0,0,0,0.08);
+}
+
+.session-status.completed {
+  background: rgba(76,175,80,0.85);
+  color: white;
+}
+
+.session-status.in-progress {
+  background: rgba(255,152,0,0.9);
+  color: white;
+}
+
+.session-status.pending {
+  background: rgba(244,67,54,0.85);
+  color: white;
+}
+
+
+/* ==============================
+   ✅ SESSION DETAILS
+============================== */
+
+.session-description {
+  font-size: 0.95rem;
+  color: rgba(0,0,0,0.65);
+  line-height: 1.6;
+  margin-bottom: 1.1rem;
+}
+
+.session-time {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  font-weight: 900;
+  font-size: 0.9rem;
+  color: rgba(0,0,0,0.55);
+
+  background: rgba(229,249,255,0.75);
+  border: 2px solid rgba(255,250,183,0.9);
+  border-radius: 14px;
+  padding: 0.6rem 1rem;
+
+  width: fit-content;
+}
+
+
+/* ==============================
+   ✅ SESSION ACTIONS
+============================== */
+
+.session-actions {
+  margin-top: 1.2rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.start-session-btn {
+  border: none;
+  cursor: pointer;
+
+  padding: 0.85rem 2.2rem;
+  border-radius: 999px;
+
+  font-size: 1rem;
+  font-weight: 1000;
+
+  background: linear-gradient(135deg, #4CAF50, #43a047);
+  color: white;
+
+  box-shadow: 0 14px 24px rgba(76,175,80,0.25);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.start-session-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 18px 30px rgba(76,175,80,0.35);
+}
+
+.start-session-btn.history-btn {
+  background: linear-gradient(135deg, #6C63FF, #5BBCFF);
+  box-shadow: 0 14px 24px rgba(108,99,255,0.25);
+}
+
+.start-session-btn.history-btn:hover {
+  box-shadow: 0 18px 30px rgba(108,99,255,0.35);
+}
+
+
+/* ==============================
+   ✅ EMPTY DAY STATE (PREMIUM)
+============================== */
+
 .no-sessions {
   text-align: center;
-  color: #666;
-  font-style: italic;
-  padding: 2rem;
+  padding: 2rem 1rem;
+
+  background: rgba(229,249,255,0.65);
+  border-radius: 22px;
+
+  border: 2px dashed rgba(91,188,255,0.35);
+  color: rgba(0,0,0,0.65);
+
+  box-shadow: 0 12px 24px rgba(0,0,0,0.05);
+}
+
+/* Add cute emoji / icon */
+.no-sessions::before {
+  content: "🗓️";
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
 }
 
 .no-sessions p {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  font-weight: 1000;
 }
+
 
 /* Animations */
 @keyframes gradientShift {

@@ -39,9 +39,10 @@ export class ProfileComponent implements OnInit {
 
   achievements: Achievement[] = [];
 
+  // ✅ UPDATED: Activities icons are now images (not emojis)
   recentActivities: Activity[] = [
-    { icon: '📚', text: 'أكملت درس "الأعداد"' },
-    { icon: '🎯', text: 'بدأت رحلة التعلم' }
+    { icon: 'assets/images/book.png', text: 'أكملت درس "الأعداد"' },
+    { icon: 'assets/images/target.png', text: 'بدأت رحلة التعلم' }
   ];
 
   ngOnInit(): void {
@@ -59,6 +60,7 @@ export class ProfileComponent implements OnInit {
 
         // Map backend stats to UI
         this.completedQuizzes = user.totalQuizzes || 0;
+
         // Mock data for missing backend fields to keep UI rich
         this.completedLessons = Math.floor(this.xp / 50);
         this.highestStreak = Math.floor(Math.random() * 10);

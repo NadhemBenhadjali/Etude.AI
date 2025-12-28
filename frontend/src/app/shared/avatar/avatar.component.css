@@ -1,49 +1,88 @@
-.avatar-container {
+/* ✅ LOGOUT fixed LEFT */
+.logout-btn {
   position: fixed;
   top: 20px;
   left: 20px;
   z-index: 1000;
-}
 
-.avatar-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: 3px solid #fff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.avatar:hover {
-  transform: scale(1.05);
-}
-
-.logout-btn {
-  background: white;
+  background: none;
   border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 1.2rem;
+  padding: 0;
   cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #e74c3c;
-  /* Red color for logout */
+
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.logout-btn:hover {
+/* ✅ logout icon */
+.logout-icon {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  opacity: 0.85;
+}
+
+/* ✅ hover effect */
+.logout-btn:hover .logout-icon {
   transform: scale(1.1);
-  background: #f8f9fa;
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  opacity: 1;
+}
+
+
+/* ✅ Avatar fixed RIGHT */
+.avatar-link {
+  position: fixed;
+  top: 15px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.avatar {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  object-fit: cover;
+
+  border: 4px solid rgba(255, 250, 183, 0.95);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.12);
+  cursor: pointer;
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.avatar:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 16px 26px rgba(0,0,0,0.18);
+}
+
+
+/* ✅ Tooltip for logout */
+.mini-tooltip {
+  position: absolute;
+  top: 50px;
+  left: 0;
+
+  background: rgba(255,255,255,0.95);
+  border: 2px solid rgba(255,250,183,0.9);
+  padding: 6px 10px;
+  border-radius: 14px;
+
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(0,0,0,0.75);
+
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: 0.25s ease;
+
+  box-shadow: 0 14px 22px rgba(0,0,0,0.12);
+}
+
+.logout-btn:hover .mini-tooltip {
+  opacity: 1;
+  transform: translateY(0);
 }

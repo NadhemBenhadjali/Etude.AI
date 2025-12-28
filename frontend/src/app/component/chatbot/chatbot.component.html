@@ -62,18 +62,28 @@
         </button>
       </div>
       <div class="quick-responses">
-        <button class="quick-response" (click)="sendQuickResponse('مرحباً!')" [disabled]="isLoading">مرحباً!</button>
-        <button *ngFor="let suggestion of ['كيف حالك؟', 'احكلي نكتة', 'شنوة الطقس؟']"
-          (click)="sendQuickResponse(suggestion)" [disabled]="isLoading">
+        <button class="quick-response"
+                (click)="sendQuickResponse('مرحباً!')"
+                [disabled]="isLoading">
+          مرحباً!
+        </button>
+
+        <button class="quick-response"
+                *ngFor="let suggestion of ['كيف حالك؟', 'احكلي نكتة', 'شنوة الطقس؟']"
+                (click)="sendQuickResponse(suggestion)"
+                [disabled]="isLoading">
           {{suggestion}}
         </button>
       </div>
-      <div class="save-actions" style="margin-top: 20px; text-align: center;">
-        <button (click)="saveSession()" [disabled]="messages.length === 0"
-          style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer;">
+
+      <div class="save-actions">
+        <button class="save-session-btn"
+                (click)="saveSession()"
+                [disabled]="messages.length === 0">
           💾 حفظ الجلسة وإنهاء
         </button>
       </div>
+
     </div>
   </div>
 </div>

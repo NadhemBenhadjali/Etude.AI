@@ -1,18 +1,25 @@
 <div class="user-management-container" dir="rtl">
   <div class="user-management-box">
     <div class="header">
-      <h1>⚙️ إدارة الحساب</h1>
+      <h1>
+        <img class="title-icon" src="assets/images/gear.png" alt="إدارة الحساب" />
+        إدارة الحساب
+      </h1>
+
       <button class="back-button" routerLink="/profile">
         ← رجوع للملف الشخصي
       </button>
     </div>
 
+    <!-- ALERTS -->
     <div *ngIf="error" class="alert alert-error">
-      ⚠️ {{ error }}
+      <img class="alert-icon" src="assets/images/warning.png" alt="error" />
+      {{ error }}
     </div>
 
     <div *ngIf="successMessage" class="alert alert-success">
-      ✅ {{ successMessage }}
+      <img class="alert-icon" src="assets/images/success.png" alt="success" />
+      {{ successMessage }}
     </div>
 
     <div *ngIf="loading" class="loading-spinner">
@@ -23,9 +30,11 @@
     <!-- PROFILE FORM -->
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
       <div class="form-section">
-        <h2>📝 المعلومات الشخصية</h2>
+        <h2>
+          <img class="section-icon-img" src="assets/images/user.png" alt="المعلومات الشخصية" />
+          المعلومات الشخصية
+        </h2>
 
-        <!-- NEW: Email -->
         <div class="form-group">
           <label for="email">البريد الإلكتروني *</label>
           <input
@@ -86,7 +95,7 @@
         </div>
 
         <div class="form-group">
-          <label for="level">السنة الدراسية 📚</label>
+          <label for="level">السنة الدراسية</label>
           <select id="level" formControlName="level">
             <option value="FIRST">السنة الاولى</option>
             <option value="SECOND">السنة الثانية</option>
@@ -98,63 +107,79 @@
         </div>
       </div>
 
+      <!-- ✅ INFO SECTION -->
       <div class="form-section" *ngIf="currentUser">
-        <h2>ℹ️ معلومات إضافية</h2>
+        <h2>
+          <img class="section-icon-img" src="assets/images/info.png" alt="معلومات إضافية" />
+          معلومات إضافية
+        </h2>
 
         <div class="info-grid">
+
           <div class="info-item">
-            <span class="info-label">📧 البريد الإلكتروني</span>
+            <span class="info-label">
+              <img class="info-icon" src="assets/images/mail.png" alt="email" />
+              البريد الإلكتروني
+            </span>
             <span class="info-value">{{ currentUser.email }}</span>
           </div>
 
           <div class="info-item">
-            <span class="info-label">🏆 نقاط Elo</span>
+            <span class="info-label">
+              <img class="info-icon" src="assets/images/trophy.png" alt="elo" />
+              نقاط Elo
+            </span>
             <span class="info-value">{{ currentUser.elo || 0 }}</span>
           </div>
 
           <div class="info-item">
-            <span class="info-label">👤 الدور</span>
+            <span class="info-label">
+              <img class="info-icon" src="assets/images/user-role.png" alt="role" />
+              الدور
+            </span>
             <span class="info-value">{{ currentUser.role }}</span>
           </div>
 
           <div class="info-item">
-            <span class="info-label">📅 تاريخ الإنشاء</span>
+            <span class="info-label">
+              <img class="info-icon" src="assets/images/calendar.png" alt="created at" />
+              تاريخ الإنشاء
+            </span>
             <span class="info-value">{{ currentUser.createdAt | date: 'short' }}</span>
           </div>
+
         </div>
       </div>
 
+      <!-- BUTTONS -->
       <div class="button-group">
-        <button
-          type="submit"
-          class="btn-primary"
-          [disabled]="userForm.invalid || loading"
-        >
-          <span>💾 حفظ التغييرات</span>
+        <button type="submit" class="btn-primary" [disabled]="userForm.invalid || loading">
+          <img class="btn-icon" src="assets/images/save.png" alt="save" />
+          <span>حفظ التغييرات</span>
         </button>
 
-        <button
-          type="button"
-          class="btn-danger"
-          (click)="onDelete()"
-          *ngIf="currentUser"
-          [disabled]="loading"
-        >
-          <span>🗑️ حذف الحساب</span>
+        <button type="button" class="btn-danger" (click)="onDelete()" *ngIf="currentUser" [disabled]="loading">
+          <img class="btn-icon" src="assets/images/delete.png" alt="delete" />
+          <span>حذف الحساب</span>
         </button>
       </div>
     </form>
 
-    <!-- PASSWORD FORM -->
+    <!-- ✅ PASSWORD FORM -->
     <div class="form-section" *ngIf="!loading && currentUser">
-      <h2>🔒 تغيير كلمة المرور</h2>
+      <h2>
+        <img class="section-icon-img" src="assets/images/reset-password.png" alt="تغيير كلمة المرور" />
+        تغيير كلمة المرور
+      </h2>
 
       <div *ngIf="passwordError" class="alert alert-error">
-        ⚠️ {{ passwordError }}
+        <img class="alert-icon" src="assets/images/warning.png" alt="error" />
+        {{ passwordError }}
       </div>
 
       <div *ngIf="passwordSuccess" class="alert alert-success">
-        ✅ {{ passwordSuccess }}
+        <img class="alert-icon" src="assets/images/success.png" alt="success" />
+        {{ passwordSuccess }}
       </div>
 
       <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
@@ -166,15 +191,6 @@
             formControlName="currentPassword"
             placeholder="أدخل كلمة المرور الحالية"
           />
-          <div
-            class="error-message"
-            *ngIf="
-              passwordForm.get('currentPassword')?.invalid &&
-              passwordForm.get('currentPassword')?.touched
-            "
-          >
-            كلمة المرور الحالية مطلوبة
-          </div>
         </div>
 
         <div class="form-group">
@@ -185,15 +201,6 @@
             formControlName="newPassword"
             placeholder="أدخل كلمة مرور جديدة"
           />
-          <div
-            class="error-message"
-            *ngIf="
-              passwordForm.get('newPassword')?.invalid &&
-              passwordForm.get('newPassword')?.touched
-            "
-          >
-            كلمة المرور يجب أن تكون على الأقل 6 أحرف
-          </div>
         </div>
 
         <div class="form-group">
@@ -204,27 +211,16 @@
             formControlName="confirmPassword"
             placeholder="أعد كتابة كلمة المرور الجديدة"
           />
-          <div
-            class="error-message"
-            *ngIf="
-              passwordForm.hasError('passwordsMismatch') &&
-              passwordForm.get('confirmPassword')?.touched
-            "
-          >
-            كلمتا المرور غير متطابقتين
-          </div>
         </div>
 
         <div class="button-group">
-          <button
-            type="submit"
-            class="btn-primary"
-            [disabled]="passwordForm.invalid || loading"
-          >
-            <span>🔒 حفظ كلمة المرور الجديدة</span>
+          <button type="submit" class="btn-primary" [disabled]="passwordForm.invalid || loading">
+            <img class="btn-icon" src="assets/images/lock-save.png" alt="save password" />
+            <span>حفظ كلمة المرور الجديدة</span>
           </button>
         </div>
       </form>
     </div>
+
   </div>
 </div>

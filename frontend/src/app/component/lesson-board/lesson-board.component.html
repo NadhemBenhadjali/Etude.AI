@@ -1,55 +1,112 @@
+<!-- ✅ NAVBAR SAME DESIGN AS OTHER PAGES -->
+<nav class="navbar">
+  <ul>
+    <li><a routerLink="/"> الرئيسية </a></li>
+    <li><a routerLink="/about"> شكون احنا؟</a></li>
+    <li><a routerLink="/contact"> كلمنا </a></li>
+  </ul>
+</nav>
+
 <app-avatar></app-avatar>
-<div class="lesson-container2">
-  <div class="lesson-container">
 
-    <h2 class="lesson-title">
-      {{ title }} — الشريحة {{ slides[currentSlideIndex].number }}
-    </h2>
+<div class="lesson-container2" dir="rtl">
 
-    <button class="exit-button" routerLink="/select-mode">
-      <span>العودة</span>
-    </button>
+  <!-- ✅ MAIN GLASS CARD -->
+  <div class="lesson-card">
 
+    <!-- ✅ TOP HEADER -->
+    <div class="lesson-top-bar">
+
+      <button class="exit-button" routerLink="/select-mode">
+        <img src="assets/images/back.png" class="exit-icon" alt="back">
+        <span>العودة</span>
+      </button>
+
+      <h2 class="lesson-title">
+        {{ title }} — الشريحة {{ slides[currentSlideIndex].number }}
+      </h2>
+
+      <!-- ✅ progress indicator -->
+      <div class="lesson-progress">
+        {{currentSlideIndex + 1}} / {{slides.length}}
+      </div>
+
+    </div>
+
+    <!-- ✅ BOARD PREMIUM FRAME -->
     <div class="image-wrapper">
+
       <img [src]="boardImage" alt="Board" class="board-image" />
 
+      <!-- overlay -->
       <div class="overlay-content">
-        <img *ngIf="hasPhoto(slides[currentSlideIndex])" [src]="slides[currentSlideIndex].image"
-          [alt]="'Slide photo ' + slides[currentSlideIndex].number" class="slide-img" />
 
-        <div class="slide-text" [ngClass]="hasPhoto(slides[currentSlideIndex]) ? 'has-photo' : 'no-photo'"
-          [innerHTML]="slides[currentSlideIndex].text"></div>
+        <img *ngIf="hasPhoto(slides[currentSlideIndex])"
+             [src]="slides[currentSlideIndex].image"
+             [alt]="'Slide photo ' + slides[currentSlideIndex].number"
+             class="slide-img" />
+
+        <div class="slide-text"
+             [ngClass]="hasPhoto(slides[currentSlideIndex]) ? 'has-photo' : 'no-photo'"
+             [innerHTML]="slides[currentSlideIndex].text">
+        </div>
 
       </div>
     </div>
 
+    <!-- ✅ AUDIO CONTROLS -->
     <div class="audio-controls">
-      <button class="play-button" (click)="playSummary()" [disabled]="!slides[currentSlideIndex].text || isPlaying">
+
+      <button class="audio-btn play-button"
+              (click)="playSummary()"
+              [disabled]="!slides[currentSlideIndex].text || isPlaying">
+        <img src="assets/images/speaker.png" alt="play">
         الاستماع
       </button>
-      <button class="stop-button" (click)="stopSummary()" [disabled]="!isPlaying">
+
+      <button class="audio-btn stop-button"
+              (click)="stopSummary()"
+              [disabled]="!isPlaying">
+        <img src="assets/images/mute.png" alt="stop">
         إيقاف الصوت
       </button>
+
     </div>
 
-    <div class="button-group">
-      <button class="back-button" (click)="prevSlide()" [disabled]="currentSlideIndex === 0">
-        العودة ←
+    <!-- ✅ CONTROLS (NEW PREMIUM STYLE) -->
+    <div class="lesson-controls">
+
+      <!-- ✅ Navigation Row -->
+      <div class="nav-row">
+
+        <button class="nav-btn back-button"
+                (click)="prevSlide()"
+                [disabled]="currentSlideIndex === 0">
+          ← الرجوع
+        </button>
+
+        <button class="question-button"
+                (click)="onQuestion()">
+          <img src="/assets/images/arrow.png" alt="سؤال" class="question-icon" />
+        </button>
+
+        <button class="nav-btn next-button"
+                (click)="nextSlide()"
+                *ngIf="currentSlideIndex < slides.length - 1">
+          اللي بعدو →
+        </button>
+
+      </div>
+
+      <!-- ✅ FINISH BUTTON ALWAYS VISIBLE -->
+      <button class="finish-button"
+              (click)="finishLesson()"
+              type="button">
+        <img src="assets/images/graduate.png" class="finish-icon" alt="finish">
+        <span>إنهاء الدرس</span>
       </button>
 
-      <button class="question-button" (click)="onQuestion()">
-        <img src="/assets/images/arrow.png" alt="سؤال" class="question-icon" />
-      </button>
 
-      <button class="next-button" (click)="nextSlide()" *ngIf="currentSlideIndex < slides.length - 1">
-        اللي بعدو →
-      </button>
-
-      <!-- Finish Button on Last Slide -->
-      <button class="finish-button" (click)="finishLesson()" *ngIf="currentSlideIndex === slides.length - 1"
-        style="background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-        <span>إنهاء الدرس 🎓</span>
-      </button>
     </div>
 
   </div>

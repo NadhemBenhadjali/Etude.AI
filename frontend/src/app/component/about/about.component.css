@@ -174,3 +174,240 @@
 .navbar li a:hover {
   color: #eb90b3;
 }
+/* ===============================
+   ✅ PRICING SECTION (PREMIUM)
+================================ */
+
+.pricing-section {
+  max-width: 1200px;
+  margin: 4rem auto;
+  padding: 3.2rem 2.6rem;
+  background: rgba(255,255,255,0.72);
+  border-radius: 28px;
+  border: 4px solid rgba(255, 250, 183, 0.95);
+  box-shadow: 0 18px 55px rgba(0,0,0,0.15);
+  text-align: center;
+  backdrop-filter: blur(14px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Soft background bubbles */
+.pricing-section::before,
+.pricing-section::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(91,188,255,0.15);
+  filter: blur(10px);
+  z-index: 0;
+}
+
+.pricing-section::before {
+  width: 240px;
+  height: 240px;
+  top: -70px;
+  right: -90px;
+}
+
+.pricing-section::after {
+  width: 190px;
+  height: 190px;
+  bottom: -60px;
+  left: -80px;
+  background: rgba(255, 111, 145, 0.14);
+}
+
+.pricing-section * {
+  position: relative;
+  z-index: 2;
+}
+
+.pricing-title {
+  font-size: 2.7rem;
+  font-weight: 900;
+  color: #5BBCFF;
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 0px rgba(91,188,255,0.15);
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+.pricing-subtitle {
+  font-size: 1.25rem;
+  color: #444;
+  margin-bottom: 3rem;
+  line-height: 1.8;
+  max-width: 850px;
+  margin-inline: auto;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+/* ✅ Grid */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 2.3rem;
+  align-items: stretch;
+}
+
+/* ✅ Card */
+.pricing-card {
+  background: rgba(255,255,255,0.96);
+  border-radius: 26px;
+  padding: 2.4rem 2.1rem;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  position: relative;
+  overflow: hidden;
+  border: 3px solid rgba(255, 209, 227, 0.55);
+}
+
+.pricing-card:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 30px 70px rgba(0,0,0,0.18);
+}
+
+/* Premium top band */
+.pricing-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  height: 125px;
+  background: linear-gradient(135deg,
+  rgba(91,188,255,0.22),
+  rgba(255,250,183,0.22),
+  rgba(255,209,227,0.20));
+  z-index: 0;
+}
+
+/* ✅ Featured */
+.pricing-card.featured {
+  border: 4px solid rgba(91,188,255,0.55);
+  box-shadow: 0 20px 65px rgba(91,188,255,0.22);
+}
+
+/* ✅ highlight badge */
+.highlight-badge {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  background: linear-gradient(135deg, #FFC75F, #FF6F91);
+  color: white;
+  font-weight: 900;
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  box-shadow: 0 12px 26px rgba(255, 111, 145, 0.3);
+}
+
+/* ✅ Header */
+.pricing-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.pricing-header h3 {
+  font-size: 1.6rem;
+  font-weight: 900;
+  margin: 0;
+  color: #222;
+  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+}
+
+.pricing-tag {
+  font-size: 0.95rem;
+  font-weight: 900;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(91,188,255,0.15);
+  color: #5BBCFF;
+  border: 2px solid rgba(91,188,255,0.25);
+}
+
+/* ✅ Icon Wrap */
+.pricing-icon-wrap {
+  width: 92px;
+  height: 92px;
+  border-radius: 24px;
+  background: rgba(255,255,255,0.7);
+  display: grid;
+  place-items: center;
+  border: 3px solid rgba(255,250,183,0.85);
+  box-shadow: 0 14px 26px rgba(0,0,0,0.12);
+}
+
+.pricing-icon {
+  width: 62px;
+  height: 62px;
+  object-fit: contain;
+  filter: drop-shadow(0px 6px 12px rgba(0,0,0,0.15));
+}
+
+/* ✅ Price */
+.pricing-price {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.big-price {
+  font-size: 3.4rem;
+  font-weight: 900;
+  color: #5BBCFF;
+  text-shadow: 2px 2px 0 rgba(91,188,255,0.15);
+}
+
+.currency {
+  font-size: 1.12rem;
+  font-weight: 900;
+  color: #555;
+}
+
+.pricing-note {
+  font-size: 1.05rem;
+  margin: 1rem 0 1.8rem;
+  color: #444;
+  font-weight: 800;
+}
+
+/* ✅ FEATURES PILLS */
+.pricing-features {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 2.2rem;
+}
+
+.feature-pill {
+  background: rgba(255,250,183,0.65);
+  border: 2px solid rgba(255, 209, 227, 0.55);
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 0.98rem;
+  color: #222;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+  transition: 0.25s ease;
+}
+
+.feature-pill:hover {
+  transform: translateY(-3px) scale(1.04);
+  background: rgba(91,188,255,0.16);
+  border-color: rgba(91,188,255,0.35);
+}
+
+/* ✅ Buttons */
+.pricing-btn {
+  border: none;
+  padding: 14px 26px;
+  font-size: 1.15rem;
+  font-weight: 900;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.3s ease;}

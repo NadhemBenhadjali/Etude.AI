@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Database initialization script for Docker
 # This runs automatically when the AI Pipeline container starts
 
