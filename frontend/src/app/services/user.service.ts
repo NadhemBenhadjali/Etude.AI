@@ -3,6 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
+export enum SessionType {
+    QUIZ = 'QUIZ',
+    QNA = 'QNA',
+    SUMMARY = 'SUMMARY'
+}
+
 export interface UserDTO {
     id?: string;
     keycloakUserId?: string;
@@ -18,6 +24,8 @@ export interface UserDTO {
     highestScore?: number;
     createdAt?: string;
     updatedAt?: string;
+    totalQna ?: number;
+    totalSummaries ?: number;
 }
 
 export interface ChangePasswordRequest {
@@ -40,6 +48,7 @@ export interface SessionDTO {
     module?: string;
     lesson?: string;
     status: string;
+    sessionType: SessionType; // REQUIRED field - must be set for all sessions
     createdAt?: string;
     startedAt?: string;
     completedAt?: string;
@@ -51,6 +60,7 @@ export interface SessionDTO {
     lessonContent?: string;
     quizElements?: QuizElementDTO[];
     qnaElements?: QnAElementDTO[];
+    summaryElements?: SummaryElementDTO[]; // ADD: Array of summary elements
     // Deprecated/Mapped fields locally
     topic?: string;
     selectedModule?: string;
@@ -71,6 +81,11 @@ export interface QnAElementDTO {
     id?: string;
     question: string;
     answer: string;
+}
+
+export interface SummaryElementDTO {
+    id?: string;
+    content: string;
 }
 
 export interface AchievementDTO {

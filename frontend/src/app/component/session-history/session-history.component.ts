@@ -1,8 +1,7 @@
-
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { UserService, SessionDTO, QuizElementDTO, QnAElementDTO } from '../../services/user.service';
+import { UserService, SessionDTO, QuizElementDTO, QnAElementDTO, SessionType, SummaryElementDTO } from '../../services/user.service';
 import { switchMap } from 'rxjs/operators';
 import { firstValueFrom } from 'rxjs';
 
@@ -68,5 +67,51 @@ export class SessionHistoryComponent implements OnInit {
         if (percent >= 70) return 'grade-good';
         if (percent >= 50) return 'grade-average';
         return 'grade-poor';
+    }
+
+    // Helper methods to check session type
+    isQuizSession(): boolean {
+        return this.session?.sessionType === SessionType.QUIZ;
+    }
+
+    isQnaSession(): boolean {
+        return this.session?.sessionType === SessionType.QNA;
+    }
+
+    isSummarySession(): boolean {
+        return this.session?.sessionType === SessionType.SUMMARY;
+    }
+
+    getSessionTypeLabel(): string {
+        if (!this.session?.sessionType) return 'غير محدد';
+        switch (this.session.sessionType) {
+            case SessionType.QUIZ: return 'اختبار';
+            case SessionType.QNA: return 'أسئلة وأجوبة';
+            case SessionType.SUMMARY: return 'ملخص';
+            default: return 'غير محدد';
+        }
+    }
+
+    getSessionTypeIcon(): string {
+        if (!this.session?.sessionType) return '📋';
+        switch (this.session.sessionType) {
+            case SessionType.QUIZ: return '📝';
+            case SessionType.QNA: return '💬';
+            case SessionType.SUMMARY: return '📚';
+            default: return '📋';
+        }
+    }
+
+    // Get summary text from summaryElements array
+    getSummaryText(): string {
+        if (!this.session) return '';
+
+        // Try summaryElements first (new format)
+        if (this.session.summaryElements && this.session.summaryElements.length > 0) {
+            return this.session.summaryElements.map(el => el.content).join('\n\n');
+        }
+
+        // Fallback to old summary field for backward compatibility
+        return this.session.summary || 'مغامرة تعليمية ممتعة!';
     }
 }

@@ -12,6 +12,7 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,8 @@ public class UserService {
     @Value("${keycloak.realm:etudeai}")
     private String realm;
 
+    @Transactional
+    @CacheEvict(value = "users", key = "#keycloakUserId", beforeInvocation = true)
     public UUID createUser(String keycloakUserId, UserDTO dto) {
         if (userRepository.findByKeycloakUserId(keycloakUserId).isPresent()) {
             throw new IllegalStateException("User profile already exists");
@@ -74,6 +77,8 @@ public class UserService {
                 .updatedAt(user.getUpdatedAt())
                 .totalQuizzes(user.getTotalQuizzes())
                 .highestScore(user.getHighestScore())
+                .totalQna(user.getTotalQna())
+                .totalSummaries(user.getTotalSummaries())
                 .build();
 
     }
@@ -117,6 +122,8 @@ public class UserService {
                 .updatedAt(updated.getUpdatedAt())
                 .totalQuizzes(updated.getTotalQuizzes())
                 .highestScore(updated.getHighestScore())
+                .totalQna(updated.getTotalQna())
+                .totalSummaries(updated.getTotalSummaries())
                 .build();
     }
 
@@ -142,6 +149,8 @@ public class UserService {
 
 
 
+    @Transactional
+    @CacheEvict(value = {"users", "achievements"}, key = "#keycloakUserId")
     public void deleteUser(String keycloakUserId) {
         if (!userRepository.existsByKeycloakUserId(keycloakUserId)) {
             throw new ResourceNotFoundException("User", "keycloakUserId", keycloakUserId);
@@ -149,6 +158,8 @@ public class UserService {
         userRepository.deleteByKeycloakUserId(keycloakUserId);
     }
 
+    @Transactional
+    @CacheEvict(value = "users", key = "#keycloakUserId")
     public void updateElo(String keycloakUserId, int newElo) {
         User user = userRepository.findByKeycloakUserId(keycloakUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "keycloakUserId", keycloakUserId));

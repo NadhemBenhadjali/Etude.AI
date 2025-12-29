@@ -16,7 +16,7 @@ from tenacity import (
     retry_if_exception_type,
 )
 
-from app.crew.config import settings, embedder_cfg
+from app.crew.config import settings
 from app.exceptions import EmbeddingError, InvalidResponseError
 
 logger = structlog.get_logger()

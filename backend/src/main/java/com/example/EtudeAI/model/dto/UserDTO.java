@@ -43,4 +43,6 @@ public class UserDTO {
         private ZonedDateTime updatedAt;
         private Integer totalQuizzes;
         private Integer highestScore;
+        private Integer totalQna;
+        private Integer totalSummaries;
 }

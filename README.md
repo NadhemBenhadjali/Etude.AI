@@ -709,8 +709,6 @@ docker exec -it etudeai-ai-pipeline python check_and_populate_databases.py
 # Wait 2-5 minutes, then restart
 docker-compose restart ai-pipeline
 
-# Use manual population script
-docker exec -it etudeai-ai-pipeline python fix_qdrant_population.py
 ```
 
 #### 3. Q&A Agent Timeout

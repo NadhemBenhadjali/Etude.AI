@@ -10,6 +10,8 @@ from app.crew.config import embedder_cfg
 from app.handlers import get_sessions_logs, get_user_logs
 import json
 from app.crew.config import URI, USER, PASSWORD
+from app.crew.config import settings
+
 
 
 @CrewBase
@@ -20,7 +22,8 @@ class PlannerCrew:
 
     @llm
     def llm_cfg(self) -> LLM:
-        return LLM(model="mistral/mistral-large-latest", temperature=0.7, max_tokens=4000)
+        return LLM(model=settings.LLM_MODEL, base_url="https://openrouter.ai/api/v1",
+                       api_key=settings.LLM_API_KEY)
 
     @tool
     def lesson_retriever_tool(self) -> LessonRetrieverTool:

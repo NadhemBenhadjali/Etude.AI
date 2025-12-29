@@ -6,7 +6,7 @@ import { AvatarComponent } from '../../shared/avatar/avatar.component';
 @Component({
   selector: 'app-contact-us',
   standalone: true,
-  imports: [CommonModule , RouterModule, AvatarComponent],
+  imports: [CommonModule , RouterModule],
   templateUrl: './contact-us.component.html',
   styleUrl: './contact-us.component.css'
 })

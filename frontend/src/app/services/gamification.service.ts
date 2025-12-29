@@ -10,6 +10,9 @@ export interface Achievement {
     icon: string;
     unlocked: boolean;
     unlockedAt?: string;
+    progress?: number; // Add optional progress field (0-100)
+    currentValue?: number; // e.g., current quiz count
+    targetValue?: number; // e.g., target quiz count
 }
 
 @Injectable({

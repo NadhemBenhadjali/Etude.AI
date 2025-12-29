@@ -1,6 +1,7 @@
 package com.example.EtudeAI.model.entity;
 
 import com.example.EtudeAI.model.enums.Level;
+import com.example.EtudeAI.model.enums.SessionType;
 import com.example.EtudeAI.model.enums.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -50,6 +51,11 @@ public class Session {
     @Column(nullable = false)
     private Status status;
 
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Session type is required")
+    @Column(name = "session_type", nullable = false)
+    private SessionType sessionType;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private ZonedDateTime createdAt;
@@ -93,6 +99,10 @@ public class Session {
     @OrderColumn(name = "idx")
     private List<QnAElement> qnaElements;
 
+    @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderColumn(name = "idx")
+    private List<SummaryElement> summaryElements;
+
     public void addQuizElement(QuizElement element) {
         if (quizElements == null) {
             quizElements = new java.util.ArrayList<>();
@@ -106,6 +116,14 @@ public class Session {
             qnaElements = new java.util.ArrayList<>();
         }
         qnaElements.add(element);
+        element.setSession(this);
+    }
+
+    public void addSummaryElement(SummaryElement element) {
+        if (summaryElements == null) {
+            summaryElements = new java.util.ArrayList<>();
+        }
+        summaryElements.add(element);
         element.setSession(this);
     }
 }

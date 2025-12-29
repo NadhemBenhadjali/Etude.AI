@@ -6,7 +6,6 @@ import { UserService } from '../../services/user.service';
 import { AuthService } from '../../services/auth.service';
 import { firstValueFrom } from 'rxjs';
 import { RouterModule, Router } from '@angular/router';
-import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { GamificationService } from '../../services/gamification.service';
 
 interface StudentData {
@@ -34,13 +33,18 @@ const levelMap = {
   SIXTH: 'السنة السادسة',
 };
 
-interface Achievement {
+export interface Achievement {
   id: string;
+  name: string;
   title: string;
   description: string;
   icon: string;
+  unlocked: boolean;
   earned: boolean;
-  progress: number;
+  unlockedAt?: string;
+  progress?: number;
+  currentValue?: number;
+  targetValue?: number;
 }
 
 interface Session {
@@ -95,6 +99,15 @@ export class DashboardComponent implements OnInit {
   // Calendar view type
   currentCalendarView: CalendarViewType = 'month';
 
+  // User statistics for achievement progress
+  userStats = {
+    totalSessions: 0,
+    totalQna: 0,
+    totalQuizzes: 0,
+    totalSummaries: 0,
+    elo: 0
+  };
+
   // Shared Arabic months list
   private readonly arabicMonths = [
     'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
@@ -113,7 +126,7 @@ export class DashboardComponent implements OnInit {
   studentData: StudentData = {
     name: '', // Fallback
     class: '',
-    avatar: 'assets/images/student-avatar.jpg',
+    avatar: '',
     lastActivity: 'منذ ساعتين',
     isOnline: true
   };
@@ -147,7 +160,6 @@ export class DashboardComponent implements OnInit {
   ];
 
   // Achievements - Initialized with Friend's Arabic Fallback Data
-  // Initial empty state, will load from backend
   achievements: Achievement[] = [];
 
   // Calendar
@@ -249,9 +261,9 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.updateCurrentMonthYear();
     this.generateCalendarDays();
+    this.loadUserData(); // Load user data first to get stats
     this.loadSessions();
     this.fetchAchievements();
-    this.loadUserData(); // Ensure user data is also loaded
   }
 
   // ===== Data loading =====
@@ -259,17 +271,122 @@ export class DashboardComponent implements OnInit {
   fetchAchievements() {
     this.gamificationService.getMyAchievements().subscribe({
       next: (data) => {
-        this.achievements = data.map(item => ({
-          id: item.id,
-          title: item.name,
-          description: item.description,
-          icon: item.icon,
-          earned: item.unlocked,
-          progress: item.unlocked ? 100 : 0
-        }));
+        this.achievements = data.map(item => {
+          const { progress, currentValue, targetValue } = this.calculateAchievementProgress(item);
+
+          return {
+            id: item.id,
+            name: item.name,
+            title: item.name,
+            description: item.description,
+            icon: item.icon,
+            unlocked: item.unlocked,
+            earned: item.unlocked,
+            unlockedAt: item.unlockedAt,
+            progress: progress,
+            currentValue: currentValue,
+            targetValue: targetValue
+          };
+        });
       },
       error: (err) => console.error('Failed to fetch achievements', err)
     });
+  }
+
+  /**
+   * Calculate achievement progress based on achievement name and user statistics
+   */
+  calculateAchievementProgress(achievement: any): { progress: number, currentValue: number, targetValue: number } {
+    if (achievement.unlocked) {
+      return { progress: 100, currentValue: 0, targetValue: 0 };
+    }
+
+    const name = achievement.name || achievement.description || '';
+
+    // Session-based achievements
+    if (name.includes('جلسة') || name.includes('جلسات')) {
+      return this.calculateSessionProgress(name);
+    }
+
+    // Quiz-based achievements
+    if (name.includes('اختبار') || name.includes('اختبارات')) {
+      return this.calculateQuizProgress(name);
+    }
+
+    // Elo/Rating-based achievements
+    if (name.includes('نقطة تصنيف') || name.includes('الترتيب')) {
+      return this.calculateEloProgress(name);
+    }
+
+    return { progress: 0, currentValue: 0, targetValue: 1 };
+  }
+
+  /**
+   * Calculate progress for session-based achievements
+   */
+  calculateSessionProgress(achievementName: string): { progress: number, currentValue: number, targetValue: number } {
+    const current = this.userStats.totalSessions;
+    let target = 1;
+
+    // Extract target from achievement name
+    if (achievementName.includes('50')) {
+      target = 50;
+    } else if (achievementName.includes('25')) {
+      target = 25;
+    } else if (achievementName.includes('10')) {
+      target = 10;
+    } else if (achievementName.includes('3')) {
+      target = 3;
+    } else if (achievementName.includes('أول') || achievementName.includes('الأولى')) {
+      target = 1;
+    }
+
+    const progress = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
+    return { progress, currentValue: current, targetValue: target };
+  }
+
+  /**
+   * Calculate progress for quiz-based achievements
+   */
+  calculateQuizProgress(achievementName: string): { progress: number, currentValue: number, targetValue: number } {
+    const current = this.userStats.totalQuizzes;
+    let target = 1;
+
+    // Extract target from achievement name
+    if (achievementName.includes('25')) {
+      target = 25;
+    } else if (achievementName.includes('10')) {
+      target = 10;
+    } else if (achievementName.includes('5')) {
+      target = 5;
+    } else if (achievementName.includes('أول')) {
+      target = 1;
+    }
+
+    const progress = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
+    return { progress, currentValue: current, targetValue: target };
+  }
+
+  /**
+   * Calculate progress for elo/rating-based achievements
+   */
+  calculateEloProgress(achievementName: string): { progress: number, currentValue: number, targetValue: number } {
+    const current = this.userStats.elo;
+    let target = 100;
+
+    // Extract target from achievement name
+    if (achievementName.includes('500')) {
+      target = 500;
+    } else if (achievementName.includes('300')) {
+      target = 300;
+    } else if (achievementName.includes('200')) {
+      target = 200;
+    } else if (achievementName.includes('100')) {
+      target = 100;
+    }
+
+    const progress = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
+    return { progress, currentValue: current, targetValue: target };
   }
 
   async loadUserData() {
@@ -285,6 +402,18 @@ export class DashboardComponent implements OnInit {
             : '',
           isOnline: true
         };
+
+        // Update user stats for achievement calculations
+        this.userStats = {
+          totalSessions: (user.totalSummaries || 0) + (user.totalQna || 0) + (user.totalQuizzes || 0),
+          totalQna: user.totalQna || 0,
+          totalQuizzes: user.totalQuizzes || 0,
+          totalSummaries: user.totalSummaries || 0,
+          elo: user.elo || 0
+        };
+
+        // Refresh achievements after loading user stats
+        this.fetchAchievements();
       }
     } catch (error) {
       console.error('Error loading user data, using fallback:', error);
@@ -301,6 +430,7 @@ export class DashboardComponent implements OnInit {
           chapterName: session.selectedModule || 'مادة',
           description: session.notes || 'جلسة تعليمية',
           date: new Date(session.createdAt).toISOString().split('T')[0],
+          createdAt: session.createdAt, // Keep the full ISO string
           time: new Date(session.createdAt).toLocaleTimeString('ar-TN', {
             hour: '2-digit',
             minute: '2-digit'
@@ -310,37 +440,16 @@ export class DashboardComponent implements OnInit {
               session.status === 'IN_PROGRESS' ? 'in-progress' :
                 'pending'
         }));
+
+        // Update total sessions count
+        this.userStats.totalSessions = this.sessionsData.filter(s => s.status === 'completed').length;
+
         this.generateCalendarDays(); // Regenerate after loading sessions
+        this.fetchAchievements(); // Refresh achievements with updated stats
       }
     } catch (error) {
       console.error('Error loading sessions, using fallback:', error);
     }
-  }
-
-  async loadAchievements() {
-    try {
-      const achievements = await firstValueFrom(this.userService.getUserAchievements());
-      if (achievements && achievements.length > 0) {
-        this.achievements = achievements.map((ach: any) => ({
-          id: ach.id,
-          title: ach.name,
-          description: ach.description,
-          icon: this.getAchievementIcon(ach.name),
-          earned: ach.unlocked,
-          progress: ach.unlocked ? 100 : 0
-        }));
-      }
-    } catch (error) {
-      console.error('Error loading achievements, using fallback:', error);
-    }
-  }
-
-  getAchievementIcon(name: string): string {
-    if (name.includes('قرا') || name.toLowerCase().includes('read')) return '📚';
-    if (name.includes('رياض') || name.toLowerCase().includes('math')) return '🧮';
-    if (name.includes('علوم') || name.toLowerCase().includes('science')) return '🔬';
-    if (name.includes('لغة') || name.toLowerCase().includes('lang')) return '✍️';
-    return '🏆';
   }
 
   // ===== Calendar View Methods =====
@@ -367,7 +476,6 @@ export class DashboardComponent implements OnInit {
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth();
     const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0); // eslint-disable-line @typescript-eslint/no-unused-vars
     const startDate = new Date(firstDay);
 
     // Start from Sunday of the week containing the first day

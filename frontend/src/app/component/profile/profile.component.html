@@ -104,11 +104,11 @@
              [class.locked]="!achievement.unlocked">
 
           <!-- achievement icon can be image too -->
-          <img
-            class="achievement-icon-img"
-            [src]="'assets/images/achievements/' + achievement.icon + '.png'"
-            [alt]="achievement.name"
-          />
+            <img
+              class="achievement-img"
+              [src]="achievement.icon"
+              [alt]="achievement.name"/>
+
 
 
           <h3>{{ achievement.name }}</h3>

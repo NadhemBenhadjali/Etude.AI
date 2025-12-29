@@ -25,7 +25,7 @@ export class ProfileComponent implements OnInit {
   // Front2 Data Fields
   username = 'Loading...';
   email = '';
-  avatar = 'assets/images/panda.png';
+  avatar = '';
   level = 1;
   rank = 'المستكشف الفضولي';
   streak = 4; // Mock for now, could come from backend later
@@ -57,6 +57,7 @@ export class ProfileComponent implements OnInit {
         this.email = user.email;
         this.xp = user.elo || 0;
         this.level = this.mapLevel(user.level);
+        this.avatar= user.avatar? user.avatar : '';
 
         // Map backend stats to UI
         this.completedQuizzes = user.totalQuizzes || 0;

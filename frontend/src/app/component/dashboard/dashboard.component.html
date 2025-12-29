@@ -8,7 +8,7 @@
 
       <div class="student-avatar">
         <a routerLink="/profile">
-          <img src="assets/images/panda.png" [alt]="studentData.name">
+          <img [src]="studentData.avatar" [alt]="studentData.name">
         </a>
         <div class="status-indicator" [class.online]="studentData.isOnline"></div>
       </div>
@@ -41,7 +41,7 @@
       <a class="dock-item"
          routerLink="/profile"
          aria-label="الملف الشخصي">
-        <img class="dock-icon" src="assets/images/user.png" alt="profile">
+        <img class="dock-icon" [src]="studentData.avatar" alt="profile"/>
         <span class="dock-label">الملف الشخصي</span>
       </a>
 
@@ -51,7 +51,7 @@
            [class.active]="chatOpen"
            aria-label="المحادثة">
 
-        <img class="dock-icon" src="assets/images/chat.png" alt="chat">
+        <img class="dock-icon" src="assets/images/chat.png" alt="chat"/>
 
         <span class="dock-notification" *ngIf="hasNewMessages">
           {{newMessagesCount}}
@@ -257,9 +257,8 @@
         <div class="achievement-icon">
           <img
             class="achievement-img"
-            [src]="'assets/images/achievements/' + achievement.icon + '.png'"
-            [alt]="achievement.title"
-          />
+            [src]="achievement.icon"
+            [alt]="achievement.title"/>
         </div>
 
         <h3>{{achievement.title}}</h3>

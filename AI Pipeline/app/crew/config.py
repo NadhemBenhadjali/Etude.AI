@@ -119,10 +119,10 @@ except Exception as e:
     print(f"Warning: Could not register font {ARABIC_FONT_PATH}. Ensure file exists. Error: {e}")
 
 # CrewAI embedder config (if you use it anywhere)
-embedder_cfg = {
-    "provider": "google-generativeai",
-    "config": {
-        "api_key": settings.GEMINI_API_KEY,
-        "model_name": "models/text-embedding-004",
-    },
-}
+embedder_cfg ={
+        "provider": "sentence-transformer",
+        "config": {
+            "model": os.getenv("EMBEDDINGS_MODEL", "all-MiniLM-L6-v2"),
+            "normalize_embeddings": True,
+        },
+    }

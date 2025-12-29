@@ -25,7 +25,8 @@ from app.crew import config
 NEO4J_URI:      str = config.URI
 NEO4J_USER:     str = config.USER
 NEO4J_PASSWORD: str = config.PASSWORD
-CSV_PATH:       Path = Path("../config_files")/ "captions_ar (1).csv"
+BASE_DIR = Path(__file__).resolve().parent
+CSV_PATH: Path = BASE_DIR / "captions_ar.csv"
 MODEL_NAME:     str = "Omartificial-Intelligence-Space/GATE-AraBert-v1"
 CLEAR_DB_FIRST: bool = True
 # ────────────────────────────────────────────────
@@ -169,8 +170,10 @@ def _page_from_filename(fname: str) -> Optional[int]:
 
 
 def add_images_from_csv(driver: Driver, csv_path: Path) -> None:
-    csv_path = csv_path.expanduser().resolve()
     print("CSV:", csv_path)
+    print("CSV:", csv_path, "->", csv_path.resolve())
+    print("CWD:", Path.cwd())
+
     if not csv_path.exists():
         print(f"⚠️  CSV not found: {csv_path} - skipping image import")
         return

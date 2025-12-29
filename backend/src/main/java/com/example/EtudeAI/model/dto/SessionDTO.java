@@ -1,6 +1,7 @@
 package com.example.EtudeAI.model.dto;
 
 import com.example.EtudeAI.model.enums.Level;
+import com.example.EtudeAI.model.enums.SessionType;
 import com.example.EtudeAI.model.enums.Status;
 
 import java.time.ZonedDateTime;
@@ -14,6 +15,7 @@ public record SessionDTO(
                 String module,
                 String lesson,
                 Status status,
+                SessionType sessionType,
                 ZonedDateTime createdAt,
                 ZonedDateTime startedAt,
                 ZonedDateTime completedAt,
@@ -24,5 +26,6 @@ public record SessionDTO(
                 String sessionFeedback,
                 String lessonContent,
                 List<QuizElementDTO> quizElements,
-                List<QnAElementDTO> qnaElements) {
+                List<QnAElementDTO> qnaElements,
+                List<SummaryElementDTO> summaryElements) {
 }

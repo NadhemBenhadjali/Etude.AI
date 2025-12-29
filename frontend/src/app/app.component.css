@@ -7,7 +7,7 @@
 
 @font-face {
     font-family: 'InkBrushArabic';
-    src: url('/assets/fonts/InkBrushArabic.ttf') format('truetype');
+    src: url('/assets/fonts/InkBrushArabic.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
   }

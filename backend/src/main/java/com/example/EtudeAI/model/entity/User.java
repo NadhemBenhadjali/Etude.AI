@@ -106,4 +106,12 @@ public class User {
     @Column(nullable = false)
     @Builder.Default
     private Integer highestScore = 0;
+
+    @Column(name = "total_qna", nullable = false)
+    @Builder.Default
+    private Integer totalQna = 0;
+
+    @Column(name = "total_summaries", nullable = false)
+    @Builder.Default
+    private Integer totalSummaries = 0;
 }

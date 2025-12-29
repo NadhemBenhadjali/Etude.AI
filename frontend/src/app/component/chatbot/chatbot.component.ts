@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AiService } from '../../services/ai.service';
-import { UserService, SessionDTO, QnAElementDTO } from '../../services/user.service';
+import { UserService, SessionDTO, QnAElementDTO, SessionType } from '../../services/user.service';
 import { AvatarComponent } from "../../shared/avatar/avatar.component";
 import { firstValueFrom } from 'rxjs';
 
@@ -145,28 +145,27 @@ export class ChatbotComponent implements OnInit {
       }
     }
 
+    // QNA session - only send relevant fields
     const sessionDTO: SessionDTO = {
       id: crypto.randomUUID(),
-      level: 'FIRST', // Default
+      level: 'FIRST',
       subject: 'General',
       module: this.currentMode || 'General',
       lesson: 'Chat Session',
       status: 'COMPLETED',
+      sessionType: SessionType.QNA, // REQUIRED: Set session type to QNA
       createdAt: new Date().toISOString(),
       startedAt: new Date().toISOString(),
       completedAt: new Date().toISOString(),
-      summaryPointsOfFocus: [],
-      quizPointsOfFocus: [],
-      quizScore: 0,
-      summary: 'Chat session (' + this.currentMode + ')',
-      sessionFeedback: 'Completed successfully',
-      lessonContent: '',
-      quizElements: [],
       qnaElements: qnaElements
+      // DON'T send quizElements, summaryElements, or other non-QNA fields
     };
 
     this.userService.saveSession(sessionDTO).subscribe({
       next: () => {
+        // Clear the messages from localStorage so next conversation starts fresh
+        localStorage.removeItem(this.getStorageKey());
+        this.messages = [];
         alert('تم حفظ الجلسة بنجاح!');
         this.router.navigate(['/dashboard']);
       },

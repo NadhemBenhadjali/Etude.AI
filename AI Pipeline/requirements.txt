@@ -58,6 +58,7 @@ elevenlabs>=0.2.3
 # Database Construction (Optional - only needed for setup scripts)
  PyMuPDF
  pytesseract
+ sentence-transformers
 
 
 

@@ -3,6 +3,7 @@ package com.example.EtudeAI.service;
 import com.example.EtudeAI.model.dto.SessionDTO;
 import com.example.EtudeAI.model.entity.Session;
 import com.example.EtudeAI.model.entity.User;
+import com.example.EtudeAI.model.enums.Status;
 import com.example.EtudeAI.repository.SessionRepository;
 import com.example.EtudeAI.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +17,10 @@ import java.util.stream.Collectors;
 
 import com.example.EtudeAI.model.dto.QnAElementDTO;
 import com.example.EtudeAI.model.dto.QuizElementDTO;
+import com.example.EtudeAI.model.dto.SummaryElementDTO;
 import com.example.EtudeAI.model.entity.QnAElement;
 import com.example.EtudeAI.model.entity.QuizElement;
+import com.example.EtudeAI.model.entity.SummaryElement;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ public class SessionService {
 
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
+    private final GamificationService gamificationService;
 
     @Transactional
     public SessionDTO saveSession(SessionDTO sessionDTO, String keycloakUserId) {
@@ -38,26 +42,52 @@ public class SessionService {
                     .orElse(new Session());
         }
 
+        // Set common session fields
         session.setUser(user);
         session.setLevel(sessionDTO.level());
         session.setSubject(sessionDTO.subject());
         session.setModule(sessionDTO.module());
         session.setLesson(sessionDTO.lesson());
         session.setStatus(sessionDTO.status());
+        session.setSessionType(sessionDTO.sessionType());
         session.setStartedAt(sessionDTO.startedAt());
         session.setCompletedAt(sessionDTO.completedAt());
-        session.setSummaryPointsOfFocus(sessionDTO.summaryPointsOfFocus());
-        session.setQuizPointsOfFocus(sessionDTO.quizPointsOfFocus());
-        session.setQuizScore(sessionDTO.quizScore());
-        session.setSummary(sessionDTO.summary());
         session.setSessionFeedback(sessionDTO.sessionFeedback());
         session.setLessonContent(sessionDTO.lessonContent());
 
+        // Handle session type-specific logic
+        switch (sessionDTO.sessionType()) {
+            case QUIZ -> handleQuizSession(session, sessionDTO, user);
+            case QNA -> handleQnASession(session, sessionDTO, user);
+            case SUMMARY -> handleSummarySession(session, sessionDTO, user);
+        }
+
+        Session savedSession = sessionRepository.save(session);
+
+        // Trigger session completion gamification if status is COMPLETED
+        if (sessionDTO.status() == Status.COMPLETED) {
+            gamificationService.processSessionCompletion(user);
+        }
+
+        return mapToDTO(savedSession);
+    }
+
+    private void handleQuizSession(Session session, SessionDTO sessionDTO, User user) {
+        session.setQuizPointsOfFocus(sessionDTO.quizPointsOfFocus());
+        session.setQuizScore(sessionDTO.quizScore());
+
+        // Clear other type-specific data
+        session.setSummaryPointsOfFocus(null);
+        session.setSummary(null);
+        if (session.getQnaElements() != null) {
+            session.getQnaElements().clear();
+        }
+        if (session.getSummaryElements() != null) {
+            session.getSummaryElements().clear();
+        }
+
         // Handle Quiz Elements
         if (sessionDTO.quizElements() != null) {
-            // Clear existing if necessary or just add new ones?
-            // For simplicity in this "save/update" logic, we might need to handle merging.
-            // But if it's a new session or a full overwrite:
             if (session.getQuizElements() != null) {
                 session.getQuizElements().clear();
             }
@@ -72,6 +102,20 @@ public class SessionService {
                 session.addQuizElement(qe);
             }
         }
+    }
+
+    private void handleQnASession(Session session, SessionDTO sessionDTO, User user) {
+        // Clear other type-specific data
+        session.setQuizPointsOfFocus(null);
+        session.setQuizScore(null);
+        session.setSummaryPointsOfFocus(null);
+        session.setSummary(null);
+        if (session.getQuizElements() != null) {
+            session.getQuizElements().clear();
+        }
+        if (session.getSummaryElements() != null) {
+            session.getSummaryElements().clear();
+        }
 
         // Handle QnA Elements
         if (sessionDTO.qnaElements() != null) {
@@ -84,10 +128,43 @@ public class SessionService {
                 qna.setAnswer(qnaDTO.answer());
                 session.addQnAElement(qna);
             }
+            // Trigger gamification for QnA completion
+            if (!sessionDTO.qnaElements().isEmpty()) {
+                gamificationService.processQnaCompletion(user);
+            }
+        }
+    }
+
+    private void handleSummarySession(Session session, SessionDTO sessionDTO, User user) {
+        session.setSummaryPointsOfFocus(sessionDTO.summaryPointsOfFocus());
+        session.setSummary(sessionDTO.summary());
+
+        // Clear other type-specific data
+        session.setQuizPointsOfFocus(null);
+        session.setQuizScore(null);
+        if (session.getQuizElements() != null) {
+            session.getQuizElements().clear();
+        }
+        if (session.getQnaElements() != null) {
+            session.getQnaElements().clear();
         }
 
-        Session savedSession = sessionRepository.save(session);
-        return mapToDTO(savedSession);
+        // Handle Summary Elements
+        if (sessionDTO.summaryElements() != null) {
+            if (session.getSummaryElements() != null) {
+                session.getSummaryElements().clear();
+            }
+            for (SummaryElementDTO summaryDTO : sessionDTO.summaryElements()) {
+                SummaryElement summary = SummaryElement.builder()
+                        .content(summaryDTO.content())
+                        .build();
+                session.addSummaryElement(summary);
+            }
+            // Trigger gamification for Summary completion
+            if (!sessionDTO.summaryElements().isEmpty()) {
+                gamificationService.processSummaryCompletion(user);
+            }
+        }
     }
 
     @Transactional(readOnly = true)
@@ -123,20 +200,24 @@ public class SessionService {
                 session.getModule(),
                 session.getLesson(),
                 session.getStatus(),
+                session.getSessionType(),
                 session.getCreatedAt(),
                 session.getStartedAt(),
                 session.getCompletedAt(),
                 session.getSummaryPointsOfFocus(),
                 session.getQuizPointsOfFocus(),
                 session.getQuizScore(),
-                null, // summary
-                session.getSessionFeedback(), // sessionFeedback
-                session.getLessonContent(), // lessonContent
+                session.getSummary(),
+                session.getSessionFeedback(),
+                session.getLessonContent(),
                 session.getQuizElements() != null
                         ? session.getQuizElements().stream().map(this::mapQuizElementToDTO).collect(Collectors.toList())
                         : null,
                 session.getQnaElements() != null
                         ? session.getQnaElements().stream().map(this::mapQnAElementToDTO).collect(Collectors.toList())
+                        : null,
+                session.getSummaryElements() != null
+                        ? session.getSummaryElements().stream().map(this::mapSummaryElementToDTO).collect(Collectors.toList())
                         : null);
     }
 
@@ -155,5 +236,11 @@ public class SessionService {
                 element.getId(),
                 element.getQuestion(),
                 element.getAnswer());
+    }
+
+    private SummaryElementDTO mapSummaryElementToDTO(SummaryElement element) {
+        return new SummaryElementDTO(
+                element.getId(),
+                element.getContent());
     }
 }

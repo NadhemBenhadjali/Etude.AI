@@ -1,13 +1,13 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { AvatarComponent } from "../../shared/avatar/avatar.component";
-import { QuizService, QuizQuestion } from '../../services/quiz.service';
-import { AiService } from '../../services/ai.service';
-import { GamificationService } from '../../services/gamification.service';
-import { UserService, SessionDTO, QuizElementDTO, QnAElementDTO } from '../../services/user.service';
-import { firstValueFrom } from 'rxjs';
+import {Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
+import {FormsModule} from '@angular/forms';
+import {AvatarComponent} from "../../shared/avatar/avatar.component";
+import {QuizQuestion, QuizService} from '../../services/quiz.service';
+import {AiService} from '../../services/ai.service';
+import {GamificationService} from '../../services/gamification.service';
+import {QnAElementDTO, QuizElementDTO, SessionDTO, SessionType, UserService} from '../../services/user.service';
+import {firstValueFrom} from 'rxjs';
 
 interface Achievement {
   id: string;
@@ -677,7 +677,6 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
   saveSessionToServer() {
     // 1. Convert QuizQuestions to QuizElementDTOs
     const quizElements: QuizElementDTO[] = this.questions.map(q => ({
-      // FIX: Map to exact Backend Enum names
       quizType: (q.type === 'mc' ? 'MULTIPLE_CHOICE' : 'TRUE_FALSE') as any,
       question: q.q,
       options: q.options || [],
@@ -685,39 +684,22 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
       answered: !!q.answered
     }));
 
-    // 2. Convert Chat Messages to QnAElementDTOs
-    // Assume pairing: User message followed by Agent message
-    const qnaElements: QnAElementDTO[] = [];
-    for (let i = 0; i < this.messages.length - 1; i++) {
-      const msg = this.messages[i];
-      const nextMsg = this.messages[i + 1];
-      if (msg.isUser && !nextMsg.isUser) {
-        qnaElements.push({
-          question: msg.text,
-          answer: nextMsg.text
-        });
-      }
-    }
-
-    // 3. Construct SessionDTO
+    // 2. QUIZ session - only send relevant fields
     const sessionDTO: SessionDTO = {
-      id: crypto.randomUUID(), // New session ID
-      level: 'FIRST', // Default or get from user service
+      id: crypto.randomUUID(),
+      level: 'FIRST',
       subject: this.currentModule || 'General',
       module: this.currentModule || 'General',
       lesson: 'Quiz Session',
       status: 'COMPLETED',
+      sessionType: SessionType.QUIZ, // REQUIRED: Set session type to QUIZ
       createdAt: new Date().toISOString(),
-      startedAt: new Date().toISOString(), // Should track start time properly
+      startedAt: new Date().toISOString(),
       completedAt: new Date().toISOString(),
-      summaryPointsOfFocus: [],
-      quizPointsOfFocus: [],
       quizScore: this.score,
-      summary: 'Completed quiz on ' + (this.currentModule || 'General'),
-      sessionFeedback: this.getFinalMessage(),
-      lessonContent: '',
-      quizElements: quizElements,
-      qnaElements: qnaElements
+      quizPointsOfFocus: [],
+      quizElements: quizElements
+      // DON'T send qnaElements, summaryElements, or other non-QUIZ fields
     };
 
     this.userService.saveSession(sessionDTO).subscribe({

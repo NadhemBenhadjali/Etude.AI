@@ -2,6 +2,7 @@ package com.example.EtudeAI.Controller;
 
 import com.example.EtudeAI.exception.ResourceNotFoundException;
 import com.example.EtudeAI.model.dto.QuizSubmissionDTO;
+import com.example.EtudeAI.model.dto.SessionDTO;
 import com.example.EtudeAI.model.entity.User;
 import com.example.EtudeAI.repository.UserRepository;
 import com.example.EtudeAI.service.GamificationService;
@@ -38,44 +39,38 @@ public class SessionController {
         String keycloakUserId = jwt.getSubject();
         User user = userRepository.findByKeycloakUserId(keycloakUserId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "keycloakUserId", keycloakUserId));
-
         gamificationService.processQuizCompletion(user, submission.getScore());
-
-        // Return 200 OK. The frontend can check /api/achievements/me separately or via
-        // WebSocket in future
-        // to see if something new was unlocked. For simplicity now, we just accept the
-        // result.
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/save")
     @Operation(summary = "Save Session", description = "Saves the current session state, including generated content.")
-    public ResponseEntity<com.example.EtudeAI.model.dto.SessionDTO> saveSession(
+    public ResponseEntity<SessionDTO> saveSession(
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody com.example.EtudeAI.model.dto.SessionDTO sessionDTO) {
         String keycloakUserId = jwt.getSubject();
-        com.example.EtudeAI.model.dto.SessionDTO savedSession = sessionService.saveSession(sessionDTO, keycloakUserId);
+        SessionDTO savedSession = sessionService.saveSession(sessionDTO, keycloakUserId);
         return ResponseEntity.ok(savedSession);
     }
 
     @GetMapping
     @Operation(summary = "Get User Sessions", description = "Retrieves a paginated list of study sessions for the current user.")
-    public ResponseEntity<org.springframework.data.domain.Page<com.example.EtudeAI.model.dto.SessionDTO>> getUserSessions(
+    public ResponseEntity<org.springframework.data.domain.Page<SessionDTO>> getUserSessions(
             @AuthenticationPrincipal Jwt jwt,
             org.springframework.data.domain.Pageable pageable) {
         String keycloakUserId = jwt.getSubject();
-        org.springframework.data.domain.Page<com.example.EtudeAI.model.dto.SessionDTO> sessions = sessionService
+        org.springframework.data.domain.Page<SessionDTO> sessions = sessionService
                 .getUserSessions(keycloakUserId, pageable);
         return ResponseEntity.ok(sessions);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get Session Details", description = "Retrieves full details of a specific session.")
-    public ResponseEntity<com.example.EtudeAI.model.dto.SessionDTO> getSession(
+    public ResponseEntity<SessionDTO> getSession(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable UUID id) {
         String keycloakUserId = jwt.getSubject();
-        com.example.EtudeAI.model.dto.SessionDTO session = sessionService.getSessionById(id, keycloakUserId);
+        SessionDTO session = sessionService.getSessionById(id, keycloakUserId);
         return ResponseEntity.ok(session);
     }
 }

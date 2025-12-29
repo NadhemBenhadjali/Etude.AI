@@ -5,7 +5,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { firstValueFrom } from 'rxjs';
-import { UserService, SessionDTO } from '../../services/user.service';
+import { UserService, SessionDTO, SessionType, SummaryElementDTO } from '../../services/user.service';
 
 import fallbackData from '../../../assets/lesson.json';
 
@@ -246,7 +246,12 @@ export class LessonBoardComponent implements OnInit, OnDestroy { // Implement On
   finishLesson() {
     this.stopSummary();
 
-    // Create Session Info
+    // Convert slides to SummaryElementDTO array
+    const summaryElements: SummaryElementDTO[] = this.slides.map(slide => ({
+      content: slide.text || ''
+    }));
+
+    // SUMMARY session - only send summaryElements (NOT summary or lessonContent)
     const sessionDTO: SessionDTO = {
       id: crypto.randomUUID(),
       level: 'FIRST',
@@ -254,17 +259,13 @@ export class LessonBoardComponent implements OnInit, OnDestroy { // Implement On
       module: this.title || 'Lesson',
       lesson: this.title || 'Lesson Content',
       status: 'COMPLETED',
+      sessionType: SessionType.SUMMARY, // REQUIRED: Set session type to SUMMARY
       createdAt: new Date().toISOString(),
       startedAt: new Date().toISOString(),
       completedAt: new Date().toISOString(),
-      summaryPointsOfFocus: [],
-      quizPointsOfFocus: [],
-      quizScore: 10, // Completion score (10/10)
-      summary: 'Completed lesson: ' + this.title,
-      sessionFeedback: 'Great job completing the lesson!',
-      lessonContent: this.slides.map(s => s.text).join('\n'), // Store content
-      quizElements: [],
-      qnaElements: []
+      summaryPointsOfFocus: [], // Summary-specific field
+      summaryElements: summaryElements // ✅ Save slides as array of objects
+      // ❌ DON'T send summary, lessonContent, quizElements, or qnaElements
     };
 
     this.userService.saveSession(sessionDTO).subscribe({

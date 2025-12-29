@@ -53,7 +53,7 @@ public class AchievementService {
     }
 
     @Transactional
-    @CacheEvict(value = "achievements", key = "#user.keycloakUserId")
+    @CacheEvict(value = {"achievements", "users"}, key = "#user.keycloakUserId")
     public void checkAndUnlock(User user, CriteriaType type, int currentValue) {
         List<Achievement> potentiallyUnlockable = achievementRepository.findAll().stream()
                 .filter(a -> a.getCriteriaType() == type)

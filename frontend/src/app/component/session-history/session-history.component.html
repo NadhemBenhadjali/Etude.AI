@@ -50,7 +50,7 @@
 
           <p class="session-summary">
             <img class="summary-icon" src="assets/images/sparkle.png" alt="summary">
-            {{ session?.summary || 'مغامرة تعليمية ممتعة!' }}
+            {{ getSummaryText() }}
           </p>
         </div>
 
@@ -104,6 +104,25 @@
           <div class="animate-enter">
 
             <div class="info-grid">
+
+              <!-- ✅ SUMMARY ELEMENTS (Lesson Slides) -->
+              @if (session?.summaryElements?.length) {
+                <div class="info-card points-card">
+                  <h3 class="card-title">
+                    <img class="card-icon" src="assets/images/scroll.png" alt="content">
+                    محتوى الدرس
+                  </h3>
+
+                  <div class="summary-elements-list">
+                    @for (element of session?.summaryElements; track $index) {
+                      <div class="summary-element-item">
+                        <span class="element-number">{{ $index + 1 }}</span>
+                        <div class="element-content" [innerHTML]="element.content"></div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
 
               <!-- ✅ POINTS -->
               @if (session?.summaryPointsOfFocus?.length) {
