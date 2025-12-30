@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AvatarComponent } from "../../shared/avatar/avatar.component";
+import { SessionStateService } from '../../services/session-state.service';
 
 @Component({
   selector: 'app-select-subject',
@@ -20,11 +21,14 @@ export class SelectSubjectComponent {
 
   colors = ['#5BBCFF', '#FFFAB7', '#FFD1E3', '#7EA1FF'];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private sessionStateService: SessionStateService
+  ) {}
 
   selectSubject(subjectName: string) {
-    this.router.navigate(['/profile'], {
-      queryParams: { subject: subjectName }
-    });
+    this.sessionStateService.setSubject(subjectName);
+
+    this.router.navigate(['/select-mode']);
   }
 }

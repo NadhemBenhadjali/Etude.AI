@@ -4,6 +4,7 @@ import com.example.EtudeAI.exception.AiServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -21,7 +22,6 @@ public class AiPipelineService {
             @Value("${ai-pipeline.url}") String aiPipelineUrl) {
         this.webClient = webClientBuilder.baseUrl(aiPipelineUrl).build();
     }
-
     public Mono<Map> getSummary(String subject, String module, String sessionId) {
         log.info("Calling AI Pipeline /summary with subject='{}', module='{}', sessionId='{}'", subject, module, sessionId);
 

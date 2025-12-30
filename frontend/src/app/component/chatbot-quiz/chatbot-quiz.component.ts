@@ -8,6 +8,7 @@ import {AiService} from '../../services/ai.service';
 import {GamificationService} from '../../services/gamification.service';
 import {QnAElementDTO, QuizElementDTO, SessionDTO, SessionType, UserService} from '../../services/user.service';
 import {firstValueFrom} from 'rxjs';
+import {SessionStateService} from '../../services/session-state.service';
 
 interface Achievement {
   id: string;
@@ -61,6 +62,7 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
   private aiService = inject(AiService);
   private gamificationService = inject(GamificationService);
   private userService = inject(UserService);
+  private sessionStateService: SessionStateService = inject(SessionStateService);
 
   messages: { text: string; isUser: boolean }[] = [];
   isLoading = false;
@@ -162,6 +164,7 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
   confettiParticles: Particle[] = [];
   starBurstParticles: Particle[] = [];
   feedbackParticles: Particle[] = [];
+
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -675,6 +678,12 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
   }
 
   saveSessionToServer() {
+    // Get the saved session state
+    const sessionState = this.sessionStateService.getState();
+    const level = sessionState?.selectedLevel || 'FIRST';
+    const subject = sessionState?.selectedSubject || 'General';
+    const module = sessionState?.selectedModule || this.currentModule || 'General';
+
     // 1. Convert QuizQuestions to QuizElementDTOs
     const quizElements: QuizElementDTO[] = this.questions.map(q => ({
       quizType: (q.type === 'mc' ? 'MULTIPLE_CHOICE' : 'TRUE_FALSE') as any,
@@ -687,9 +696,9 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
     // 2. QUIZ session - only send relevant fields
     const sessionDTO: SessionDTO = {
       id: crypto.randomUUID(),
-      level: 'FIRST',
-      subject: this.currentModule || 'General',
-      module: this.currentModule || 'General',
+      level: level, // Use saved level from session state
+      subject: subject, // Use saved subject from session state
+      module: module, // Use saved module from session state
       lesson: 'Quiz Session',
       status: 'COMPLETED',
       sessionType: SessionType.QUIZ, // REQUIRED: Set session type to QUIZ

@@ -6,6 +6,7 @@ import { AiService } from '../../services/ai.service';
 import { UserService, SessionDTO, QnAElementDTO, SessionType } from '../../services/user.service';
 import { AvatarComponent } from "../../shared/avatar/avatar.component";
 import { firstValueFrom } from 'rxjs';
+import {SessionStateService} from '../../services/session-state.service';
 
 @Component({
   selector: 'app-chatbot',
@@ -21,11 +22,13 @@ export class ChatbotComponent implements OnInit {
   currentMode = '';
   private storageKey = 'chatbot_messages';
 
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private aiService: AiService,
-    private userService: UserService
+    private userService: UserService,
+      private sessionStateService: SessionStateService
   ) { }
 
   ngOnInit() {
@@ -132,6 +135,12 @@ export class ChatbotComponent implements OnInit {
   saveSession() {
     if (this.messages.length === 0) return;
 
+    // Get the saved session state
+    const sessionState = this.sessionStateService.getState();
+    const level = sessionState?.selectedLevel || 'FIRST';
+    const subject = sessionState?.selectedSubject || 'General';
+    const module = sessionState?.selectedModule || this.currentMode || 'General';
+
     // Convert pairs to QnA
     const qnaElements: QnAElementDTO[] = [];
     for (let i = 0; i < this.messages.length - 1; i++) {
@@ -148,16 +157,16 @@ export class ChatbotComponent implements OnInit {
     // QNA session - only send relevant fields
     const sessionDTO: SessionDTO = {
       id: crypto.randomUUID(),
-      level: 'FIRST',
-      subject: 'General',
-      module: this.currentMode || 'General',
+      level: level, // Use saved level from session state
+      subject: subject, // Use saved subject from session state
+      module: module, // Use saved module from session state
       lesson: 'Chat Session',
       status: 'COMPLETED',
       sessionType: SessionType.QNA, // REQUIRED: Set session type to QNA
       createdAt: new Date().toISOString(),
       startedAt: new Date().toISOString(),
       completedAt: new Date().toISOString(),
-      qnaElements: qnaElements
+      qnaElements: qnaElements,
       // DON'T send quizElements, summaryElements, or other non-QNA fields
     };
 

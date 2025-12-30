@@ -8,6 +8,7 @@ import { QuizService } from '../../services/quiz.service';
 import { AiService } from '../../services/ai.service';
 import { AuthService } from '../../services/auth.service';
 import { firstValueFrom } from 'rxjs';
+import {SessionStateService} from '../../services/session-state.service';
 
 interface ModuleOption {
   name: string;
@@ -73,7 +74,8 @@ export class SelectModuleComponent implements OnInit {
     private quizService: QuizService,
     private aiService: AiService,
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private sessionStateService: SessionStateService
   ) {}
 
   ngOnInit(): void {
@@ -90,6 +92,9 @@ export class SelectModuleComponent implements OnInit {
 
   async selectModule(module: ModuleOption): Promise<void> {
     if (!this.selectedSubject || !this.currentMode) return;
+
+
+    this.sessionStateService.setModule(module.name);
 
     // --- LOGIC FROM FRONT 1 (Backend Connection) ---
     if (this.currentMode === 'summary') {
