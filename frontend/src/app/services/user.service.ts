@@ -2,100 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-
-export enum SessionType {
-    QUIZ = 'QUIZ',
-    QNA = 'QNA',
-    SUMMARY = 'SUMMARY'
-}
-
-export interface UserDTO {
-    id?: string;
-    keycloakUserId?: string;
-    email: string;
-    firstname: string;
-    lastname: string;
-    birthDate: string;
-    level: 'FIRST' | 'SECOND' | 'THIRD' | 'FOURTH' | 'FIFTH' | 'SIXTH'
-    elo?: number;
-    role?: string;
-    avatar?: string;
-    totalQuizzes?: number;
-    highestScore?: number;
-    createdAt?: string;
-    updatedAt?: string;
-    totalQna ?: number;
-    totalSummaries ?: number;
-}
-
-export interface ChangePasswordRequest {
-    currentPassword: string;
-    newPassword: string;
-}
-
-export interface PageResponse<T> {
-    content: T[];
-    totalElements: number;
-    totalPages: number;
-    size: number;
-    number: number;
-}
-
-export interface SessionDTO {
-    id: string;
-    level?: string;
-    subject?: string;
-    module?: string;
-    lesson?: string;
-    status: string;
-    sessionType: SessionType; // REQUIRED field - must be set for all sessions
-    createdAt?: string;
-    startedAt?: string;
-    completedAt?: string;
-    summaryPointsOfFocus?: string[];
-    quizPointsOfFocus?: string[];
-    quizScore?: number;
-    summary?: string;
-    sessionFeedback?: string;
-    lessonContent?: string;
-    quizElements?: QuizElementDTO[];
-    qnaElements?: QnAElementDTO[];
-    summaryElements?: SummaryElementDTO[]; // ADD: Array of summary elements
-    // Deprecated/Mapped fields locally
-    topic?: string;
-    selectedModule?: string;
-    notes?: string;
-    updatedAt?: string;
-}
-
-export interface QuizElementDTO {
-    id?: string;
-    quizType: 'MULTIPLE_CHOICE' | 'TRUE_FALSE' | 'OPEN_ENDED' | 'CODING' | 'FILL_IN_THE_BLANK';
-    question: string;
-    options: string[];
-    answer: string;
-    answered: boolean;
-}
-
-export interface QnAElementDTO {
-    id?: string;
-    question: string;
-    answer: string;
-}
-
-export interface SummaryElementDTO {
-    id?: string;
-    content: string;
-}
-
-export interface AchievementDTO {
-    id: string;
-    name: string;
-    icon: string;
-    description: string;
-    unlocked: boolean;
-    unlockedAt?: string;
-}
+import { SessionDTO } from '../model/session.model';
+import { UserDTO,ChangePasswordRequest,RegistrationData } from '../model/user.model';
+import { PageResponse } from '../model/shared.model';
 
 @Injectable({
     providedIn: 'root'
@@ -126,10 +35,6 @@ export class UserService {
         });
     }
 
-    getUserAchievements(): Observable<AchievementDTO[]> {
-        return this.http.get<AchievementDTO[]>(`${this.apiUrl}/achievements/me`);
-    }
-
     registerUser(registrationData: RegistrationData): Observable<string> {
         return this.http.post<string>(`${this.apiUrl}/public/register`, registrationData, {
             responseType: 'text' as 'json'
@@ -146,13 +51,4 @@ export class UserService {
     getSessionById(id: string): Observable<SessionDTO> {
         return this.http.get<SessionDTO>(`${this.apiUrl}/sessions/${id}`);
     }
-}
-
-export interface RegistrationData {
-    email: string;
-    password: string;
-    firstname: string;
-    lastname: string;
-    birthDate?: string;
-    level?: string;
 }

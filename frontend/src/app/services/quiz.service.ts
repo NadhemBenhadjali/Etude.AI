@@ -1,28 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { QuizResponse,QuizRequest,QuizQuestion } from '../model/quiz.model';
 
-export interface QuizQuestion {
-  type: 'mc' | 'tf';
-  q: string;
-  options?: string[];
-  a: string;
-  category?: string;
-  userAnswer?: string;
-  answered?: boolean;
-}
 
-export interface QuizRequest {
-  module: string;
-  num_mc: number;
-  num_tf: number;
-}
-
-export interface QuizResponse {
-  module: string;
-  data: {
-    questions: QuizQuestion[];
-  };
-}
 
 @Injectable({ providedIn: 'root' })
 export class QuizService {

@@ -13,8 +13,8 @@ export const AuthGuard: CanActivateFn = async (route, state) => {
   }
 
   // Redirect to your custom signin page, keep returnUrl
-  router.navigate(['/signin'], {
-    queryParams: { returnUrl: state.url }
+  await router.navigate(['/signin'], {
+    queryParams: {returnUrl: state.url}
   });
 
   return false;

@@ -2,19 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { SummaryResponse,SummaryRequest } from '../model/summary.model';
 
-export interface SummaryRequest {
-  subject: string;
-  module:  string;
-}
 
-export interface SummaryResponse {
-  path: string;
-  data: {
-    title:  string;
-    slides: { [key: string]: string }[];
-  };
-}
+
 
 @Injectable({ providedIn: 'root' })
 export class SummaryService {

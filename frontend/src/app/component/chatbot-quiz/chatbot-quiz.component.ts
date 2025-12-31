@@ -3,50 +3,18 @@ import {CommonModule} from '@angular/common';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {FormsModule} from '@angular/forms';
 import {AvatarComponent} from "../../shared/avatar/avatar.component";
-import {QuizQuestion, QuizService} from '../../services/quiz.service';
+import {QuizService} from '../../services/quiz.service';
+import {QuizQuestion} from '../../model/quiz.model';
 import {AiService} from '../../services/ai.service';
 import {GamificationService} from '../../services/gamification.service';
-import {QnAElementDTO, QuizElementDTO, SessionDTO, SessionType, UserService} from '../../services/user.service';
+import {UserService} from '../../services/user.service';
+import {QuizElementDTO} from '../../model/quiz.model';
+import {SessionDTO, SessionType} from '../../model/session.model';
 import {firstValueFrom} from 'rxjs';
 import {SessionStateService} from '../../services/session-state.service';
+import {Achievement,PowerUp,Checkpoint,Particle,PowerupNotification} from '../../model/gamification.model';
 
-interface Achievement {
-  id: string;
-  name: string;
-  icon: string;
-  description: string;
-  unlocked: boolean;
-}
 
-interface PowerUp {
-  id: string;
-  name: string;
-  icon: string;
-  count: number;
-  available: boolean;
-  description: string;
-}
-
-interface Checkpoint {
-  position: number;
-  icon: string;
-  reached: boolean;
-  current: boolean;
-}
-
-interface Particle {
-  x: number;
-  y: number;
-  delay: number;
-  emoji?: string;
-  color?: string;
-}
-
-interface PowerupNotification {
-  powerup: PowerUp;
-  visible: boolean;
-  message: string;
-}
 
 @Component({
   selector: 'app-chatbot-quiz',

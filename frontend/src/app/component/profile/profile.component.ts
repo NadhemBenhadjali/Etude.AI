@@ -1,14 +1,14 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { UserService, UserDTO } from '../../services/user.service';
-import { GamificationService, Achievement } from '../../services/gamification.service';
+import { UserService} from '../../services/user.service';
+import { UserDTO } from '../../model/user.model';
+import { Achievement } from '../../model/achievement.model';
+import { GamificationService} from '../../services/gamification.service';
 import { AuthService } from '../../services/auth.service';
+import { Activity } from '../../model/shared.model';
 
-interface Activity {
-  icon: string;
-  text: string;
-}
+
 
 @Component({
   selector: 'app-profile',

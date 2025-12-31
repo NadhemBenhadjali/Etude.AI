@@ -1,8 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { UserService, SessionDTO, QuizElementDTO, QnAElementDTO, SessionType, SummaryElementDTO } from '../../services/user.service';
-import { switchMap } from 'rxjs/operators';
+import { UserService } from '../../services/user.service';
+import { SessionDTO, SessionType } from '../../model/session.model';
 import { firstValueFrom } from 'rxjs';
 
 @Component({

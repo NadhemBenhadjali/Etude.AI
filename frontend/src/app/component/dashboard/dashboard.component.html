@@ -252,26 +252,26 @@
     <div class="achievements-grid">
       <div class="achievement-card"
            *ngFor="let achievement of achievements"
-           [class.earned]="achievement.earned">
+           [class.earned]="achievement.unlocked">
 
         <div class="achievement-icon">
           <img
             class="achievement-img"
             [src]="achievement.icon"
-            [alt]="achievement.title"/>
+            [alt]="achievement.name"/>
         </div>
 
-        <h3>{{achievement.title}}</h3>
+        <h3>{{achievement.name}}</h3>
         <p>{{achievement.description}}</p>
 
-        <div class="achievement-progress" *ngIf="!achievement.earned">
+        <div class="achievement-progress" *ngIf="!achievement.unlocked">
           <div class="progress-bar">
             <div class="progress-fill" [style.width.%]="achievement.progress"></div>
           </div>
           <span class="progress-text">{{achievement.progress}}%</span>
         </div>
 
-        <div class="earned-badge" *ngIf="achievement.earned">✓</div>
+        <div class="earned-badge" *ngIf="achievement.unlocked">✓</div>
       </div>
     </div>
   </div>

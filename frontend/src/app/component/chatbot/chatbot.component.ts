@@ -3,7 +3,10 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AiService } from '../../services/ai.service';
-import { UserService, SessionDTO, QnAElementDTO, SessionType } from '../../services/user.service';
+import { UserService } from '../../services/user.service';
+import { SessionDTO, SessionType } from '../../model/session.model';
+import { QnAElementDTO} from '../../model/qna.model';
+
 import { AvatarComponent } from "../../shared/avatar/avatar.component";
 import { firstValueFrom } from 'rxjs';
 import {SessionStateService} from '../../services/session-state.service';

@@ -3,7 +3,7 @@ import {inject} from '@angular/core';
 import {AuthService} from '../services/auth.service';
 import {from} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
-import {environment} from '../../environments/environment'; // adjust path if needed
+import {environment} from '../../environments/environment';
 
 export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);

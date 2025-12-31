@@ -9,19 +9,7 @@ import { AiService } from '../../services/ai.service';
 import { AuthService } from '../../services/auth.service';
 import { firstValueFrom } from 'rxjs';
 import {SessionStateService} from '../../services/session-state.service';
-
-interface ModuleOption {
-  name: string;
-  value: string;
-  icon: string;
-}
-interface SubjectOption {
-  name: string;
-  value: string;
-  color: string;
-  icon: string;
-  modules: ModuleOption[];
-}
+import {ModuleOption,SubjectOption} from '../../model/shared.model';
 
 @Component({
   selector: 'app-select-module',

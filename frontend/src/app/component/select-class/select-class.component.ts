@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import {Router, RouterLink} from '@angular/router';
 import { SessionStateService } from '../../services/session-state.service';
 
+
 @Component({
   selector: 'app-select-class',
   standalone: true,
@@ -21,7 +22,6 @@ export class SelectClassComponent {
   ) {}
 
   selectClass(classNumber: number) {
-    // Map class number to level (FIRST, SECOND, etc.)
     const levelMap: { [key: number]: string } = {
       1: 'FIRST',
       2: 'SECOND',

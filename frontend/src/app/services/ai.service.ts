@@ -5,24 +5,6 @@ import { map, switchMap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
-export interface PlanRequest {
-    goal: string;
-    time: string;
-}
-
-export interface QaRequest {
-    question: string;
-}
-
-export interface SummaryRequest {
-    subject: string;
-    module: string;
-}
-
-export interface TtsRequest {
-    text: string;
-}
-
 @Injectable({
     providedIn: 'root'
 })

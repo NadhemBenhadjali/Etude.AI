@@ -5,15 +5,11 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { firstValueFrom } from 'rxjs';
-import { UserService, SessionDTO, SessionType, SummaryElementDTO } from '../../services/user.service';
-
+import { UserService} from '../../services/user.service';
+import {Slide} from '../../model/shared.model';
+import {SessionDTO, SessionType} from '../../model/session.model';
+import { SummaryElementDTO } from '../../model/summary.model';
 import fallbackData from '../../../assets/lesson.json';
-
-interface Slide {
-  number: string;
-  text?: string;
-  image?: string | null;
-}
 
 @Component({
   selector: 'app-lesson-board',

@@ -7,82 +7,13 @@ import { AuthService } from '../../services/auth.service';
 import { firstValueFrom } from 'rxjs';
 import { RouterModule, Router } from '@angular/router';
 import { GamificationService } from '../../services/gamification.service';
+import {Achievement} from '../../model/achievement.model';
+import {StudentData,Activity,levelMap} from '../../model/user.model';
+import {Session} from '../../model/session.model';
+import {ChatMessage,SuggestedPlan} from '../../model/planner.model';
+import {CalendarDay,Difficulty} from '../../model/shared.model';
 
-interface StudentData {
-  name: string;
-  class: string;
-  avatar: string;
-  lastActivity: string;
-  isOnline: boolean;
-}
 
-interface Activity {
-  id: string;
-  title: string;
-  description: string;
-  time: string;
-  status: 'completed' | 'in-progress' | 'pending';
-  icon: string;
-}
-const levelMap = {
-  FIRST: 'السنة الاولى',
-  SECOND: 'السنة الثانية',
-  THIRD: 'السنة الثالثة',
-  FOURTH: 'السنة الرابعة',
-  FIFTH: 'السنة الخامسة',
-  SIXTH: 'السنة السادسة',
-};
-
-export interface Achievement {
-  id: string;
-  name: string;
-  title: string;
-  description: string;
-  icon: string;
-  unlocked: boolean;
-  earned: boolean;
-  unlockedAt?: string;
-  progress?: number;
-  currentValue?: number;
-  targetValue?: number;
-}
-
-interface Session {
-  id?: string;
-  sessionName: string;
-  chapterName: string;
-  description: string;
-  date: string; // Keep for fallback or display string
-  createdAt?: string; // Add this field for ISO parsing
-  time?: string;
-  status: 'completed' | 'in-progress' | 'pending';
-}
-
-interface CalendarDay {
-  number: number;
-  isToday: boolean;
-  status: 'completed' | 'incomplete' | 'mixed' | '';
-  sessions: Session[];
-  arabicDate: string;
-  isCurrentMonth: boolean;
-}
-
-interface ChatMessage {
-  id: string;
-  content: string;
-  sender: 'user' | 'agent';
-  time: string;
-}
-
-interface SuggestedPlan {
-  description: string;
-  items: string[];
-}
-
-interface Difficulty {
-  name: string;
-  severity: 'high' | 'medium' | 'low';
-}
 
 type CalendarViewType = 'month' | 'list' | 'card';
 
@@ -272,121 +203,21 @@ export class DashboardComponent implements OnInit {
     this.gamificationService.getMyAchievements().subscribe({
       next: (data) => {
         this.achievements = data.map(item => {
-          const { progress, currentValue, targetValue } = this.calculateAchievementProgress(item);
-
           return {
             id: item.id,
             name: item.name,
-            title: item.name,
             description: item.description,
             icon: item.icon,
             unlocked: item.unlocked,
-            earned: item.unlocked,
             unlockedAt: item.unlockedAt,
-            progress: progress,
-            currentValue: currentValue,
-            targetValue: targetValue
+            progress: item.progress || 0,
+            currentValue: item.currentValue || 0,
+            targetValue: item.targetValue || 0
           };
         });
       },
       error: (err) => console.error('Failed to fetch achievements', err)
     });
-  }
-
-  /**
-   * Calculate achievement progress based on achievement name and user statistics
-   */
-  calculateAchievementProgress(achievement: any): { progress: number, currentValue: number, targetValue: number } {
-    if (achievement.unlocked) {
-      return { progress: 100, currentValue: 0, targetValue: 0 };
-    }
-
-    const name = achievement.name || achievement.description || '';
-
-    // Session-based achievements
-    if (name.includes('جلسة') || name.includes('جلسات')) {
-      return this.calculateSessionProgress(name);
-    }
-
-    // Quiz-based achievements
-    if (name.includes('اختبار') || name.includes('اختبارات')) {
-      return this.calculateQuizProgress(name);
-    }
-
-    // Elo/Rating-based achievements
-    if (name.includes('نقطة تصنيف') || name.includes('الترتيب')) {
-      return this.calculateEloProgress(name);
-    }
-
-    return { progress: 0, currentValue: 0, targetValue: 1 };
-  }
-
-  /**
-   * Calculate progress for session-based achievements
-   */
-  calculateSessionProgress(achievementName: string): { progress: number, currentValue: number, targetValue: number } {
-    const current = this.userStats.totalSessions;
-    let target = 1;
-
-    // Extract target from achievement name
-    if (achievementName.includes('50')) {
-      target = 50;
-    } else if (achievementName.includes('25')) {
-      target = 25;
-    } else if (achievementName.includes('10')) {
-      target = 10;
-    } else if (achievementName.includes('3')) {
-      target = 3;
-    } else if (achievementName.includes('أول') || achievementName.includes('الأولى')) {
-      target = 1;
-    }
-
-    const progress = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
-    return { progress, currentValue: current, targetValue: target };
-  }
-
-  /**
-   * Calculate progress for quiz-based achievements
-   */
-  calculateQuizProgress(achievementName: string): { progress: number, currentValue: number, targetValue: number } {
-    const current = this.userStats.totalQuizzes;
-    let target = 1;
-
-    // Extract target from achievement name
-    if (achievementName.includes('25')) {
-      target = 25;
-    } else if (achievementName.includes('10')) {
-      target = 10;
-    } else if (achievementName.includes('5')) {
-      target = 5;
-    } else if (achievementName.includes('أول')) {
-      target = 1;
-    }
-
-    const progress = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
-    return { progress, currentValue: current, targetValue: target };
-  }
-
-  /**
-   * Calculate progress for elo/rating-based achievements
-   */
-  calculateEloProgress(achievementName: string): { progress: number, currentValue: number, targetValue: number } {
-    const current = this.userStats.elo;
-    let target = 100;
-
-    // Extract target from achievement name
-    if (achievementName.includes('500')) {
-      target = 500;
-    } else if (achievementName.includes('300')) {
-      target = 300;
-    } else if (achievementName.includes('200')) {
-      target = 200;
-    } else if (achievementName.includes('100')) {
-      target = 100;
-    }
-
-    const progress = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0;
-    return { progress, currentValue: current, targetValue: target };
   }
 
   async loadUserData() {

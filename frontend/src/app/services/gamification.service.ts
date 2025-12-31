@@ -2,18 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-
-export interface Achievement {
-    id: string;
-    name: string;
-    description: string;
-    icon: string;
-    unlocked: boolean;
-    unlockedAt?: string;
-    progress?: number; // Add optional progress field (0-100)
-    currentValue?: number; // e.g., current quiz count
-    targetValue?: number; // e.g., target quiz count
-}
+import { Achievement } from '../model/achievement.model';
 
 @Injectable({
     providedIn: 'root'

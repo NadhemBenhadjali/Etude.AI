@@ -1,13 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-
-export enum LogLevel {
-    DEBUG = 0,
-    INFO = 1,
-    WARN = 2,
-    ERROR = 3,
-    OFF = 4
-}
+import { LogLevel } from '../model/shared.model';
 
 @Injectable({
     providedIn: 'root'

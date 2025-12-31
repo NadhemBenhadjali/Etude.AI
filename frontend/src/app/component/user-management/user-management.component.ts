@@ -1,10 +1,9 @@
-// user-management.component.ts
-
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { UserService, UserDTO, ChangePasswordRequest } from '../../services/user.service';
+import { UserService} from '../../services/user.service';
+import { UserDTO, ChangePasswordRequest  } from '../../model/user.model';
 
 @Component({
   selector: 'app-user-management',

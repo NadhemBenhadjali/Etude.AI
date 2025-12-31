@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
+import { SessionState } from '../model/session.model';
 
-export interface SessionState {
-  selectedLevel: string; // The class selected (will be mapped to level)
-  selectedSubject: string; // The module selected (will be mapped to subject)
-  selectedModule: string; // The specific module/lesson
-}
+
+
 
 @Injectable({
   providedIn: 'root'
