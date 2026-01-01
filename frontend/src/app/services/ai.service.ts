@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, from } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
+import { PlanRequest, PlanResponse } from '../model/planner.model';
 
 @Injectable({
     providedIn: 'root'
@@ -13,8 +13,8 @@ export class AiService {
 
     constructor(private http: HttpClient) { }
 
-    generatePlan(goal: string, time: string): Observable<any> {
-        return this.http.post(`${this.apiUrl}/plan`, { goal, time });
+    generatePlan(request: PlanRequest): Observable<PlanResponse> {
+        return this.http.post<PlanResponse>(`${this.apiUrl}/plan`, request);
     }
 
     askQuestion(question: string): Observable<any> {

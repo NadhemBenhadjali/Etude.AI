@@ -58,13 +58,12 @@ export class ProfileComponent implements OnInit {
         this.xp = user.elo || 0;
         this.level = this.mapLevel(user.level);
         this.avatar= user.avatar? user.avatar : '';
-
         // Map backend stats to UI
         this.completedQuizzes = user.totalQuizzes || 0;
 
         // Mock data for missing backend fields to keep UI rich
-        this.completedLessons = Math.floor(this.xp / 50);
-        this.highestStreak = Math.floor(Math.random() * 10);
+        this.completedLessons = (user.totalQuizzes || 0)+(user.totalQna ||0)+(user.totalSummaries || 0)
+        this.highestStreak = (user.highestScore ||0);
       },
       error: (err) => {
         console.error('Failed to load profile', err);

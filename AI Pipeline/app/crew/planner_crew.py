@@ -1,13 +1,11 @@
-from typing import ClassVar
+from typing import ClassVar, Optional
 from pathlib import Path
 from crewai import Agent, Crew, Task, LLM, Process
 from crewai.project import CrewBase, agent, crew, task, llm, tool
 from crewai.knowledge.source.string_knowledge_source import StringKnowledgeSource
-import google.generativeai as genai
 from app.crew.tools import LessonRetrieverTool
 from app.crew.knowledge_graph import Neo4jKG
 from app.crew.config import embedder_cfg
-from app.handlers import get_sessions_logs, get_user_logs
 import json
 from app.crew.config import URI, USER, PASSWORD
 from app.crew.config import settings
@@ -19,6 +17,20 @@ class PlannerCrew:
     base_directory: ClassVar[Path] = Path(__file__).parent
     agents_config: ClassVar[str] = 'config/agents.yaml'
     tasks_config:  ClassVar[str] = 'config/tasks.yaml'
+    
+    def __init__(self, session_logs: Optional[list] = None, user_logs: Optional[list] = None, request_data: Optional[dict] = None):
+        """
+        Initialize PlannerCrew with data passed directly from Spring Boot.
+
+        Args:
+            session_logs: User's session history (passed from Spring Boot)
+            user_logs: User profile and learning data (passed from Spring Boot)
+            request_data: Dictionary containing request parameters (branch, topic, goal, etc.)
+        """
+        super().__init__()
+        self.session_logs = session_logs or []
+        self.user_logs = user_logs or []
+        self.request_data = request_data or {}
 
     @llm
     def llm_cfg(self) -> LLM:
@@ -32,8 +44,8 @@ class PlannerCrew:
 
     @agent
     def sessions_history_agent(self) -> Agent:
-        session_logs_input = get_sessions_logs()
-        json_str = json.dumps(session_logs_input, ensure_ascii=False, indent=2)
+        # Use session logs passed directly from Spring Boot
+        json_str = json.dumps(self.session_logs, ensure_ascii=False, indent=2)
         knowledge_source = StringKnowledgeSource(content=json_str)
         return Agent(
             config=self.agents_config['sessions_history_agent'],
@@ -43,8 +55,8 @@ class PlannerCrew:
 
     @agent
     def user_history_agent(self) -> Agent:
-        user_logs_input = get_user_logs()
-        json_str = json.dumps(user_logs_input, ensure_ascii=False, indent=2)
+        # Use user logs passed directly from Spring Boot
+        json_str = json.dumps(self.user_logs, ensure_ascii=False, indent=2)
         knowledge_source = StringKnowledgeSource(content=json_str)
         return Agent(
             config=self.agents_config['user_history_agent'],

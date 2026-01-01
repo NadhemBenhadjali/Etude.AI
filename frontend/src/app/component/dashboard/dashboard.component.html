@@ -149,7 +149,7 @@
 
           <div class="session-details">
             <h4>{{session.sessionName}}</h4>
-            <p class="session-chapter">{{session.chapterName}}</p>
+            <p class="session-chapter">{{session.lesson}}</p>
             <p class="session-description">{{session.description}}</p>
 
             <div class="session-meta">
@@ -173,6 +173,11 @@
 
     <!-- Card View Calendar -->
     <div class="calendar-card-view" *ngIf="currentCalendarView === 'card'">
+      <div class="cards-header">
+        <h3>📚 الجلسات القادمة</h3>
+        <span class="cards-count">{{getUpcomingSessions().length}} جلسة</span>
+      </div>
+
       <div class="cards-container">
         <div class="session-card-item"
              *ngFor="let session of getUpcomingSessions()"
@@ -184,26 +189,79 @@
               <div class="card-month">{{ formatArabicMonth(session.date) }}</div>
             </div>
 
-            <div class="card-status" [class]="session.status">
+            <div class="card-status-badge" [class]="session.status">
               <span class="status-dot"></span>
+              <span class="status-text">
+                {{ session.status === 'completed' ? 'مكتملة' :
+                   session.status === 'in-progress' ? 'جارية' : 'قادمة' }}
+              </span>
             </div>
           </div>
 
           <div class="card-content">
-            <h3>{{session.sessionName}}</h3>
-            <p class="card-chapter">{{session.chapterName}}</p>
-            <p class="card-description">{{session.description}}</p>
+            <div class="card-subject-badge" *ngIf="session.subject">
+              📚 {{session.subject}}
+            </div>
 
-            <div class="card-footer">
-              <span class="card-time">🕐 {{session.time || 'غير محدد'}}</span>
-              <button class="card-action-btn"
-                      *ngIf="session.status !== 'completed'"
-                      (click)="startSession(session)">
-                ابدأ الجلسة
-              </button>
+            <h3 class="card-title">{{session.sessionName}}</h3>
+
+            <div class="card-info-row" *ngIf="session.lesson">
+              <span class="info-icon">📖</span>
+              <span class="info-text">{{session.lesson}}</span>
+            </div>
+
+            <p class="card-description" *ngIf="session.description">
+              {{session.description | slice:0:100}}{{session.description.length > 100 ? '...' : ''}}
+            </p>
+
+            <div class="card-meta">
+              <div class="card-time">
+                <span class="time-icon">🕐</span>
+                <span>{{session.time || 'غير محدد'}}</span>
+              </div>
+
+              <div class="card-type" *ngIf="session.sessionType">
+                <span class="type-badge" [class]="session.sessionType?.toLowerCase()">
+                  {{ session.sessionType === 'SUMMARY' ? '📝 ملخص' :
+                     session.sessionType === 'QUIZ' ? '❓ اختبار' :
+                     session.sessionType === 'QNA' ? '💬 أسئلة' : session.sessionType }}
+                </span>
+              </div>
+            </div>
+
+            <div class="card-score" *ngIf="session.quizScore !== undefined && session.quizScore !== null">
+              <span class="score-label">النتيجة:</span>
+              <span class="score-value" [class.high]="session.quizScore >= 70" [class.low]="session.quizScore < 50">
+                {{session.quizScore}}%
+              </span>
             </div>
           </div>
 
+          <div class="card-footer">
+            <button class="card-action-btn primary"
+                    *ngIf="session.status === 'pending'"
+                    (click)="startSession(session)">
+              🚀 ابدأ الجلسة
+            </button>
+            <button class="card-action-btn secondary"
+                    *ngIf="session.status === 'in-progress'"
+                    (click)="startSession(session)">
+              ▶️ متابعة
+            </button>
+            <button class="card-action-btn outline"
+                    *ngIf="session.status === 'completed'"
+                    (click)="startSession(session)">
+              👁️ عرض التفاصيل
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Empty State -->
+        <div class="cards-empty" *ngIf="getUpcomingSessions().length === 0">
+          <div class="empty-icon">📅</div>
+          <h4>لا توجد جلسات قادمة</h4>
+          <p>استخدم مساعد التخطيط لإنشاء جلسات جديدة</p>
         </div>
       </div>
     </div>
@@ -355,6 +413,137 @@
 
       </div>
 
+      <!-- ✅ Planning Form Wizard -->
+      <div class="planning-form-container" *ngIf="showPlanningForm">
+        <div class="planning-form premium-plan">
+
+          <div class="form-header">
+            <img src="assets/images/lamp.png" alt="plan" class="plan-icon">
+            <h4>إنشاء خطة تعليمية</h4>
+            <span class="step-indicator">الخطوة {{planningStep}} من 3</span>
+          </div>
+
+          <!-- Step 1: Goal & Time -->
+          <div class="form-step" *ngIf="planningStep === 1">
+            <div class="form-group">
+              <label for="goal">🎯 الهدف التعليمي *</label>
+              <textarea
+                id="goal"
+                [(ngModel)]="planFormData.goal"
+                placeholder="مثال: أريد تحسين مستوى الطفل في الرياضيات والتركيز على جدول الضرب"
+                rows="3"
+                maxlength="500"
+                required>
+              </textarea>
+              <small>{{planFormData.goal.length}}/500</small>
+            </div>
+
+            <div class="form-group">
+              <label for="time">⏱️ الوقت المتاح *</label>
+              <select id="time" [(ngModel)]="planFormData.time_available" required>
+                <option value="">اختر الوقت المتاح</option>
+                <option *ngFor="let time of availableTimeOptions" [value]="time">{{time}}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Step 2: Subject & Topic -->
+          <div class="form-step" *ngIf="planningStep === 2">
+            <div class="form-group">
+              <label for="branch">📚 المادة الدراسية</label>
+              <select id="branch" [(ngModel)]="planFormData.branch">
+                <option value="">اختر المادة (اختياري)</option>
+                <option *ngFor="let branch of availableBranches" [value]="branch">{{branch}}</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="topic">📖 الموضوع المحدد</label>
+              <input
+                type="text"
+                id="topic"
+                [(ngModel)]="planFormData.topic"
+                placeholder="مثال: التنفس، الزمن، الكسور..."
+                maxlength="200">
+            </div>
+
+            <div class="form-group">
+              <label>⚠️ التحديات والصعوبات</label>
+              <div class="obstacles-input">
+                <input
+                  type="text"
+                  [(ngModel)]="newObstacle"
+                  placeholder="أضف تحدي أو صعوبة..."
+                  (keydown.enter)="addObstacle(); $event.preventDefault()">
+                <button type="button" class="add-obstacle-btn" (click)="addObstacle()">+</button>
+              </div>
+              <div class="obstacles-list" *ngIf="planFormData.obstacles && planFormData.obstacles.length > 0">
+                <span class="obstacle-tag" *ngFor="let obstacle of planFormData.obstacles; let i = index">
+                  {{obstacle}}
+                  <button type="button" class="remove-obstacle" (click)="removeObstacle(i)">×</button>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Parent Remarks -->
+          <div class="form-step" *ngIf="planningStep === 3">
+            <div class="form-group">
+              <label for="remark">💬 ملاحظات الولي</label>
+              <textarea
+                id="remark"
+                [(ngModel)]="planFormData.parent_remark"
+                placeholder="أي ملاحظات إضافية تريد مشاركتها مع المعلم الافتراضي..."
+                rows="4"
+                maxlength="1000">
+              </textarea>
+              <small>{{planFormData.parent_remark?.length || 0}}/1000</small>
+            </div>
+
+            <!-- Summary Preview -->
+            <div class="form-summary">
+              <h5>ملخص الطلب:</h5>
+              <ul>
+                <li><strong>الهدف:</strong> {{planFormData.goal || 'غير محدد'}}</li>
+                <li><strong>الوقت:</strong> {{planFormData.time_available || 'غير محدد'}}</li>
+                <li><strong>المادة:</strong> {{planFormData.branch || 'غير محدد'}}</li>
+                <li><strong>الموضوع:</strong> {{planFormData.topic || 'غير محدد'}}</li>
+                <li *ngIf="planFormData.obstacles && planFormData.obstacles.length > 0">
+                  <strong>التحديات:</strong> {{planFormData.obstacles.join('، ')}}
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" (click)="cancelPlanning()">
+              إلغاء
+            </button>
+
+            <div class="nav-buttons">
+              <button type="button" class="prev-btn" *ngIf="planningStep > 1" (click)="prevPlanStep()">
+                ← السابق
+              </button>
+
+              <button type="button" class="next-btn" *ngIf="planningStep < 3"
+                      (click)="nextPlanStep()"
+                      [disabled]="planningStep === 1 && (!planFormData.goal || !planFormData.time_available)">
+                التالي →
+              </button>
+
+              <button type="button" class="submit-btn" *ngIf="planningStep === 3"
+                      (click)="submitPlan()"
+                      [disabled]="!planFormData.goal || !planFormData.time_available || isGeneratingPlan">
+                <span *ngIf="!isGeneratingPlan">🚀 إنشاء الخطة</span>
+                <span *ngIf="isGeneratingPlan">⏳ جاري الإنشاء...</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
       <!-- ✅ Suggested Plan -->
       <div class="suggested-plan premium-plan" *ngIf="suggestedPlan">
         <div class="plan-header">
@@ -364,7 +553,51 @@
 
         <div class="plan-content">
           <p>{{suggestedPlan.description}}</p>
-          <ul>
+
+          <!-- Structured Sessions Display -->
+          <div class="plan-sessions" *ngIf="suggestedPlan.sessions && suggestedPlan.sessions.length > 0">
+            <div class="plan-session-card" *ngFor="let session of suggestedPlan.sessions; let i = index">
+              <div class="session-card-header">
+                <span class="session-number">الجلسة {{i + 1}}</span>
+                <span class="session-date-badge">📅 {{session.date}}</span>
+              </div>
+
+              <div class="session-card-body">
+                <div class="session-info-row">
+                  <span class="info-label">📚 المادة:</span>
+                  <span class="info-value">{{session.Branch}}</span>
+                </div>
+                <div class="session-info-row">
+                  <span class="info-label">📖 الموضوع:</span>
+                  <span class="info-value">{{session.Topic}}</span>
+                </div>
+                <div class="session-info-row">
+                  <span class="info-label">📝 الدرس:</span>
+                  <span class="info-value">{{session.Lesson}}</span>
+                </div>
+
+                <div class="session-goal">
+                  <span class="goal-label">🎯 هدف الجلسة:</span>
+                  <p class="goal-text">{{session.session_goal}}</p>
+                </div>
+
+                <div class="session-obstacles" *ngIf="session.obstacles && session.obstacles.length > 0">
+                  <span class="obstacles-label">⚠️ التحديات:</span>
+                  <div class="obstacles-tags">
+                    <span class="obstacle-tag" *ngFor="let obstacle of session.obstacles">{{obstacle}}</span>
+                  </div>
+                </div>
+
+                <div class="parent-tip" *ngIf="session.parent_tip">
+                  <span class="tip-label">💡 نصيحة للولي:</span>
+                  <p class="tip-text">{{session.parent_tip}}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Simple Text Items (fallback) -->
+          <ul *ngIf="suggestedPlan.items && suggestedPlan.items.length > 0 && (!suggestedPlan.sessions || suggestedPlan.sessions.length === 0)">
             <li *ngFor="let item of suggestedPlan.items">{{item}}</li>
           </ul>
         </div>
@@ -384,17 +617,25 @@
 
     </div>
 
+    <!-- ✅ Quick Action Button -->
+    <div class="chat-quick-actions" *ngIf="!showPlanningForm && !isGeneratingPlan">
+      <button class="quick-action-btn" (click)="startPlanningWizard()">
+        📝 إنشاء خطة تعليمية جديدة
+      </button>
+    </div>
+
     <!-- ✅ Input -->
-    <div class="chat-input premium-input">
+    <div class="chat-input premium-input" *ngIf="!showPlanningForm">
     <textarea [(ngModel)]="chatMessage"
               (keydown)="onChatKeyPress($event)"
               placeholder="اكتب رسالتك هنا..."
-              rows="1">
+              rows="1"
+              [disabled]="isGeneratingPlan">
     </textarea>
 
       <button class="send-btn"
               (click)="sendMessage()"
-              [disabled]="!chatMessage.trim()">
+              [disabled]="!chatMessage.trim() || isGeneratingPlan">
         <img src="assets/images/send.png" alt="send" />
       </button>
     </div>
@@ -417,7 +658,7 @@
           <div class="session-header">
             <div class="session-info">
               <h3>{{ session.sessionName }}</h3>
-              <p class="chapter-name">{{ session.chapterName }}</p>
+              <p class="chapter-name">{{ session.lesson }}</p>
             </div>
 
             <div class="session-status" [class]="session.status">

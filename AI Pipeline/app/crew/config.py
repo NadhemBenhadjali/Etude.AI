@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     # Redis
     REDIS_URL: str = "redis://redis:6379/0"
 
+    # Backend API
+    BACKEND_URL: str = "http://backend:8080"
+
     # Sentry (Observability)
     SENTRY_DSN: str | None = None
     ENVIRONMENT: str = "development"

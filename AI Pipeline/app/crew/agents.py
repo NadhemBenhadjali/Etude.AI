@@ -4,7 +4,7 @@ from app.crew.config import settings
 
 def build_llm() -> LLM:
     return LLM(model=settings.LLM_MODEL, base_url="https://openrouter.ai/api/v1",
-    api_key=settings.LLM_API_KEY)
+    api_key=settings.LLM_API_KEY, reasoning_effort="low")
 
 def define_agents(tool) -> tuple[Agent, Agent, Agent, Agent]:
     llm = build_llm()

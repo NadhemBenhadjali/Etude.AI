@@ -5,7 +5,6 @@ plan_task:
     including {sessions_per_week} sessions per week.
     Consider and address the following learning obstacles: {obstacles}.
     Incorporate the following context from the last session and the parent's remark:
-    - Last session: {last_session}
     - Parent remark: {parent_remark}
 
     Include a goal for the session, and clear communication notes for the parent or child when needed.

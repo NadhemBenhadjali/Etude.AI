@@ -621,15 +621,67 @@ async def plan_endpoint(request: Request, body: PlanRequest):
             time_available=body.time_available
         )
 
-        # Create planner crew instance
-        planner_crew = PlannerCrew()
-
-        # Build inputs for the crew
-        inputs = {
-            "goal": body.goal,
-            "time_available": body.time_available,
+        # Prepare request data for parent choices
+        request_data = {
             "branch": body.branch or "عام",
             "topic": body.topic or "غير محدد",
+            "goal": body.goal,
+            "time_available": body.time_available,
+            "obstacles": body.obstacles,
+            "parent_remark": body.parent_remark,
+        }
+
+        # Create planner crew instance with data passed directly from Spring Boot
+        planner_crew = PlannerCrew(
+            session_logs=body.session_logs,
+            user_logs=body.user_logs,
+            request_data=request_data
+        )
+
+        # Calculate date range based on time_available
+        from datetime import datetime, timedelta
+        start_date = datetime.now()
+        # Parse time_available to determine end date
+        time_str = body.time_available.lower()
+        if 'أسبوع' in time_str or 'week' in time_str:
+            if 'أسبوعين' in time_str or '2' in time_str or 'two' in time_str:
+                end_date = start_date + timedelta(weeks=2)
+                sessions_per_week = 3
+            elif '٣' in time_str or '3' in time_str or 'three' in time_str:
+                end_date = start_date + timedelta(weeks=3)
+                sessions_per_week = 3
+            else:
+                end_date = start_date + timedelta(weeks=1)
+                sessions_per_week = 3
+        elif 'شهر' in time_str or 'month' in time_str:
+            end_date = start_date + timedelta(days=30)
+            sessions_per_week = 2
+        elif 'يوم' in time_str or 'day' in time_str:
+            # Extract number of days
+            import re
+            nums = re.findall(r'\d+', time_str)
+            days = int(nums[0]) if nums else 10
+            end_date = start_date + timedelta(days=days)
+            sessions_per_week = 3
+        else:
+            end_date = start_date + timedelta(weeks=1)
+            sessions_per_week = 3
+
+        date_range = f"{start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}"
+
+        # Format obstacles as a string
+        obstacles_str = ", ".join(body.obstacles) if body.obstacles else "لا توجد عقبات محددة"
+
+        # Build inputs for the crew - must match task template variables
+        inputs = {
+            "Branch": body.branch or "عام",
+            "Topic": body.topic or "غير محدد",
+            "date_range": date_range,
+            "sessions_per_week": sessions_per_week,
+            "obstacles": obstacles_str,
+            "parent_remark": body.parent_remark or "لا توجد ملاحظات",
+            "goal": body.goal,
+            "time_available": body.time_available,
             "session_id": session_id,
         }
 

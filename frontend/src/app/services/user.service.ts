@@ -44,7 +44,7 @@ export class UserService {
         return this.http.post<void>(`${this.apiUrl}/users/me/change-password`, payload);
     }
 
-    saveSession(session: SessionDTO): Observable<SessionDTO> {
+    saveSession(session: Partial<SessionDTO>): Observable<SessionDTO> {
         return this.http.post<SessionDTO>(`${this.apiUrl}/sessions/save`, session);
     }
 

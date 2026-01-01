@@ -80,17 +80,27 @@ class QuizRequest(BaseModel):
 
 
 class PlanRequest(BaseModel):
-    """Request model for /plan endpoint."""
+    """Request model for /plan endpoint.
+
+    Spring Boot collects all data (parent_choices, session_logs, user_logs)
+    and sends it directly to the AI Pipeline.
+    """
 
     goal: str = Field(..., min_length=10, max_length=500, description="Learning goal description")
     time_available: str = Field(..., description="Available time (e.g., '2 weeks', '10 days')")
     branch: str = Field(default="", max_length=100, description="Subject branch (optional)")
     topic: str = Field(default="", max_length=200, description="Specific topic (optional)")
+    obstacles: list[str] = Field(default=[], description="List of learning obstacles")
+    parent_remark: str = Field(default="", max_length=1000, description="Parent remarks")
+    session_logs: list[dict] = Field(default=[], description="User's session history from backend")
+    user_logs: list[dict] = Field(default=[], description="User profile and learning data from backend")
 
-    @field_validator('goal', 'time_available')
+    @field_validator('goal', 'time_available', 'parent_remark')
     @classmethod
     def sanitize_text(cls, v: str) -> str:
         """Sanitize text input."""
+        if not v:
+            return ""
         v = v.strip()
         # Remove control characters
         v = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', v)

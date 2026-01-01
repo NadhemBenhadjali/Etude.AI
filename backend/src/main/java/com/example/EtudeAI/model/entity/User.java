@@ -114,4 +114,6 @@ public class User {
     @Column(name = "total_summaries", nullable = false)
     @Builder.Default
     private Integer totalSummaries = 0;
+
+    
 }

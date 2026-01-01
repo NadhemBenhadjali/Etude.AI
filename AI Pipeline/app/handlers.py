@@ -3,8 +3,6 @@ import json
 import re
 import structlog
 from crewai import Crew
-from app.pdf_report import render_pdf
-from app.helpers import embed
 from app.crew.knowledge_graph import Neo4jKG
 from pathlib import Path
 from app.helpers import _clean_json_block, parse_quiz_json, _clean_user_question, _extract_final_answer
@@ -177,122 +175,28 @@ def generate_quiz_json(module: str, kg, num_mc: int=6, num_tf: int=4) -> dict:
         logger.error("quiz_generation_failed", error=str(e), module=module)
         raise
 
-def get_parent_choices():
+def get_parent_choices(branch: str = "", topic: str = "", time_available: str = "", goal: str = "", obstacles: list[str] = None, parent_remark: str = "") -> dict:
+    """
+    Build parent choices dictionary from provided parameters.
+    Note: Data is passed from Spring Boot backend, not fetched here.
+
+    Args:
+        branch: Subject branch (e.g., "أحياء", "رياضيات")
+        topic: Specific topic within the branch
+        time_available: Available time for learning (e.g., "2 weeks", "10 days")
+        goal: Learning goal description
+        obstacles: List of learning obstacles/challenges
+        parent_remark: Additional remarks from parent
+    
+    Returns:
+        Dictionary containing parent choices and preferences
+    """
     return {
-    "Branch": "أحياء", 
-    "Topic": "التنفس",  
-    "date_range": "2025-09-04 to 2025-09-18",
-    "sessions_per_week": 3,
-    "obstacles": [
-        "يختلط عليه التفريق بين الشهيق والزفير",
-        "فقدان التركيز بعد 15 دقيقة",
-        "صعوبة ربط المفهوم بمواقف حياتية"
-    ],
-    "parent_remark": "يملّ الطفل بسرعة إلا إذا كان النشاط تفاعليًا أو فيه أمثلة من الواقع"
-}
-def get_sessions_logs() -> list[dict]:
-    return [
-        {
-            "session_id": "session_001",
-            "type": "summary",
-            "date": "2025-08-20",
-            "branch": "علوم",
-            "topic": "الجهاز التنفسي",
-            "lesson": "الشهيق والزفير",
-            "summary": "مراجعة للمفاهيم السابقة مع تطبيق في الحياة اليومية.",
-            "feedback": "الطفل كان متفاعلًا في البداية، لكن فقد تركيزه بعد 15 دقيقة. واجه صعوبة في ربط النشاط بالمفهوم العلمي.",
-        },
-        {
-            "session_id": "session_002",
-            "type": "quiz",
-            "date": "2025-08-27",
-            "branch": "علوم",
-            "topic": "الجهاز التنفسي",
-            "lesson": "الشهيق والزفير",
-            "summary": "مراجعة للمفاهيم السابقة مع تطبيق في الحياة اليومية.",
-            "feedback": "تحسن ملحوظ في الفهم. الطفل استطاع أن يشرح الفرق بين الشهيق والزفير باستخدام المثال المنزلي.",
-            "quiz_rating": 8,
-        }
-    ]
-def get_user_logs() -> list[dict]:
-    return [
-        {
-            "user_id": "user_123",
-            "name": "أحمد",
-            "grade": 5,
-            "strengths": [
-                "فضولي ويحب الاستكشاف",
-                "يستمتع بالأنشطة العملية"
-            ],
-            "weaknesses": [
-                "يفقد التركيز بسرعة",
-                "يحتاج إلى أمثلة من الحياة اليومية لفهم المفاهيم"
-            ]
-        }
-    ]
-def output() :
-    return """{{                                                                                                                                                             
-      "Branch": "أحياء",                                                                                                                                          
-      "Topic": "التنفس",                                                                                                                                          
-      "Lesson": "الشهيق والزفير - مراجعة وتطبيق",                                                                                                                 
-      "obstacles": [                                                                                                                                              
-        "يختلط عليه التفريق بين الشهيق والزفير",                                                                                                                  
-        "فقدان التركيز بعد 15 دقيقة",                                                                                                                             
-        "صعوبة ربط المفهوم بمواقف حياتية"                                                                                                                         
-      ],                                                                                                                                                          
-      "date": "2025-09-04",                                                                                                                                       
-      "session_goal": "تعزيز الفهم بين الشهيق والزفير من خلال نشاط تفاعلي يعتمد على الحركة.",                                                                     
-      "parent_tip": "اجعل النشاط مرحًا! يمكنكما اللعب بلعبة تحاكي الشهيق والزفير، مثل نفخ البالونات أو تقليد حركات الحيوانات."                                     
-    },                                                                                                                                                            
-    {                                                                                                                                                             
-      "Branch": "أحياء",                                                                                                                                          
-      "Topic": "التنفس",                                                                                                                                          
-      "Lesson": "أعضاء التنفس لدى بعض الحيوانات",                                                                                                                 
-      "obstacles": [                                                                                                                                              
-        "يختلط عليه التفريق بين الشهيق والزفير",                                                                                                                  
-        "فقدان التركيز بعد 15 دقيقة",                                                                                                                             
-        "صعوبة ربط المفهوم بمواقف حياتية"                                                                                                                         
-      ],                                                                                                                                                          
-      "date": "2025-09-08",                                                                                                                                       
-      "session_goal": "مقارنة كيفية تنفس الحيوانات المختلفة (الخروف والسمكة) وكيف تتكيف مع بيئاتها.",                                                             
-      "parent_tip": "ابحثا عن صور أو مقاطع فيديو للحيوانات تتنفس. ناقشا كيف تساعد هذه الآليات الحيوانات على البقاء على قيد الحياة."                               
-    },                                                                                                                                                            
-    {                                                                                                                                                             
-      "Branch": "أحياء",                                                                                                                                          
-      "Topic": "التنفس",                                                                                                                                          
-      "Lesson": "مراجعة عملية التنفس - لعبة",                                                                                                                     
-      "obstacles": [                                                                                                                                              
-        "يختلط عليه التفريق بين الشهيق والزفير",                                                                                                                  
-        "فقدان التركيز بعد 15 دقيقة",                                                                                                                             
-        "صعوبة ربط المفهوم بمواقف حياتية"                                                                                                                         
-      ],                                                                                                                                                          
-      "date": "2025-09-11",                                                                                                                                       
-      "session_goal": "ترسيخ المفاهيم من خلال لعبة تتطلب تطبيق المعرفة حول الشهيق والزفير.",                                                                      
-      "parent_tip": "شجع أحمد على شرح قوانين اللعبة لك، فهذا يساعده على التأكد من فهمه للمفاهيم."                                                                 
-    },                                                                                                                                                            
-    {                                                                                                                                                             
-      "Branch": "أحياء",                                                                                                                                          
-      "Topic": "التنفس",                                                                                                                                          
-      "Lesson": "الرئتان عند الخروف",                                                                                                                             
-      "obstacles": [                                                                                                                                              
-        "يختلط عليه التفريق بين الشهيق والزفير",                                                                                                                  
-        "فقدان التركيز بعد 15 دقيقة",                                                                                                                             
-        "صعوبة ربط المفهوم بمواقف حياتية"                                                                                                                         
-      ],                                                                                                                                                          
-      "date": "2025-09-15",                                                                                                                                       
-      "session_goal": "فهم كيف تعمل الرئتان في الخروف وكيفية تبادل الغازات.",                                                                                     
-      "parent_tip": "يمكنك استخدام نموذج بسيط للرئة (مثل زجاجة بلاستيكية وقبالون) لتوضيح كيفية عملها."                                                            
-    },                                                                                                                                                            
-    {                                                                                                                                                             
-      "Branch": "أحياء",                                                                                                                                          
-      "Topic": "التنفس",                                                                                                                                          
-      "Lesson": "الغلاصم عند السمكة",                                                                                                                             
-      "obstacles": [                                                                                                                                              
-        "يختلط عليه التفريق بين الشهيق والزفير",                                                                                                                  
-        "فقدان التركيز بعد 15 دقيقة",                                                                                                                             
-        "صعوبة ربط المفهوم بمواقف حياتية"                                                                                                                         
-      ],                                                                                                                                                          
-      "date": "2025-09-18",                                                                                                                                       
-      "session_goal": "فهم كيف تستخرج الأسماك الأكسجين من الماء باستخدام الغلاصم.",                                                                               
-      "parent_tip": "شاهدوا فيلمًا وثائقيًا عن الأسماك لترى كيف تتحرك الغلاصم وكيف تتكيف الأسماك مع بيئتها المائية."                                                
-    }"""
+        "Branch": branch or "غير محدد",
+        "Topic": topic or "غير محدد",
+        "time_available": time_available or "غير محدد",
+        "goal": goal or "غير محدد",
+        "obstacles": obstacles or [],
+        "parent_remark": parent_remark or ""
+    }
+

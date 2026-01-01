@@ -45,10 +45,18 @@ export interface SessionDTO {
 export interface Session {
   id?: string;
   sessionName: string;
-  chapterName: string;
   description: string;
   date: string;
   createdAt?: string;
+  startedAt?: string;
   time?: string;
   status: 'completed' | 'in-progress' | 'pending';
+  // Fields from backend
+  subject?: string;
+  module?: string;
+  lesson?: string;
+  sessionType?: string;
+  sessionGoal?: string;
+  parentTip?: string;
+  quizScore?: number;
 }
