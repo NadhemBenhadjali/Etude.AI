@@ -1,11 +1,7 @@
 package com.example.EtudeAI.Controller;
 
-import com.example.EtudeAI.exception.ResourceNotFoundException;
 import com.example.EtudeAI.model.dto.QuizSubmissionDTO;
 import com.example.EtudeAI.model.dto.SessionDTO;
-import com.example.EtudeAI.model.entity.User;
-import com.example.EtudeAI.repository.UserRepository;
-import com.example.EtudeAI.service.GamificationService;
 import com.example.EtudeAI.service.SessionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,8 +24,6 @@ import java.util.UUID;
 @Tag(name = "Session Management", description = "Endpoints for managing study sessions and quiz results")
 public class SessionController {
 
-    private final GamificationService gamificationService;
-    private final UserRepository userRepository;
     private final SessionService sessionService;
 
     @PostMapping("/quiz/submit")
@@ -37,9 +31,7 @@ public class SessionController {
     public ResponseEntity<Void> submitQuizResult(@AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody QuizSubmissionDTO submission) {
         String keycloakUserId = jwt.getSubject();
-        User user = userRepository.findByKeycloakUserId(keycloakUserId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "keycloakUserId", keycloakUserId));
-        gamificationService.processQuizCompletion(user, submission.getScore());
+        sessionService.submitQuizResult(keycloakUserId, submission);
         return ResponseEntity.ok().build();
     }
 

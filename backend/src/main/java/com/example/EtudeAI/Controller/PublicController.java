@@ -22,20 +22,16 @@ public class PublicController {
     @PostMapping("/register")
     @Operation(summary = "Register User", description = "Registers a new user in Keycloak and the application database.")
     public ResponseEntity<String> register(@Valid @RequestBody RegistrationDTO registrationDTO) {
-        try {
-            UserDTO userDTO = new UserDTO();
-            userDTO.setEmail(registrationDTO.getEmail());
-            userDTO.setFirstname(registrationDTO.getFirstname());
-            userDTO.setLastname(registrationDTO.getLastname());
-            userDTO.setBirthDate(registrationDTO.getBirthDate());
-            userDTO.setLevel(registrationDTO.getLevel() != null ? registrationDTO.getLevel() : Level.FIRST);
-            userDTO.setAvatar(registrationDTO.getAvatar());
+        UserDTO userDTO = new UserDTO();
+        userDTO.setEmail(registrationDTO.getEmail());
+        userDTO.setFirstname(registrationDTO.getFirstname());
+        userDTO.setLastname(registrationDTO.getLastname());
+        userDTO.setBirthDate(registrationDTO.getBirthDate());
+        userDTO.setLevel(registrationDTO.getLevel() != null ? registrationDTO.getLevel() : Level.FIRST);
+        userDTO.setAvatar(registrationDTO.getAvatar());
 
-            registrationService.registerUser(userDTO, registrationDTO.getPassword());
+        registrationService.registerUser(userDTO, registrationDTO.getPassword());
 
-            return ResponseEntity.ok("User registered successfully");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
-        }
+        return ResponseEntity.ok("User registered successfully");
     }
 }

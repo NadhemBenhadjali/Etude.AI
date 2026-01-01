@@ -18,4 +18,7 @@ public class AchievementDTO {
     private String icon;
     private boolean unlocked;
     private ZonedDateTime unlockedAt;
+    private Integer progress;        // Progress percentage (0-100)
+    private Integer currentValue;    // Current user value (e.g., current quiz count)
+    private Integer targetValue;     // Target value to unlock (e.g., required quiz count)
 }

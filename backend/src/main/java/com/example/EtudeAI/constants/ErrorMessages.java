@@ -7,6 +7,10 @@ public final class ErrorMessages {
     public static final String USER_ALREADY_EXISTS = "User already exists";
     public static final String INVALID_USER_DATA = "Invalid user data";
 
+    // Session related errors
+    public static final String SESSION_NOT_FOUND = "Session not found";
+    public static final String SESSION_UNAUTHORIZED = "Unauthorized access to session";
+
     // Authentication/Authorization errors
     public static final String UNAUTHORIZED = "Unauthorized access";
     public static final String FORBIDDEN = "Access denied";

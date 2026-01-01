@@ -1,5 +1,6 @@
 package com.example.EtudeAI.Controller;
 
+import com.example.EtudeAI.model.dto.PlanRequestDTO;
 import com.example.EtudeAI.service.AiPipelineService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -80,11 +81,13 @@ public class AiController {
 
         @PostMapping("/plan")
         @Operation(summary = "Generate Study Plan", description = "Generates a study plan based on goal and available time.")
-        public Mono<ResponseEntity<Map>> generatePlan(@RequestBody Map<String, String> payload,
-                        @Parameter(description = "Session ID for tracking context") @RequestHeader(value = "X-Session-ID", required = false) String sessionId) {
+        public Mono<ResponseEntity<Map>> generatePlan(
+                        @RequestBody PlanRequestDTO planRequest,
+                        @Parameter(description = "Session ID for tracking context") @RequestHeader(value = "X-Session-ID", required = false) String sessionId,
+                        @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
                 String finalSessionId = (sessionId != null && !sessionId.isEmpty()) ? sessionId
                                 : UUID.randomUUID().toString();
-                return aiPipelineService.generatePlan(payload.get("goal"), payload.get("time"), finalSessionId)
+                return aiPipelineService.generatePlan(planRequest, authorizationHeader, finalSessionId)
                                 .map(response -> ResponseEntity.ok().header("X-Session-ID", finalSessionId)
                                                 .body(response));
         }

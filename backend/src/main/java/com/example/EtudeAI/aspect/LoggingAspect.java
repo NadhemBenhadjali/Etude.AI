@@ -4,14 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.UUID;
 
 @Aspect
 @Component
 @Slf4j
 public class LoggingAspect {
+
+    private static final String REQUEST_ID = "requestId";
 
     /**
      * Pointcut for all controller methods
@@ -28,13 +31,19 @@ public class LoggingAspect {
     }
 
     /**
-     * Log before executing controller methods
+     * Log before executing controller methods.
+     * Note: Arguments are intentionally NOT logged to prevent leaking sensitive data
+     * (passwords, tokens, etc.) into logs.
      */
     @Before("controllerMethods()")
     public void logBeforeController(JoinPoint joinPoint) {
+        // Generate request ID for tracing if not already set
+        if (MDC.get(REQUEST_ID) == null) {
+            MDC.put(REQUEST_ID, UUID.randomUUID().toString().substring(0, 8));
+        }
         String methodName = joinPoint.getSignature().toShortString();
-        Object[] args = joinPoint.getArgs();
-        log.info("Entering controller method: {} with arguments: {}", methodName, Arrays.toString(args));
+        String requestId = MDC.get(REQUEST_ID);
+        log.info("[{}] Entering controller method: {}", requestId, methodName);
     }
 
     /**
@@ -43,7 +52,9 @@ public class LoggingAspect {
     @AfterReturning(pointcut = "controllerMethods()", returning = "result")
     public void logAfterReturningController(JoinPoint joinPoint, Object result) {
         String methodName = joinPoint.getSignature().toShortString();
-        log.info("Controller method completed: {}", methodName);
+        String requestId = MDC.get(REQUEST_ID);
+        log.info("[{}] Controller method completed: {}", requestId, methodName);
+        MDC.remove(REQUEST_ID);
     }
 
     /**
@@ -52,7 +63,9 @@ public class LoggingAspect {
     @AfterThrowing(pointcut = "controllerMethods() || serviceMethods()", throwing = "exception")
     public void logAfterThrowing(JoinPoint joinPoint, Throwable exception) {
         String methodName = joinPoint.getSignature().toShortString();
-        log.error("Exception in method: {} - Exception: {}", methodName, exception.getMessage(), exception);
+        String requestId = MDC.get(REQUEST_ID);
+        log.error("[{}] Exception in method: {} - Exception: {}", requestId, methodName, exception.getMessage(), exception);
+        MDC.remove(REQUEST_ID);
     }
 
     /**
