@@ -16,7 +16,9 @@ export class SelectSubjectComponent {
     { name: 'رياضيات', image: 'math.png' },
     { name: 'إيقاظ علمي', image: 'science.png' },
     { name: 'العربية', image: 'arabic.png' },
-    { name: 'الفرنسية', image: 'french.png' }
+    { name: 'الفرنسية', image: 'french.png' },
+    { name: 'الإنكليزية', image: 'eng.png' },
+    { name: 'المواد الاجتماعية', image: 'geo.png' }
   ];
 
   colors = ['#5BBCFF', '#FFFAB7', '#FFD1E3', '#7EA1FF'];
