@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-// adjust the path if needed
+import { ToastComponent } from './shared/toast/toast.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterModule, ToastComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })

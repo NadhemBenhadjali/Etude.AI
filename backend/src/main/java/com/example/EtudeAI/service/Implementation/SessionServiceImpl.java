@@ -12,7 +12,7 @@ import com.example.EtudeAI.repository.SessionRepository;
 import com.example.EtudeAI.repository.UserRepository;
 import com.example.EtudeAI.service.GamificationService;
 import com.example.EtudeAI.service.SessionService;
-import com.example.EtudeAI.service.session.SessionTypeHandler;
+import com.example.EtudeAI.service.helper.SessionTypeHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import com.example.EtudeAI.model.dto.QnAElementDTO;
 import com.example.EtudeAI.model.dto.QuizElementDTO;
 import com.example.EtudeAI.model.dto.SummaryElementDTO;
+import com.example.EtudeAI.model.dto.SessionUpdateDTO;
 import com.example.EtudeAI.model.entity.QnAElement;
 import com.example.EtudeAI.model.entity.QuizElement;
 import com.example.EtudeAI.model.entity.SummaryElement;
@@ -83,6 +84,92 @@ public class SessionServiceImpl implements SessionService {
     public void submitQuizResult(String keycloakUserId, QuizSubmissionDTO submission) {
         User user = findUserByKeycloakId(keycloakUserId);
         gamificationService.processQuizCompletion(user, submission.getScore());
+    }
+
+    @Transactional
+    @Override
+    public SessionDTO updateSession(UUID sessionId, SessionUpdateDTO updateDTO, String keycloakUserId) {
+        User user = findUserByKeycloakId(keycloakUserId);
+
+        Session session = sessionRepository.findById(sessionId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.SESSION_NOT_FOUND));
+
+        // Verify ownership
+        if (!session.getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedException(ErrorMessages.SESSION_UNAUTHORIZED);
+        }
+
+        // Update only non-null fields (partial update)
+        if (updateDTO.getStatus() != null) {
+            session.setStatus(updateDTO.getStatus());
+        }
+        if (updateDTO.getStartedAt() != null) {
+            session.setStartedAt(updateDTO.getStartedAt());
+        }
+        if (updateDTO.getCompletedAt() != null) {
+            session.setCompletedAt(updateDTO.getCompletedAt());
+        }
+        if (updateDTO.getSessionFeedback() != null) {
+            session.setSessionFeedback(updateDTO.getSessionFeedback());
+        }
+        if (updateDTO.getLessonContent() != null) {
+            session.setLessonContent(updateDTO.getLessonContent());
+        }
+        if (updateDTO.getSummary() != null) {
+            session.setSummary(updateDTO.getSummary());
+        }
+        if (updateDTO.getQuizScore() != null) {
+            session.setQuizScore(updateDTO.getQuizScore());
+        }
+        if (updateDTO.getSummaryPointsOfFocus() != null) {
+            session.setSummaryPointsOfFocus(updateDTO.getSummaryPointsOfFocus());
+        }
+        if (updateDTO.getQuizPointsOfFocus() != null) {
+            session.setQuizPointsOfFocus(updateDTO.getQuizPointsOfFocus());
+        }
+
+        // Handle type-specific elements if provided
+        if (updateDTO.getSessionType() != null || hasTypeSpecificElements(updateDTO)) {
+            // Create a SessionDTO for the handler using existing session data + updates
+            SessionDTO sessionDTO = new SessionDTO(
+                    session.getId(),
+                    session.getLevel(),
+                    session.getSubject(),
+                    session.getModule(),
+                    session.getLesson(),
+                    updateDTO.getStatus() != null ? updateDTO.getStatus() : session.getStatus(),
+                    updateDTO.getSessionType() != null ? updateDTO.getSessionType() : session.getSessionType(),
+                    session.getCreatedAt(),
+                    updateDTO.getStartedAt() != null ? updateDTO.getStartedAt() : session.getStartedAt(),
+                    updateDTO.getCompletedAt() != null ? updateDTO.getCompletedAt() : session.getCompletedAt(),
+                    updateDTO.getSummaryPointsOfFocus(),
+                    updateDTO.getQuizPointsOfFocus(),
+                    updateDTO.getQuizScore(),
+                    updateDTO.getSummary(),
+                    updateDTO.getSessionFeedback(),
+                    updateDTO.getLessonContent(),
+                    updateDTO.getQuizElements(),
+                    updateDTO.getQnaElements(),
+                    updateDTO.getSummaryElements()
+            );
+            SessionTypeHandler handler = findHandler(sessionDTO);
+            handler.handle(session, sessionDTO, user);
+        }
+
+        Session savedSession = sessionRepository.save(session);
+
+        // Trigger session completion gamification if status is COMPLETED
+        if (updateDTO.getStatus() == Status.COMPLETED) {
+            gamificationService.processSessionCompletion(user);
+        }
+
+        return mapToDTO(savedSession);
+    }
+
+    private boolean hasTypeSpecificElements(SessionUpdateDTO updateDTO) {
+        return (updateDTO.getQuizElements() != null && !updateDTO.getQuizElements().isEmpty()) ||
+               (updateDTO.getQnaElements() != null && !updateDTO.getQnaElements().isEmpty()) ||
+               (updateDTO.getSummaryElements() != null && !updateDTO.getSummaryElements().isEmpty());
     }
 
     private SessionTypeHandler findHandler(SessionDTO sessionDTO) {

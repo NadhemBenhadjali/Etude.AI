@@ -181,7 +181,7 @@
 
 .signup-link .text-link {
   color: #7EA1FF;
-  text-decoration: no;
+  text-decoration: none;
   font-weight: 700;
   cursor: pointer;
   background: none !important;

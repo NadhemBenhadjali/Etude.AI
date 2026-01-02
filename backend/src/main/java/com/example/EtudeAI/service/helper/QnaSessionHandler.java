@@ -1,4 +1,4 @@
-package com.example.EtudeAI.service.session;
+package com.example.EtudeAI.service.helper;
 
 import com.example.EtudeAI.model.dto.QnAElementDTO;
 import com.example.EtudeAI.model.dto.SessionDTO;

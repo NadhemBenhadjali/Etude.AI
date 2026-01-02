@@ -8,8 +8,9 @@ import {QuizQuestion} from '../../model/quiz.model';
 import {AiService} from '../../services/ai.service';
 import {GamificationService} from '../../services/gamification.service';
 import {UserService} from '../../services/user.service';
+import {ToastService} from '../../services/toast.service';
 import {QuizElementDTO} from '../../model/quiz.model';
-import {SessionDTO, SessionType} from '../../model/session.model';
+import {SessionDTO, SessionType, SessionUpdateDTO} from '../../model/session.model';
 import {firstValueFrom} from 'rxjs';
 import {SessionStateService} from '../../services/session-state.service';
 import {Achievement,PowerUp,Checkpoint,Particle,PowerupNotification} from '../../model/gamification.model';
@@ -31,9 +32,13 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
   private gamificationService = inject(GamificationService);
   private userService = inject(UserService);
   private sessionStateService: SessionStateService = inject(SessionStateService);
+  private toastService = inject(ToastService);
 
   messages: { text: string; isUser: boolean }[] = [];
   isLoading = false;
+
+  // Session tracking for planned sessions
+  private sessionId: string | null = null;
 
   // Game State
   currentMode = '';
@@ -135,6 +140,13 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
+    // Extract sessionId from navigation state (for planned sessions)
+    const navState = (this.router.getCurrentNavigation()?.extras.state || history.state) as any;
+    if (navState?.sessionId) {
+      this.sessionId = navState.sessionId;
+      console.log('📌 Quiz Session ID from planned session:', this.sessionId);
+    }
+
     this.route.queryParams.subscribe(params => {
       this.currentMode = params['mode'] || '';
       this.currentModule = params['module'] || '';
@@ -661,34 +673,60 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
       answered: !!q.answered
     }));
 
-    // 2. QUIZ session - only send relevant fields
-    const sessionDTO: SessionDTO = {
-      id: crypto.randomUUID(),
-      level: level, // Use saved level from session state
-      subject: subject, // Use saved subject from session state
-      module: module, // Use saved module from session state
-      lesson: 'Quiz Session',
-      status: 'COMPLETED',
-      sessionType: SessionType.QUIZ, // REQUIRED: Set session type to QUIZ
-      createdAt: new Date().toISOString(),
-      startedAt: new Date().toISOString(),
-      completedAt: new Date().toISOString(),
-      quizScore: this.score,
-      quizPointsOfFocus: [],
-      quizElements: quizElements
-      // DON'T send qnaElements, summaryElements, or other non-QUIZ fields
-    };
+    // If we have a sessionId from a planned session, update the existing session
+    if (this.sessionId) {
+      const updateData: SessionUpdateDTO = {
+        status: 'COMPLETED',
+        completedAt: new Date().toISOString(),
+        sessionType: SessionType.QUIZ,
+        quizScore: this.score,
+        quizPointsOfFocus: [],
+        quizElements: quizElements
+      };
 
-    this.userService.saveSession(sessionDTO).subscribe({
-      next: (res) => {
-        console.log('Session saved successfully:', res);
-        this.avatarMessage = 'تم حفظ الجلسة بنجاح! 💾';
-      },
-      error: (err) => {
-        console.error('Error saving session:', err);
-        this.avatarMessage = 'فشل حفظ الجلسة ⚠️';
-      }
-    });
+      this.userService.updateSession(this.sessionId, updateData).subscribe({
+        next: (res) => {
+          console.log('Session updated successfully:', res);
+          this.toastService.success('تم حفظ نتيجة الاختبار بنجاح! 🎉');
+          this.avatarMessage = 'تم حفظ الجلسة بنجاح! 💾';
+        },
+        error: (err) => {
+          console.error('Error updating session:', err);
+          this.toastService.error('فشل حفظ نتيجة الاختبار ⚠️');
+          this.avatarMessage = 'فشل حفظ الجلسة ⚠️';
+        }
+      });
+    } else {
+      // No sessionId - create a new session (ad-hoc quiz)
+      const sessionDTO: SessionDTO = {
+        id: crypto.randomUUID(),
+        level: level,
+        subject: subject,
+        module: module,
+        lesson: 'Quiz Session',
+        status: 'COMPLETED',
+        sessionType: SessionType.QUIZ,
+        createdAt: new Date().toISOString(),
+        startedAt: new Date().toISOString(),
+        completedAt: new Date().toISOString(),
+        quizScore: this.score,
+        quizPointsOfFocus: [],
+        quizElements: quizElements
+      };
+
+      this.userService.saveSession(sessionDTO).subscribe({
+        next: (res) => {
+          console.log('Session saved successfully:', res);
+          this.toastService.success('تم حفظ نتيجة الاختبار بنجاح! 🎉');
+          this.avatarMessage = 'تم حفظ الجلسة بنجاح! 💾';
+        },
+        error: (err) => {
+          console.error('Error saving session:', err);
+          this.toastService.error('فشل حفظ نتيجة الاختبار ⚠️');
+          this.avatarMessage = 'فشل حفظ الجلسة ⚠️';
+        }
+      });
+    }
   }
 
   checkFinalAchievements() {

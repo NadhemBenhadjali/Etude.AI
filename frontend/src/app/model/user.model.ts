@@ -44,7 +44,7 @@ export interface Activity {
   title: string;
   description: string;
   time: string;
-  status: 'completed' | 'in-progress' | 'pending';
+  status: 'COMPLETED' | 'ONGOING' | 'PENDING';
   icon: string;
 }
 export const levelMap = {

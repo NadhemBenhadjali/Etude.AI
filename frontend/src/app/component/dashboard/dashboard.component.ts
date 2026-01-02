@@ -1,18 +1,19 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { AiService } from '../../services/ai.service';
-import { UserService } from '../../services/user.service';
-import { AuthService } from '../../services/auth.service';
-import { firstValueFrom } from 'rxjs';
-import { RouterModule, Router } from '@angular/router';
-import { GamificationService } from '../../services/gamification.service';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {AiService} from '../../services/ai.service';
+import {UserService} from '../../services/user.service';
+import {AuthService} from '../../services/auth.service';
+import {QuizService} from '../../services/quiz.service';
+import {ToastService} from '../../services/toast.service';
+import {firstValueFrom} from 'rxjs';
+import {Router, RouterModule} from '@angular/router';
+import {GamificationService} from '../../services/gamification.service';
 import {Achievement} from '../../model/achievement.model';
-import {StudentData,Activity,levelMap} from '../../model/user.model';
-import {Session, SessionDTO} from '../../model/session.model';
-import {ChatMessage,SuggestedPlan,PlanRequest,SessionLog,UserLog,PlanSession} from '../../model/planner.model';
-import {CalendarDay,Difficulty} from '../../model/shared.model';
-
+import {Activity, levelMap, StudentData} from '../../model/user.model';
+import {Session, SessionDTO, SessionType, SessionUpdateDTO} from '../../model/session.model';
+import {ChatMessage, PlanRequest, PlanSession, SessionLog, SuggestedPlan, UserLog} from '../../model/planner.model';
+import {CalendarDay, Difficulty} from '../../model/shared.model';
 
 
 type CalendarViewType = 'month' | 'list' | 'card';
@@ -72,7 +73,7 @@ export class DashboardComponent implements OnInit {
       title: 'درس الرياضيات',
       description: 'حل تمارين الجمع والطرح',
       time: 'اليوم 14:30',
-      status: 'completed',
+      status: 'COMPLETED',
       icon: '📊'
     },
     {
@@ -80,7 +81,7 @@ export class DashboardComponent implements OnInit {
       title: 'قراءة القصة',
       description: 'قصة الأرنب الذكي',
       time: 'اليوم 15:45',
-      status: 'in-progress',
+      status: 'ONGOING',
       icon: '📖'
     },
     {
@@ -88,7 +89,7 @@ export class DashboardComponent implements OnInit {
       title: 'اختبار العلوم',
       description: 'اختبار حول النباتات',
       time: 'غداً 10:00',
-      status: 'pending',
+      status: 'PENDING',
       icon: '🧪'
     }
   ];
@@ -111,10 +112,11 @@ export class DashboardComponent implements OnInit {
       subject: 'رياضيات',
       module: 'العمليات الحسابية',
       lesson: 'الجمع والطرح',
+      sessionType:SessionType.SUMMARY,
       description: 'تعلم الجمع والطرح والضرب مع التمارين العملية والألعاب التفاعلية',
       date: '2025-11-23',
       time: '09:00',
-      status: 'completed'
+      status: 'COMPLETED'
     },
     {
       id: 'session2',
@@ -122,10 +124,11 @@ export class DashboardComponent implements OnInit {
       subject: 'لغة عربية',
       module: 'المهارات اللغوية',
       lesson: 'القراءة والفهم',
+      sessionType:SessionType.SUMMARY,
       description: 'قراءة النصوص وفهم المعاني مع التدريب على الطلاقة في القراءة',
       date: '2025-11-24',
       time: '10:30',
-      status: 'in-progress'
+      status: 'ONGOING'
     },
     {
       id: 'session3',
@@ -133,10 +136,11 @@ export class DashboardComponent implements OnInit {
       subject: 'علوم',
       module: 'دورة الماء',
       lesson: 'حالات الماء',
+      sessionType:SessionType.SUMMARY,
       description: 'شرح دورة الماء في الطبيعة مع التجارب العملية البسيطة',
       date: '2025-11-25',
       time: '14:00',
-      status: 'pending'
+      status: 'PENDING'
     },
     {
       id: 'session4',
@@ -144,10 +148,11 @@ export class DashboardComponent implements OnInit {
       subject: 'لغة عربية',
       module: 'كتابة القصص',
       lesson: 'التعبير الكتابي',
+      sessionType:SessionType.SUMMARY,
       description: 'تعلم كتابة القصص القصيرة وتطوير مهارات التعبير الكتابي',
       date: '2025-11-26',
       time: '15:00',
-      status: 'pending'
+      status: 'PENDING'
     },
     {
       id: 'session5',
@@ -155,10 +160,11 @@ export class DashboardComponent implements OnInit {
       subject: 'رياضيات',
       module: 'جدول الضرب',
       lesson: 'الضرب',
+      sessionType:SessionType.SUMMARY,
       description: 'حفظ وفهم جدول الضرب من 1 إلى 10 مع الألعاب التعليمية',
       date: '2025-11-27',
       time: '09:30',
-      status: 'pending'
+      status: 'PENDING'
     },
     {
       id: 'session6',
@@ -166,10 +172,11 @@ export class DashboardComponent implements OnInit {
       subject: 'لغة عربية',
       module: 'النحو والصرف',
       lesson: 'القواعد الأساسية',
+      sessionType:SessionType.SUMMARY,
       description: 'تعلم قواعد النحو الأساسية',
       date: '2025-11-28',
       time: '11:00',
-      status: 'pending'
+      status: 'PENDING'
     }
   ];
 
@@ -225,7 +232,9 @@ export class DashboardComponent implements OnInit {
     public authService: AuthService, // Make public to use or use in method
     private aiService: AiService,
     private gamificationService: GamificationService,
-    private router: Router
+    private router: Router,
+    private quizService: QuizService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
@@ -324,16 +333,13 @@ export class DashboardComponent implements OnInit {
               hour: '2-digit',
               minute: '2-digit'
             }),
-            // Map status
-            status:
-              session.status === 'COMPLETED' ? 'completed' :
-                session.status === 'IN_PROGRESS' ? 'in-progress' :
-                  'pending'
+            // Map status - backend uses IN_PROGRESS, we use ONGOING for display
+            status: session.status === 'IN_PROGRESS' ? 'ONGOING' : session.status,
           };
         });
 
         // Update total sessions count
-        this.userStats.totalSessions = this.sessionsData.filter(s => s.status === 'completed').length;
+        this.userStats.totalSessions = this.sessionsData.filter(s => s.status === 'COMPLETED').length;
 
         this.generateCalendarDays(); // Regenerate after loading sessions
         this.fetchAchievements(); // Refresh achievements with updated stats
@@ -351,9 +357,20 @@ export class DashboardComponent implements OnInit {
 
   getUpcomingSessions(): Session[] {
     const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
     return this.sessionsData
-      .filter(session => new Date(session.date) >= new Date(today.toISOString().split('T')[0]))
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .filter(session => {
+        // Exclude completed sessions
+        if (session.status === 'COMPLETED') return false;
+        // Use startedAt (scheduled date) if available, else date
+        const sessionDate = session.startedAt || session.date;
+        return sessionDate >= todayStr;
+      })
+      .sort((a, b) => {
+        const dateA = a.startedAt || a.date;
+        const dateB = b.startedAt || b.date;
+        return new Date(dateA).getTime() - new Date(dateB).getTime();
+      })
       .slice(0, 10);
   }
 
@@ -381,7 +398,7 @@ export class DashboardComponent implements OnInit {
       date.setDate(startDate.getDate() + i);
 
       const sessions = this.getSessionsForDate(date);
-      const completedSessions = sessions.filter(s => s.status === 'completed').length;
+      const completedSessions = sessions.filter(s => s.status === 'COMPLETED').length;
       let status: 'completed' | 'incomplete' | 'mixed' | '' = '';
 
       if (sessions.length > 0) {
@@ -406,22 +423,23 @@ export class DashboardComponent implements OnInit {
   }
 
   getSessionsForDate(date: Date): Session[] {
-    // FIX: Use local time explicitly to avoid UTC shifts (which caused +1 day error)
+    // Use local time explicitly to avoid UTC shifts
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const dateString = `${year}-${month}-${day}`;
 
     return this.sessionsData.filter(session => {
-      // Handle both full ISO strings and YYYY-MM-DD
-      if (session.createdAt) {
-        const sessionDate = new Date(session.createdAt);
+      // Prioritize startedAt (scheduled date), then fallback to date field
+      const sessionDateSource = session.startedAt || session.date;
+      if (sessionDateSource) {
+        const sessionDate = new Date(sessionDateSource);
         const sYear = sessionDate.getFullYear();
         const sMonth = String(sessionDate.getMonth() + 1).padStart(2, '0');
         const sDay = String(sessionDate.getDate()).padStart(2, '0');
         return `${sYear}-${sMonth}-${sDay}` === dateString;
       }
-      return session.date === dateString;
+      return false;
     });
   }
 
@@ -455,10 +473,11 @@ export class DashboardComponent implements OnInit {
     this.selectedDay = null;
   }
 
-  startSession(session: Session) {
+  async startSession(session: Session) {
     console.log('START SESSION CLICKED:', session);
+
     // If completed or in-progress, view history
-    if (session.status === 'completed' || session.status === 'in-progress') { // Treat in-progress as viewable for now, or check ID
+    if (session.status === 'COMPLETED' || session.status === 'ONGOING') {
       if (session.id) {
         this.router.navigate(['/session-history', session.id]);
         this.closeModal();
@@ -466,11 +485,127 @@ export class DashboardComponent implements OnInit {
       }
     }
 
-    // Fallback or logic for starting a pending session
-    // session.status = 'in-progress'; // Only if starting new
-    // alert(`بدء الجلسة: ${session.sessionName}`);
-    this.closeModal();
-    // this.generateCalendarDays();
+    // For pending sessions, start based on session type
+    if (session.status === 'PENDING') {
+      const loadingToastId = this.toastService.loading('جاري تحضير الجلسة... ⏳');
+
+      try {
+        const sessionType = session.sessionType?.toString().toUpperCase() || 'SUMMARY';
+        const subject = session.subject || '';
+        const module = session.module || session.sessionName || '';
+        const lesson = session.lesson || '';
+
+        // Update session status to ONGOING if it has an ID (planned session)
+        if (session.id) {
+          const updateData: SessionUpdateDTO = {
+            status: 'ONGOING',
+            startedAt: new Date().toISOString()
+          };
+          await firstValueFrom(this.userService.updateSession(session.id, updateData));
+          console.log('Session updated to ONGOING:', session.id);
+        }
+
+        if (sessionType === 'SUMMARY') {
+          // Generate summary and navigate to lesson board
+          const data = await firstValueFrom(
+            this.aiService.generateSummary(subject, module)
+          );
+
+          this.toastService.dismiss(loadingToastId);
+
+          if (data?.data) {
+            this.toastService.success('تم تحضير الملخص بنجاح! 📚');
+            await this.router.navigate(['/lesson'], {
+              queryParams: {
+                subject: subject,
+                module: module,
+                mode: 'summary',
+                path: data.path
+              },
+              state: {
+                summaryPath: data.path,
+                summaryData: data.data,
+                sessionId: session.id,
+                sessionType: 'SUMMARY'
+              }
+            });
+          } else {
+            throw new Error('لم يتم استلام بيانات الملخص');
+          }
+
+        } else if (sessionType === 'QUIZ') {
+          // Generate quiz and navigate to chatbot-quiz
+          const quizRequest = {
+            module: module,
+            num_mc: 6,
+            num_tf: 4
+          };
+
+          const data = await firstValueFrom(
+            this.quizService.generateQuiz(quizRequest)
+          );
+
+          this.toastService.dismiss(loadingToastId);
+
+          if (data?.data) {
+            this.toastService.success('تم تحضير الاختبار بنجاح! 📝');
+            await this.router.navigate(['/chatbot-quiz'], {
+              queryParams: {
+                subject: subject,
+                module: module,
+                mode: 'quiz'
+              },
+              state: {
+                quizData: data.data,
+                sessionId: session.id,
+                sessionType: 'QUIZ'
+              }
+            });
+          } else {
+            throw new Error('لم يتم استلام بيانات الاختبار');
+          }
+
+        } else if (sessionType === 'QNA') {
+          // Navigate to chatbot for Q&A
+          this.toastService.dismiss(loadingToastId);
+          this.toastService.success('مرحباً بك في جلسة الأسئلة! 💬');
+          await this.router.navigate(['/chatbot'], {
+            queryParams: {
+              subject: subject,
+              module: module,
+              lesson: lesson
+            },
+            state: {
+              sessionId: session.id,
+              sessionType: 'QNA'
+            }
+          });
+
+        } else {
+          // Default: navigate to select-mode for user to choose
+          this.toastService.dismiss(loadingToastId);
+          this.toastService.info('اختر نوع الجلسة 🎯');
+          await this.router.navigate(['/select-mode'], {
+            queryParams: {
+              subject: subject,
+              module: module
+            },
+            state: {
+              sessionId: session.id
+            }
+          });
+        }
+
+        this.closeModal();
+
+      } catch (error: any) {
+        console.error('Error starting session:', error);
+        this.toastService.dismiss(loadingToastId);
+        this.toastService.error(
+          error.message || 'حدث خطأ أثناء تحضير الجلسة. حاول مرة أخرى!'
+        );
+      }
+    }
   }
 
   logout() {
@@ -927,3 +1062,4 @@ export class DashboardComponent implements OnInit {
     return `منذ ${diffDays} يوم`;
   }
 }
+

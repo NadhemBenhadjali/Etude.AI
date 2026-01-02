@@ -1,0 +1,29 @@
+<div class="toast-container">
+  <div
+    *ngFor="let toast of toasts; trackBy: trackByToastId"
+    class="toast-item"
+    [ngClass]="getToastClass(toast.type)"
+    [@toastAnimation]>
+
+    <div class="toast-icon">
+      {{ toast.icon }}
+    </div>
+
+    <div class="toast-content">
+      <span class="toast-message">{{ toast.message }}</span>
+    </div>
+
+    <button
+      *ngIf="toast.type !== 'loading'"
+      class="toast-dismiss"
+      (click)="dismissToast(toast.id)"
+      aria-label="إغلاق">
+      ✕
+    </button>
+
+    <div *ngIf="toast.type === 'loading'" class="toast-spinner">
+      <div class="spinner"></div>
+    </div>
+  </div>
+</div>
+

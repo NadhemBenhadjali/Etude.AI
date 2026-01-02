@@ -155,14 +155,14 @@
             <div class="session-meta">
               <span class="session-time">🕐 {{session.time || 'غير محدد'}}</span>
               <span class="session-status-badge" [class]="session.status">
-                {{session.status === 'completed' ? 'مكتملة' : session.status === 'in-progress' ? 'جارية' : 'لم تبدأ'}}
+                {{session.status === 'COMPLETED' ? 'مكتملة' : session.status === 'ONGOING' ? 'جارية' : 'لم تبدأ'}}
               </span>
             </div>
           </div>
 
           <div class="session-actions">
             <button class="action-btn"
-                    *ngIf="session.status !== 'completed'"
+                    *ngIf="session.status !== 'COMPLETED'"
                     (click)="startSession(session)">
               ابدأ
             </button>
@@ -192,8 +192,8 @@
             <div class="card-status-badge" [class]="session.status">
               <span class="status-dot"></span>
               <span class="status-text">
-                {{ session.status === 'completed' ? 'مكتملة' :
-                   session.status === 'in-progress' ? 'جارية' : 'قادمة' }}
+                {{ session.status === 'COMPLETED' ? 'مكتملة' :
+                   session.status === 'ONGOING' ? 'جارية' : 'قادمة' }}
               </span>
             </div>
           </div>
@@ -221,7 +221,7 @@
               </div>
 
               <div class="card-type" *ngIf="session.sessionType">
-                <span class="type-badge" [class]="session.sessionType?.toLowerCase()">
+                <span class="type-badge" [class]="session.sessionType.toLowerCase()">
                   {{ session.sessionType === 'SUMMARY' ? '📝 ملخص' :
                      session.sessionType === 'QUIZ' ? '❓ اختبار' :
                      session.sessionType === 'QNA' ? '💬 أسئلة' : session.sessionType }}
@@ -239,17 +239,17 @@
 
           <div class="card-footer">
             <button class="card-action-btn primary"
-                    *ngIf="session.status === 'pending'"
+                    *ngIf="session.status === 'PENDING'"
                     (click)="startSession(session)">
               🚀 ابدأ الجلسة
             </button>
             <button class="card-action-btn secondary"
-                    *ngIf="session.status === 'in-progress'"
+                    *ngIf="session.status === 'ONGOING'"
                     (click)="startSession(session)">
               ▶️ متابعة
             </button>
             <button class="card-action-btn outline"
-                    *ngIf="session.status === 'completed'"
+                    *ngIf="session.status === 'COMPLETED'"
                     (click)="startSession(session)">
               👁️ عرض التفاصيل
             </button>
@@ -292,7 +292,7 @@
 
         <div class="activity-status">
           <span class="status-badge" [class]="activity.status">
-            {{activity.status === 'completed' ? 'مكتمل' : activity.status === 'in-progress' ? 'جاري' : 'لم يبدأ'}}
+            {{activity.status === 'COMPLETED' ? 'مكتمل' : activity.status === 'ONGOING' ? 'جاري' : 'لم يبدأ'}}
           </span>
         </div>
       </div>
@@ -663,7 +663,7 @@
 
             <div class="session-status" [class]="session.status">
               <span class="status-text">
-                {{session.status === 'completed' ? 'مكتملة' : session.status === 'in-progress' ? 'جارية' : 'لم تبدأ'}}
+                {{session.status === 'COMPLETED' ? 'مكتملة' : session.status === 'ONGOING' ? 'جارية' : 'لم تبدأ'}}
               </span>
             </div>
           </div>
@@ -678,13 +678,13 @@
 
           <div class="session-actions">
             <button class="start-session-btn"
-                    *ngIf="session.status !== 'completed'"
+                    *ngIf="session.status !== 'COMPLETED'"
                     (click)="startSession(session)">
               ابدأ الجلسة
             </button>
 
             <button class="start-session-btn history-btn"
-                    *ngIf="session.status === 'completed' || session.status === 'in-progress'"
+                    *ngIf="session.status === 'COMPLETED' || session.status === 'ONGOING'"
                     (click)="startSession(session)"
                     style="background-color: #6C63FF;">
               📜 عرض السجل

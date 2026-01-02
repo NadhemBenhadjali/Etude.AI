@@ -4,7 +4,8 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AiService } from '../../services/ai.service';
 import { UserService } from '../../services/user.service';
-import { SessionDTO, SessionType } from '../../model/session.model';
+import { ToastService } from '../../services/toast.service';
+import { SessionDTO, SessionType, SessionUpdateDTO } from '../../model/session.model';
 import { QnAElementDTO} from '../../model/qna.model';
 
 import { AvatarComponent } from "../../shared/avatar/avatar.component";
@@ -25,16 +26,26 @@ export class ChatbotComponent implements OnInit {
   currentMode = '';
   private storageKey = 'chatbot_messages';
 
+  // Session tracking for planned sessions
+  private sessionId: string | null = null;
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private aiService: AiService,
     private userService: UserService,
-      private sessionStateService: SessionStateService
+    private sessionStateService: SessionStateService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
+    // Extract sessionId from navigation state (for planned sessions)
+    const navState = (this.router.getCurrentNavigation()?.extras.state || history.state) as any;
+    if (navState?.sessionId) {
+      this.sessionId = navState.sessionId;
+      console.log('📌 QnA Session ID from planned session:', this.sessionId);
+    }
+
     this.route.queryParams.subscribe(params => {
       this.currentMode = params['mode'] || '';
       this.loadMessages();
@@ -157,31 +168,55 @@ export class ChatbotComponent implements OnInit {
       }
     }
 
-    // QNA session - only send relevant fields
-    const sessionDTO: SessionDTO = {
-      id: crypto.randomUUID(),
-      level: level, // Use saved level from session state
-      subject: subject, // Use saved subject from session state
-      module: module, // Use saved module from session state
-      lesson: 'Chat Session',
-      status: 'COMPLETED',
-      sessionType: SessionType.QNA, // REQUIRED: Set session type to QNA
-      createdAt: new Date().toISOString(),
-      startedAt: new Date().toISOString(),
-      completedAt: new Date().toISOString(),
-      qnaElements: qnaElements,
-      // DON'T send quizElements, summaryElements, or other non-QNA fields
-    };
+    // If we have a sessionId from a planned session, update the existing session
+    if (this.sessionId) {
+      const updateData: SessionUpdateDTO = {
+        status: 'COMPLETED',
+        completedAt: new Date().toISOString(),
+        sessionType: SessionType.QNA,
+        qnaElements: qnaElements
+      };
 
-    this.userService.saveSession(sessionDTO).subscribe({
-      next: () => {
-        // Clear the messages from localStorage so next conversation starts fresh
-        localStorage.removeItem(this.getStorageKey());
-        this.messages = [];
-        alert('تم حفظ الجلسة بنجاح!');
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => console.error('Failed to save session', err)
-    });
+      this.userService.updateSession(this.sessionId, updateData).subscribe({
+        next: () => {
+          localStorage.removeItem(this.getStorageKey());
+          this.messages = [];
+          this.toastService.success('تم حفظ المحادثة بنجاح! 💬');
+          this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+          console.error('Failed to update session', err);
+          this.toastService.error('فشل حفظ المحادثة! حاول مرة أخرى');
+        }
+      });
+    } else {
+      // No sessionId - create a new session (ad-hoc QnA)
+      const sessionDTO: SessionDTO = {
+        id: crypto.randomUUID(),
+        level: level,
+        subject: subject,
+        module: module,
+        lesson: 'Chat Session',
+        status: 'COMPLETED',
+        sessionType: SessionType.QNA,
+        createdAt: new Date().toISOString(),
+        startedAt: new Date().toISOString(),
+        completedAt: new Date().toISOString(),
+        qnaElements: qnaElements
+      };
+
+      this.userService.saveSession(sessionDTO).subscribe({
+        next: () => {
+          localStorage.removeItem(this.getStorageKey());
+          this.messages = [];
+          this.toastService.success('تم حفظ المحادثة بنجاح! 💬');
+          this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+          console.error('Failed to save session', err);
+          this.toastService.error('فشل حفظ المحادثة! حاول مرة أخرى');
+        }
+      });
+    }
   }
 }

@@ -41,6 +41,26 @@ export interface SessionDTO {
     updatedAt?: string;
 }
 
+/**
+ * DTO for partial session updates.
+ * All fields are optional - only provided fields will be updated.
+ */
+export interface SessionUpdateDTO {
+    status?: string;
+    sessionType?: SessionType;
+    startedAt?: string;
+    completedAt?: string;
+    summaryPointsOfFocus?: string[];
+    quizPointsOfFocus?: string[];
+    quizScore?: number;
+    summary?: string;
+    sessionFeedback?: string;
+    lessonContent?: string;
+    quizElements?: QuizElementDTO[];
+    qnaElements?: QnAElementDTO[];
+    summaryElements?: SummaryElementDTO[];
+}
+
 
 export interface Session {
   id?: string;
@@ -50,12 +70,12 @@ export interface Session {
   createdAt?: string;
   startedAt?: string;
   time?: string;
-  status: 'completed' | 'in-progress' | 'pending';
+  status: 'COMPLETED' | 'ONGOING' | 'PENDING';
   // Fields from backend
   subject?: string;
   module?: string;
   lesson?: string;
-  sessionType?: string;
+  sessionType: SessionType;
   sessionGoal?: string;
   parentTip?: string;
   quizScore?: number;

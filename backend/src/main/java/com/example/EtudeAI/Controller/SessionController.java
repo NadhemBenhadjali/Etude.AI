@@ -2,6 +2,7 @@ package com.example.EtudeAI.Controller;
 
 import com.example.EtudeAI.model.dto.QuizSubmissionDTO;
 import com.example.EtudeAI.model.dto.SessionDTO;
+import com.example.EtudeAI.model.dto.SessionUpdateDTO;
 import com.example.EtudeAI.service.SessionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
@@ -43,6 +45,17 @@ public class SessionController {
         String keycloakUserId = jwt.getSubject();
         SessionDTO savedSession = sessionService.saveSession(sessionDTO, keycloakUserId);
         return ResponseEntity.ok(savedSession);
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update Session", description = "Updates an existing session (for starting/completing planned sessions). Only updates provided fields.")
+    public ResponseEntity<SessionDTO> updateSession(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable UUID id,
+            @RequestBody SessionUpdateDTO updateDTO) {
+        String keycloakUserId = jwt.getSubject();
+        SessionDTO updatedSession = sessionService.updateSession(id, updateDTO, keycloakUserId);
+        return ResponseEntity.ok(updatedSession);
     }
 
     @GetMapping

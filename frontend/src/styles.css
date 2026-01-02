@@ -26,12 +26,12 @@
 html, body, app-root {
   height: 100%;
   margin: 0;
-  font-family: var(--app-font);
+  font-family: var(--app-font), serif;
 }
 
 /* Force the font globally to ensure consistency across merged components */
 * {
-  font-family: var(--app-font) !important;
+  font-family: var(--app-font), serif !important;
 }
 
 /* Scrollbar Styling for a polished look */

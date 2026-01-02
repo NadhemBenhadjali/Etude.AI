@@ -6,8 +6,9 @@ import { environment } from '../../../environments/environment';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { firstValueFrom } from 'rxjs';
 import { UserService} from '../../services/user.service';
+import { ToastService } from '../../services/toast.service';
 import {Slide} from '../../model/shared.model';
-import {SessionDTO, SessionType} from '../../model/session.model';
+import {SessionDTO, SessionType, SessionUpdateDTO} from '../../model/session.model';
 import { SummaryElementDTO } from '../../model/summary.model';
 import fallbackData from '../../../assets/lesson.json';
 
@@ -24,11 +25,14 @@ export class LessonBoardComponent implements OnInit, OnDestroy { // Implement On
   slides: Slide[] = [];
   currentSlideIndex = 0;
 
-  /** The “board” image always available for the background */
+  /** The "board" image always available for the background */
   boardImage = '/assets/images/S.png';
 
   /** Your FastAPI backend base URL */
   private readonly backendBase = environment.apiBase;
+
+  // Session tracking for planned sessions
+  private sessionId: string | null = null;
 
   // TTS related properties
   audioPlayer: HTMLAudioElement | undefined;
@@ -39,13 +43,21 @@ export class LessonBoardComponent implements OnInit, OnDestroy { // Implement On
     private router: Router,
     private route: ActivatedRoute,
     private http: HttpClient,
-    private userService: UserService
+    private userService: UserService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit(): void {
     this.pingBackend();
 
     const navState = (this.router.getCurrentNavigation()?.extras.state || history.state) as any;
+
+    // Extract sessionId from navigation state (for planned sessions)
+    if (navState?.sessionId) {
+      this.sessionId = navState.sessionId;
+      console.log('📌 Session ID from planned session:', this.sessionId);
+    }
+
     if (navState?.summaryData) {
       console.log('✅ using JSON sent in navigation-state');
       this.initFromJson(navState.summaryData);
@@ -247,32 +259,53 @@ export class LessonBoardComponent implements OnInit, OnDestroy { // Implement On
       content: slide.text || ''
     }));
 
-    // SUMMARY session - only send summaryElements (NOT summary or lessonContent)
-    const sessionDTO: SessionDTO = {
-      id: crypto.randomUUID(),
-      level: 'FIRST',
-      subject: 'General',
-      module: this.title || 'Lesson',
-      lesson: this.title || 'Lesson Content',
-      status: 'COMPLETED',
-      sessionType: SessionType.SUMMARY, // REQUIRED: Set session type to SUMMARY
-      createdAt: new Date().toISOString(),
-      startedAt: new Date().toISOString(),
-      completedAt: new Date().toISOString(),
-      summaryPointsOfFocus: [], // Summary-specific field
-      summaryElements: summaryElements // ✅ Save slides as array of objects
-      // ❌ DON'T send summary, lessonContent, quizElements, or qnaElements
-    };
+    // If we have a sessionId from a planned session, update the existing session
+    if (this.sessionId) {
+      const updateData: SessionUpdateDTO = {
+        status: 'COMPLETED',
+        completedAt: new Date().toISOString(),
+        sessionType: SessionType.SUMMARY,
+        summaryPointsOfFocus: [],
+        summaryElements: summaryElements
+      };
 
-    this.userService.saveSession(sessionDTO).subscribe({
-      next: () => {
-        alert('تم حفظ الدرس بنجاح! 💾');
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        console.error('Error saving lesson:', err);
-        alert('فشل حفظ الدرس!');
-      }
-    });
+      this.userService.updateSession(this.sessionId, updateData).subscribe({
+        next: () => {
+          this.toastService.success('تم حفظ الدرس بنجاح! 📚');
+          this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+          console.error('Error updating session:', err);
+          this.toastService.error('فشل حفظ الدرس! حاول مرة أخرى');
+        }
+      });
+    } else {
+      // No sessionId - create a new session (ad-hoc session)
+      const sessionDTO: SessionDTO = {
+        id: crypto.randomUUID(),
+        level: 'FIRST',
+        subject: 'General',
+        module: this.title || 'Lesson',
+        lesson: this.title || 'Lesson Content',
+        status: 'COMPLETED',
+        sessionType: SessionType.SUMMARY,
+        createdAt: new Date().toISOString(),
+        startedAt: new Date().toISOString(),
+        completedAt: new Date().toISOString(),
+        summaryPointsOfFocus: [],
+        summaryElements: summaryElements
+      };
+
+      this.userService.saveSession(sessionDTO).subscribe({
+        next: () => {
+          this.toastService.success('تم حفظ الدرس بنجاح! 📚');
+          this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+          console.error('Error saving lesson:', err);
+          this.toastService.error('فشل حفظ الدرس! حاول مرة أخرى');
+        }
+      });
+    }
   }
 }

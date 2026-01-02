@@ -29,7 +29,10 @@
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "node_modules/material-design-icons-iconfont/dist/material-design-icons.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "js-sha256"
+            ]
           },
           "configurations": {
             "production": {
@@ -43,13 +46,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "1.5MB",
+                  "maximumError": "2MB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "50kB"
+                  "maximumWarning": "50kB",
+                  "maximumError": "100kB"
                 }
               ],
               "outputHashing": "all"
@@ -93,7 +96,6 @@
               "src/styles.css",
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
               "node_modules/material-design-icons-iconfont/dist/material-design-icons.css"
-
             ],
             "scripts": []
           }

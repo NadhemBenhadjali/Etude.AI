@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { SessionDTO } from '../model/session.model';
+import { SessionDTO, SessionUpdateDTO } from '../model/session.model';
 import { UserDTO,ChangePasswordRequest,RegistrationData } from '../model/user.model';
 import { PageResponse } from '../model/shared.model';
 
@@ -46,6 +46,10 @@ export class UserService {
 
     saveSession(session: Partial<SessionDTO>): Observable<SessionDTO> {
         return this.http.post<SessionDTO>(`${this.apiUrl}/sessions/save`, session);
+    }
+
+    updateSession(id: string, updateData: SessionUpdateDTO): Observable<SessionDTO> {
+        return this.http.put<SessionDTO>(`${this.apiUrl}/sessions/${id}`, updateData);
     }
 
     getSessionById(id: string): Observable<SessionDTO> {
