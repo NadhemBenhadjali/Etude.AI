@@ -18,6 +18,7 @@ import { ProfileComponent } from './component/profile/profile.component';
 import { DashboardComponent } from './component/dashboard/dashboard.component';
 import { UserManagementComponent } from './component/user-management/user-management.component';
 import { SessionHistoryComponent } from './component/session-history/session-history.component';
+import { NotFoundComponent } from './component/not-found/not-found.component';
 import { AuthGuard } from './guards/auth.guard';
 import { GuestGuard } from './guards/guest.guard';
 
@@ -42,5 +43,5 @@ export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'user-management', component: UserManagementComponent, canActivate: [AuthGuard] },
   { path: 'session-history/:id', component: SessionHistoryComponent, canActivate: [AuthGuard] },
-  { path: '', redirectTo: 'home', pathMatch: 'full' }
+  { path: '**', component: NotFoundComponent }
 ];
