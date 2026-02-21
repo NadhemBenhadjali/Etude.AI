@@ -1,6 +1,6 @@
-<div class="history-page" dir="rtl">
+<div class="history-page" [ngClass]="getTypeThemeClass()" dir="rtl">
 
-  <!-- ✅ NAV -->
+  <!-- NAV -->
   <nav class="history-nav">
     <button class="nav-back-btn" routerLink="/dashboard">
       <img class="btn-icon-img" src="assets/images/back.png" alt="back">
@@ -8,242 +8,505 @@
     </button>
 
     <h1 class="page-title">
-      <img class="title-img" src="assets/images/trophy.png" alt="trophy">
-      سجل المغامرات
+      <img class="title-img" [src]="'assets/images/' + getPageIcon()" alt="title">
+      {{ getPageTitle() }}
     </h1>
   </nav>
 
-  <!-- ✅ LOADING -->
+  <!-- LOADING -->
   @if (loading) {
     <div class="loading-state">
-      <img class="state-icon" src="assets/images/robot.png" alt="loading">
-      <p>جاري استرجاع ذكريات المغامرة...</p>
+      <div class="loading-character">
+        <img class="state-icon bounce-anim" src="assets/images/robot.png" alt="loading">
+        <div class="loading-dots">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+      </div>
+      <p class="loading-text">جاري استرجاع ذكريات المغامرة...</p>
     </div>
   }
 
   @else if (error) {
     <div class="error-state">
       <img class="state-icon" src="assets/images/empty.png" alt="error">
-      <p>{{ error }}</p>
-      <button class="retry-btn" routerLink="/dashboard">حاول مرة أخرى</button>
+      <p class="error-text">{{ error }}</p>
+      <button class="retry-btn" routerLink="/dashboard">
+        <img class="btn-icon-img" src="assets/images/back.png" alt="retry">
+        حاول مرة أخرى
+      </button>
     </div>
   }
 
-  @else {
-    <div class="content-container">
+  @else if (session) {
+    <div class="content-container animate-fade-in">
 
-      <!-- ✅ HERO CARD -->
+      <!-- SESSION TYPE INDICATOR -->
+      <div class="session-type-indicator">
+        <div class="indicator-line"></div>
+        <span class="indicator-badge" [ngClass]="getTypeThemeClass()">
+          <img [src]="'assets/images/' + getSessionTypeIcon()" alt="type">
+          {{ getPageTitle() }}
+        </span>
+        <div class="indicator-line"></div>
+      </div>
+
+      <!-- HERO CARD -->
       <div class="hero-card">
+        <div class="hero-decorations">
+          <span class="deco-star deco-1">⭐</span>
+          <span class="deco-star deco-2">✨</span>
+          <span class="deco-star deco-3">🌟</span>
+          <span class="deco-star deco-4">💫</span>
+        </div>
 
         <div class="hero-content">
-          <div class="session-badge">
-            <img class="badge-icon" src="assets/images/note.png" alt="session">
-            {{ session?.lesson || session?.module }}
+          <div class="hero-info-row">
+            <div class="session-type-icon-wrap">
+              <img [src]="'assets/images/' + getSessionTypeIcon()" alt="type">
+            </div>
+            <div class="hero-text-block">
+              <h2 class="hero-lesson-name">{{ session.lesson || session.module || 'جلسة تعليمية' }}</h2>
+              <div class="hero-meta">
+                @if (session.status === 'COMPLETED') {
+                  <span class="meta-chip status-completed">
+                    <span class="status-dot"></span>
+                    مكتملة
+                  </span>
+                }
+                @if (session.status === 'ONGOING') {
+                  <span class="meta-chip status-ongoing">
+                    <span class="status-dot ongoing"></span>
+                    جارية
+                  </span>
+                }
+                @if (displayDate) {
+                  <span class="meta-chip">
+                    <img src="assets/images/calendar.png" alt="date">
+                    {{ displayDate }}
+                  </span>
+                }
+                @if (session.subject) {
+                  <span class="meta-chip">
+                    <img src="assets/images/book.png" alt="subject">
+                    {{ session.subject }}
+                  </span>
+                }
+                @if (session.level) {
+                  <span class="meta-chip">
+                    🎓 {{ session.level }}
+                  </span>
+                }
+              </div>
+            </div>
           </div>
-
-          <h2 class="session-date">
-            <img class="date-icon" src="assets/images/calendar.png" alt="date">
-            {{ session?.createdAt | date:'fullDate':'':'ar-TN' }}
-          </h2>
-
-          <p class="session-summary">
-            <img class="summary-icon" src="assets/images/sparkle.png" alt="summary">
-            {{ getSummaryText() }}
-          </p>
         </div>
 
-        <!-- ✅ SCORE -->
-        <div class="score-badge floating-anim">
-          <img class="score-icon" src="assets/images/score.png" alt="score">
-          <div class="score-title">النتيجة</div>
-          <div class="score-number">
-            {{ session?.quizScore }}
-            <span class="score-max">/10</span>
+        <!-- SCORE (Quiz only) -->
+        @if (isQuizSession() && session.quizScore !== undefined) {
+          <div class="score-badge floating-anim">
+            <div class="score-emoji">{{ getGradeEmoji() }}</div>
+            <div class="score-number">
+              {{ session.quizScore }}
+              <span class="score-max">/10</span>
+            </div>
+            <div class="score-stars">
+              @for (star of getScoreStars(); track $index) {
+                @if (star) {
+                  <span class="star filled">⭐</span>
+                } @else {
+                  <span class="star empty">☆</span>
+                }
+              }
+            </div>
+            <div class="score-label" [ngClass]="getGradeClass()">
+              {{ getGradeLabel() }}
+            </div>
           </div>
+        }
 
-          <div class="score-label" [class]="getGradeClass()">
-            {{ getGradeLabel() }}
+        <!-- QNA Icon -->
+        @if (isQnaSession()) {
+          <div class="hero-type-visual floating-anim">
+            <img src="assets/images/chat.png" alt="chat">
           </div>
-        </div>
+        }
 
+        <!-- Summary Icon -->
+        @if (isSummarySession()) {
+          <div class="hero-type-visual floating-anim">
+            <img src="assets/images/scroll.png" alt="summary">
+          </div>
+        }
       </div>
 
-      <!-- ✅ TABS -->
-      <div class="tabs-container">
 
-        <button class="tab-btn"
-                [class.active]="activeTab === 'summary'"
-                (click)="setActiveTab('summary')">
-          <img class="tab-icon-img" src="assets/images/scroll.png" alt="summary">
-          ملخص الرحلة
-        </button>
+      <!-- ======================== -->
+      <!-- SUMMARY SESSION CONTENT  -->
+      <!-- ======================== -->
+      @if (isSummarySession()) {
+        <div class="session-content animate-enter">
 
-        <button class="tab-btn"
-                [class.active]="activeTab === 'quiz'"
-                (click)="setActiveTab('quiz')">
-          <img class="tab-icon-img" src="assets/images/check.png" alt="quiz">
-          نتائج الاختبار
-        </button>
+          @if (session.summaryElements && session.summaryElements.length) {
+            <div class="content-section">
+              <div class="section-header">
+                <div class="section-icon-wrap summary-icon-bg">
+                  <img class="section-icon" src="assets/images/scroll.png" alt="content">
+                </div>
+                <div class="section-title-wrap">
+                  <h3>محتوى الدرس</h3>
+                  <span class="section-subtitle">{{ session.summaryElements.length }} عناصر تعليمية</span>
+                </div>
+              </div>
 
-        <button class="tab-btn"
-                [class.active]="activeTab === 'chat'"
-                (click)="setActiveTab('chat')">
-          <img class="tab-icon-img" src="assets/images/chat.png" alt="chat">
-          سجل المحادثة
-        </button>
-
-      </div>
-
-      <!-- ✅ CONTENT -->
-      <div class="tab-content-area">
-
-        <!-- ✅ SUMMARY TAB -->
-        @if (activeTab === 'summary') {
-          <div class="animate-enter">
-
-            <div class="info-grid">
-
-              <!-- ✅ SUMMARY ELEMENTS (Lesson Slides) -->
-              @if (session?.summaryElements?.length) {
-                <div class="info-card points-card">
-                  <h3 class="card-title">
-                    <img class="card-icon" src="assets/images/scroll.png" alt="content">
-                    محتوى الدرس
-                  </h3>
-
-                  <div class="summary-elements-list">
-                    @for (element of session?.summaryElements; track $index) {
-                      <div class="summary-element-item">
-                        <span class="element-number">{{ $index + 1 }}</span>
-                        <div class="element-content" [innerHTML]="element.content"></div>
-                      </div>
-                    }
+              <div class="summary-elements-list">
+                @for (element of session.summaryElements; track $index) {
+                  <div class="summary-element-item" [style.animation-delay]="($index * 80) + 'ms'">
+                    <span class="element-number">{{ $index + 1 }}</span>
+                    <div class="element-content" [innerHTML]="element.content"></div>
                   </div>
+                }
+              </div>
+            </div>
+          }
+
+          @if ((!session.summaryElements || !session.summaryElements.length) && session.summary) {
+            <div class="content-section">
+              <div class="section-header">
+                <div class="section-icon-wrap summary-icon-bg">
+                  <img class="section-icon" src="assets/images/scroll.png" alt="content">
                 </div>
-              }
+                <h3>ملخص الدرس</h3>
+              </div>
+              <div class="summary-text-card">
+                <p>{{ session.summary }}</p>
+              </div>
+            </div>
+          }
 
-              <!-- ✅ POINTS -->
-              @if (session?.summaryPointsOfFocus?.length) {
-                <div class="info-card points-card">
-                  <h3 class="card-title">
-                    <img class="card-icon" src="assets/images/focus.png" alt="focus">
-                    ماذا تعلمنا؟
-                  </h3>
-
-                  <ul class="points-list">
-                    @for (point of session?.summaryPointsOfFocus; track $index) {
-                      <li>{{ point }}</li>
-                    }
-                  </ul>
+          @if (session.summaryPointsOfFocus && session.summaryPointsOfFocus.length) {
+            <div class="content-section">
+              <div class="section-header">
+                <div class="section-icon-wrap focus-icon-bg">
+                  <img class="section-icon" src="assets/images/focus.png" alt="focus">
                 </div>
-              }
+                <h3>ماذا تعلمنا؟</h3>
+              </div>
 
-              <!-- ✅ FEEDBACK -->
-              <div class="info-card feedback-card">
+              <div class="points-card">
+                <ul class="points-list">
+                  @for (point of session.summaryPointsOfFocus; track $index) {
+                    <li [style.animation-delay]="($index * 100) + 'ms'">
+                      <span class="point-bullet">🌟</span>
+                      <span>{{ point }}</span>
+                    </li>
+                  }
+                </ul>
+              </div>
+            </div>
+          }
 
+          @if (session.sessionFeedback) {
+            <div class="content-section">
+              <div class="feedback-card">
                 <div class="feedback-header">
-                  <img class="feedback-icon" src="assets/images/robot.png" alt="robot">
-
+                  <div class="feedback-avatar">
+                    <img src="assets/images/robot.png" alt="robot">
+                  </div>
                   <div class="feedback-title">
                     <h3>ملاحظات المساعد الذكي</h3>
-                    <span class="feedback-subtitle">✨ مساعدك الشخصي يقترح عليك هذا</span>
+                    <span class="feedback-subtitle">مساعدك الشخصي يقترح عليك هذا</span>
                   </div>
                 </div>
-
                 <div class="feedback-text">
-                  {{ session?.sessionFeedback || 'أنت بطل! استمر في التقدم.' }}
+                  {{ session.sessionFeedback }}
                 </div>
-
               </div>
-
             </div>
-          </div>
-        }
+          }
 
-        <!-- ✅ QUIZ TAB -->
-        @if (activeTab === 'quiz') {
-          <div class="animate-enter quiz-review-list">
+          @if ((!session.summaryElements || !session.summaryElements.length) && !session.summary && (!session.summaryPointsOfFocus || !session.summaryPointsOfFocus.length)) {
+            <div class="empty-content-state">
+              <img src="assets/images/empty.png" alt="empty">
+              <p>لم يتم إنشاء ملخص بعد لهذه الجلسة</p>
+              <span class="empty-hint">ابدأ الجلسة لإنشاء الملخص!</span>
+            </div>
+          }
 
-            @if (!session?.quizElements?.length) {
-              <div class="empty-state premium-empty">
-                <img src="assets/images/empty.png" alt="empty">
-                <p>لم نقم باختبار في هذه الجلسة.</p>
-              </div>
-            }
+        </div>
+      }
 
-            @for (item of session?.quizElements; track $index) {
-              <div class="quiz-item-card">
+      <!-- ======================== -->
+      <!-- QUIZ SESSION CONTENT     -->
+      <!-- ======================== -->
+      @if (isQuizSession()) {
+        <div class="session-content animate-enter">
 
-                <div class="quiz-question-header">
-                  <span class="question-num">سؤال {{ $index + 1 }}</span>
-                  <p class="question-text">{{ item.question }}</p>
+          @if (session.quizScore !== undefined) {
+            <div class="score-progress-section">
+              <div class="progress-bar-container">
+                <div class="progress-bar-track">
+                  <div class="progress-bar-fill" [ngClass]="getGradeClass()"
+                       [style.width.%]="getScorePercentage()">
+                  </div>
                 </div>
+                <div class="progress-labels">
+                  <span>{{ getScorePercentage() }}%</span>
+                  <span>{{ getGradeLabel() }} {{ getGradeEmoji() }}</span>
+                </div>
+              </div>
+            </div>
+          }
 
-                <div class="options-grid">
-                  @for (opt of item.options; track opt) {
-                    <div class="option-pill"
-                         [class.is-correct-answer]="opt === item.answer">
+          @if (session.quizElements && session.quizElements.length) {
+            <div class="quiz-stats-bar">
+              <div class="stat-item">
+                <div class="stat-icon-wrap">
+                  <img class="stat-icon" src="assets/images/note.png" alt="total">
+                </div>
+                <span class="stat-value">{{ session.quizElements.length }}</span>
+                <span class="stat-label">أسئلة</span>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat-item">
+                <div class="stat-icon-wrap correct-bg">
+                  <img class="stat-icon" src="assets/images/check.png" alt="correct">
+                </div>
+                <span class="stat-value correct-color">{{ getCorrectCount() }}</span>
+                <span class="stat-label">صحيحة</span>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat-item">
+                <div class="stat-icon-wrap score-bg">
+                  <img class="stat-icon" src="assets/images/score.png" alt="score">
+                </div>
+                <span class="stat-value score-color">{{ getScorePercentage() }}%</span>
+                <span class="stat-label">النسبة</span>
+              </div>
+            </div>
+          }
 
-                      <img *ngIf="opt === item.answer"
-                           class="opt-icon-img"
-                           src="assets/images/check.png"
-                           alt="correct">
+          @if (session.quizElements && session.quizElements.length) {
+            <div class="content-section">
+              <div class="section-header">
+                <div class="section-icon-wrap quiz-icon-bg">
+                  <img class="section-icon" src="assets/images/quiz.png" alt="quiz">
+                </div>
+                <h3>مراجعة الأسئلة</h3>
+              </div>
 
-                      {{ opt }}
+              <div class="quiz-review-list">
+                @for (item of session.quizElements; track $index) {
+                  <div class="quiz-item-card" [style.animation-delay]="($index * 100) + 'ms'">
+                    <div class="quiz-question-header">
+                      <span class="question-num">سؤال {{ $index + 1 }}</span>
+                      <p class="question-text">{{ item.question }}</p>
                     </div>
-                  }
-                </div>
+
+                    <div class="options-grid">
+                      @for (opt of item.options; track opt) {
+                        <div class="option-pill"
+                             [class.is-correct-answer]="opt === item.answer">
+                          @if (opt === item.answer) {
+                            <span class="opt-check">✅</span>
+                          }
+                          {{ opt }}
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
               </div>
-            }
-
-          </div>
-        }
-
-        <!-- ✅ CHAT TAB -->
-        @if (activeTab === 'chat') {
-          <div class="animate-enter chat-history-view">
-
-            @if (!session?.qnaElements?.length) {
-              <div class="empty-state premium-empty">
-                <img src="assets/images/empty.png" alt="empty">
-                <p>لم يكن هناك محادثة.</p>
-              </div>
-            }
-
-            <div class="chat-bubbles">
-              @for (msg of session?.qnaElements; track $index) {
-
-                <!-- USER -->
-                <div class="bubble user-bubble">
-                  <div class="bubble-avatar">
-                    <img src="assets/images/user.png" alt="you">
-                  </div>
-
-                  <div class="bubble-content">
-                    <div class="sender-name">أنت</div>
-                    {{ msg.question }}
-                  </div>
-                </div>
-
-                <!-- BOT -->
-                <div class="bubble bot-bubble">
-                  <div class="bubble-avatar">
-                    <img src="assets/images/robot.png" alt="bot">
-                  </div>
-
-                  <div class="bubble-content">
-                    <div class="sender-name">المساعد</div>
-                    {{ msg.answer }}
-                  </div>
-                </div>
-
-              }
             </div>
+          }
 
+          @if (!session.quizElements || !session.quizElements.length) {
+            <div class="empty-content-state">
+              <img src="assets/images/empty.png" alt="empty">
+              <p>لم نقم باختبار في هذه الجلسة</p>
+            </div>
+          }
+
+          @if (session.quizPointsOfFocus && session.quizPointsOfFocus.length) {
+            <div class="content-section">
+              <div class="section-header">
+                <div class="section-icon-wrap focus-icon-bg">
+                  <img class="section-icon" src="assets/images/focus.png" alt="focus">
+                </div>
+                <h3>نقاط يجب التركيز عليها</h3>
+              </div>
+
+              <div class="points-card">
+                <ul class="points-list">
+                  @for (point of session.quizPointsOfFocus; track $index) {
+                    <li [style.animation-delay]="($index * 100) + 'ms'">
+                      <span class="point-bullet">🎯</span>
+                      <span>{{ point }}</span>
+                    </li>
+                  }
+                </ul>
+              </div>
+            </div>
+          }
+
+          @if (session.sessionFeedback) {
+            <div class="content-section">
+              <div class="feedback-card">
+                <div class="feedback-header">
+                  <div class="feedback-avatar">
+                    <img src="assets/images/robot.png" alt="robot">
+                  </div>
+                  <div class="feedback-title">
+                    <h3>ملاحظات المساعد الذكي</h3>
+                    <span class="feedback-subtitle">مساعدك الشخصي يقترح عليك هذا</span>
+                  </div>
+                </div>
+                <div class="feedback-text">
+                  {{ session.sessionFeedback }}
+                </div>
+              </div>
+            </div>
+          }
+
+        </div>
+      }
+
+      <!-- ======================== -->
+      <!-- QNA SESSION CONTENT      -->
+      <!-- ======================== -->
+      @if (isQnaSession()) {
+        <div class="session-content animate-enter">
+
+          <div class="section-header">
+            <div class="section-icon-wrap qna-icon-bg">
+              <img class="section-icon" src="assets/images/chat.png" alt="chat">
+            </div>
+            <h3>سجل المحادثة</h3>
           </div>
-        }
 
+          @if (!session.qnaElements || !session.qnaElements.length) {
+            <div class="empty-content-state">
+              <img src="assets/images/empty.png" alt="empty">
+              <p>لم يكن هناك محادثة بعد</p>
+              <span class="empty-hint">ابدأ الجلسة لبدء المحادثة!</span>
+            </div>
+          }
+
+          @if (session.qnaElements && session.qnaElements.length) {
+            <div class="chat-history-view">
+              <div class="chat-bubbles">
+                @for (msg of session.qnaElements; track $index) {
+                  <div class="bubble user-bubble" [style.animation-delay]="($index * 120) + 'ms'">
+                    <div class="bubble-avatar">
+                      <img src="assets/images/user.png" alt="you">
+                    </div>
+                    <div class="bubble-body">
+                      <div class="sender-name">أنت</div>
+                      <div class="bubble-content">
+                        {{ msg.question }}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="bubble bot-bubble" [style.animation-delay]="($index * 120 + 60) + 'ms'">
+                    <div class="bubble-avatar">
+                      <img src="assets/images/robot.png" alt="bot">
+                    </div>
+                    <div class="bubble-body">
+                      <div class="sender-name">المساعد الذكي</div>
+                      <div class="bubble-content">
+                        {{ msg.answer }}
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+
+          @if (session.sessionFeedback) {
+            <div class="content-section">
+              <div class="feedback-card">
+                <div class="feedback-header">
+                  <div class="feedback-avatar">
+                    <img src="assets/images/robot.png" alt="robot">
+                  </div>
+                  <div class="feedback-title">
+                    <h3>ملاحظات المساعد الذكي</h3>
+                    <span class="feedback-subtitle">مساعدك الشخصي يقترح عليك هذا</span>
+                  </div>
+                </div>
+                <div class="feedback-text">
+                  {{ session.sessionFeedback }}
+                </div>
+              </div>
+            </div>
+          }
+
+        </div>
+      }
+
+      <!-- UNKNOWN TYPE FALLBACK -->
+      @if (!hasKnownType()) {
+        <div class="session-content animate-enter">
+          <div class="empty-content-state">
+            <img src="assets/images/robot.png" alt="unknown">
+            <p>هذه الجلسة لا تحتوي على محتوى بعد</p>
+            <span class="empty-hint">عد للوحة القيادة وابدأ المغامرة!</span>
+            <button class="retry-btn" routerLink="/dashboard">
+              <img class="btn-icon-img" src="assets/images/back.png" alt="go">
+              العودة للوحة القيادة
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- ACTION FOOTER -->
+      <div class="action-footer animate-enter">
+        <div class="footer-decoration">
+          <span>🎯</span>
+          <span>استمر في التعلم واكتشف المزيد!</span>
+          <span>🚀</span>
+        </div>
+        <div class="footer-actions">
+          <button class="action-btn secondary" routerLink="/dashboard">
+            <img src="assets/images/back.png" alt="back">
+            <span>العودة للوحة القيادة</span>
+          </button>
+          @if (isSummarySession()) {
+            <button class="action-btn primary" routerLink="/dashboard">
+              <img src="assets/images/quiz.png" alt="quiz">
+              <span>ابدأ اختبار جديد</span>
+            </button>
+          }
+          @if (isQuizSession()) {
+            <button class="action-btn primary" routerLink="/dashboard">
+              <img src="assets/images/chat.png" alt="ask">
+              <span>اسأل عن الدرس</span>
+            </button>
+          }
+          @if (isQnaSession()) {
+            <button class="action-btn primary" routerLink="/dashboard">
+              <img src="assets/images/scroll.png" alt="summary">
+              <span>راجع الملخص</span>
+            </button>
+          }
+        </div>
       </div>
+
+    </div>
+  }
+
+  <!-- NO SESSION LOADED (fallback) -->
+  @if (!loading && !error && !session) {
+    <div class="error-state">
+      <img class="state-icon" src="assets/images/empty.png" alt="not found">
+      <p class="error-text">لم نتمكن من تحميل هذه الجلسة</p>
+      <button class="retry-btn" routerLink="/dashboard">
+        <img class="btn-icon-img" src="assets/images/back.png" alt="go">
+        العودة للوحة القيادة
+      </button>
     </div>
   }
 

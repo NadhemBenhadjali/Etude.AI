@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { UserService } from '../../services/user.service';
-import { SessionDTO, SessionType } from '../../model/session.model';
+import { SessionDTO } from '../../model/session.model';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -19,7 +19,8 @@ export class SessionHistoryComponent implements OnInit {
     session: SessionDTO | null = null;
     loading = true;
     error = '';
-    activeTab: 'summary' | 'quiz' | 'chat' = 'summary';
+    displayDate: string = '';
+
 
     ngOnInit() {
         this.route.paramMap.subscribe(async params => {
@@ -28,6 +29,7 @@ export class SessionHistoryComponent implements OnInit {
                 try {
                     this.loading = true;
                     this.session = await firstValueFrom(this.userService.getSessionById(sessionId));
+                    this.displayDate = this.computeDisplayDate();
                 } catch (err) {
                     console.error('Error fetching session:', err);
                     this.error = 'عذراً، لم نتمكن من العثور على تفاصيل الجلسة.';
@@ -38,17 +40,16 @@ export class SessionHistoryComponent implements OnInit {
         });
     }
 
-    setActiveTab(tab: 'summary' | 'quiz' | 'chat') {
-        this.activeTab = tab;
+    private getTypeUpperCase(): string {
+        const type = this.session?.sessionType;
+        if (!type) return '';
+        // Handle both string and enum cases
+        return String(type).toUpperCase().trim();
     }
 
     getScorePercentage(): number {
         if (!this.session || this.session.quizScore === undefined) return 0;
-        // Assuming score is out of 10 or based on number of questions if recorded properly.
-        // The previous implementation maxed score at 10 in Entity.
-        // If invalid or zero, just return a safe value.
-        const maxScore = 10; // Or calculate from quiz elements length if available?
-        // Let's rely on quizScore field for now.
+        const maxScore = 10;
         return Math.round((this.session.quizScore / maxScore) * 100);
     }
 
@@ -60,7 +61,6 @@ export class SessionHistoryComponent implements OnInit {
         return 'يحتاج للتحسين';
     }
 
-
     getGradeClass(): string {
         const percent = this.getScorePercentage();
         if (percent >= 90) return 'grade-excellent';
@@ -69,49 +69,126 @@ export class SessionHistoryComponent implements OnInit {
         return 'grade-poor';
     }
 
-    // Helper methods to check session type
+    getGradeEmoji(): string {
+        const percent = this.getScorePercentage();
+        if (percent >= 90) return '🌟';
+        if (percent >= 70) return '✨';
+        if (percent >= 50) return '👍';
+        return '💪';
+    }
+
     isQuizSession(): boolean {
-        return this.session?.sessionType === SessionType.QUIZ;
+        return this.getTypeUpperCase() === 'QUIZ';
     }
 
     isQnaSession(): boolean {
-        return this.session?.sessionType === SessionType.QNA;
+        return this.getTypeUpperCase() === 'QNA';
     }
 
     isSummarySession(): boolean {
-        return this.session?.sessionType === SessionType.SUMMARY;
+        return this.getTypeUpperCase() === 'SUMMARY';
+    }
+
+    hasKnownType(): boolean {
+        return this.isQuizSession() || this.isQnaSession() || this.isSummarySession();
+    }
+
+    hasContent(): boolean {
+        if (!this.session) return false;
+        if (this.isQuizSession()) return !!(this.session.quizElements?.length || this.session.quizScore !== undefined);
+        if (this.isQnaSession()) return !!this.session.qnaElements?.length;
+        if (this.isSummarySession()) return !!(this.session.summaryElements?.length || this.session.summary);
+        return false;
     }
 
     getSessionTypeLabel(): string {
-        if (!this.session?.sessionType) return 'غير محدد';
-        switch (this.session.sessionType) {
-            case SessionType.QUIZ: return 'اختبار';
-            case SessionType.QNA: return 'أسئلة وأجوبة';
-            case SessionType.SUMMARY: return 'ملخص';
-            default: return 'غير محدد';
+        const type = this.getTypeUpperCase();
+        switch (type) {
+            case 'QUIZ': return 'اختبار';
+            case 'QNA': return 'أسئلة وأجوبة';
+            case 'SUMMARY': return 'ملخص';
+            default: return 'جلسة تعليمية';
         }
     }
 
     getSessionTypeIcon(): string {
-        if (!this.session?.sessionType) return '📋';
-        switch (this.session.sessionType) {
-            case SessionType.QUIZ: return '📝';
-            case SessionType.QNA: return '💬';
-            case SessionType.SUMMARY: return '📚';
-            default: return '📋';
+        const type = this.getTypeUpperCase();
+        switch (type) {
+            case 'QUIZ': return 'quiz.png';
+            case 'QNA': return 'chat.png';
+            case 'SUMMARY': return 'scroll.png';
+            default: return 'note.png';
         }
     }
 
-    // Get summary text from summaryElements array
+    getPageTitle(): string {
+        const type = this.getTypeUpperCase();
+        switch (type) {
+            case 'QUIZ': return 'نتائج الاختبار';
+            case 'QNA': return 'سجل المحادثة';
+            case 'SUMMARY': return 'ملخص الرحلة';
+            default: return 'سجل المغامرات';
+        }
+    }
+
+    getPageIcon(): string {
+        const type = this.getTypeUpperCase();
+        switch (type) {
+            case 'QUIZ': return 'trophy.png';
+            case 'QNA': return 'chat.png';
+            case 'SUMMARY': return 'scroll.png';
+            default: return 'trophy.png';
+        }
+    }
+
+    getTypeThemeClass(): string {
+        const type = this.getTypeUpperCase();
+        switch (type) {
+            case 'QUIZ': return 'theme-quiz';
+            case 'QNA': return 'theme-qna';
+            case 'SUMMARY': return 'theme-summary';
+            default: return 'theme-default';
+        }
+    }
+
     getSummaryText(): string {
         if (!this.session) return '';
-
-        // Try summaryElements first (new format)
         if (this.session.summaryElements && this.session.summaryElements.length > 0) {
             return this.session.summaryElements.map(el => el.content).join('\n\n');
         }
-
-        // Fallback to old summary field for backward compatibility
         return this.session.summary || 'مغامرة تعليمية ممتعة!';
+    }
+
+    getCorrectCount(): number {
+        if (!this.session?.quizElements) return 0;
+        return this.session.quizElements.filter(q => q.answered).length;
+    }
+
+    private computeDisplayDate(): string {
+        const raw = this.session?.createdAt || this.session?.startedAt || null;
+        if (!raw) return '';
+        try {
+            const dateStr = String(raw);
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) {
+                console.warn('[SessionHistory] Invalid date:', raw);
+                return '';
+            }
+            // Format: YYYY-MM-DD
+            return d.toLocaleDateString('ar-TN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        } catch (e) {
+            console.warn('[SessionHistory] Error parsing date:', raw, e);
+            return '';
+        }
+    }
+
+    getScoreStars(): number[] {
+        const score = this.session?.quizScore ?? 0;
+        const starCount = Math.round(score / 2);
+        return Array(5).fill(0).map((_, i) => i < starCount ? 1 : 0);
     }
 }

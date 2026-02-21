@@ -200,7 +200,7 @@ public class SessionServiceImpl implements SessionService {
     public SessionDTO getSessionById(UUID sessionId, String keycloakUserId) {
         User user = findUserByKeycloakId(keycloakUserId);
 
-        Session session = sessionRepository.findById(sessionId)
+        Session session = sessionRepository.findByIdWithElements(sessionId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.SESSION_NOT_FOUND));
 
         if (!session.getUser().getId().equals(user.getId())) {

@@ -1,3 +1,18 @@
+/* ==============================
+   ONGOING = IN-PROGRESS alias
+   (backend sends IN_PROGRESS → mapped to ONGOING → lowercase "ongoing")
+============================== */
+.session-item.ongoing            { border-left-color: #FF9800; background: rgba(255, 152, 0, 0.1); border: 1px solid rgba(255, 152, 0, 0.4); color: #ef6c00; }
+.list-session-item.ongoing       { border-right-color: #FF9800; }
+.session-status-badge.ongoing    { background: rgba(255, 152, 0, 0.15); color: #ef6c00; border-color: rgba(255, 152, 0, 0.4); }
+.session-card-item.ongoing       { border-color: rgba(255, 152, 0, 0.4); }
+.card-status-badge.ongoing .status-dot { background: #FF9800; }
+.card-status-badge.ongoing       { background: rgba(255, 152, 0, 0.12); color: #ef6c00; }
+.activity-item.ongoing           { border-right-color: #FF9800; }
+.status-badge.ongoing            { background: rgba(255, 152, 0, 0.15); color: #ef6c00; }
+.session-status.ongoing          { background: rgba(255, 152, 0, 0.15); color: #ef6c00; }
+.session-card.ongoing            { border-right-color: #FF9800; }
+
 .dashboard-container {
   min-height: 50vh;
   background: linear-gradient(135deg, #5BBCFF, #FFFAB7, #FFD1E3, #7EA1FF);

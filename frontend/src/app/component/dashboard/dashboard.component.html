@@ -107,7 +107,7 @@
         <div class="calendar-days">
           <div class="calendar-day"
                *ngFor="let day of calendarDays"
-               [class]="day.status"
+               [ngClass]="day.status || ''"
                [class.today]="day.isToday"
                [class.has-sessions]="day.sessions.length > 0"
                [class.other-month]="!day.isCurrentMonth"
@@ -118,7 +118,7 @@
             <div class="day-sessions" *ngIf="day.sessions.length > 0">
               <div class="session-item"
                    *ngFor="let session of day.sessions; let i = index"
-                   [class]="session.status"
+                   [ngClass]="(session.status || '').toLowerCase()"
                    [class.hidden]="i >= 2">
 
                 <span class="session-name">{{session.sessionName}}</span>
@@ -141,7 +141,7 @@
       </div>
 
       <div class="sessions-list">
-        <div class="list-session-item" *ngFor="let session of getUpcomingSessions()" [class]="session.status">
+        <div class="list-session-item" *ngFor="let session of getUpcomingSessions()" [ngClass]="(session.status || '').toLowerCase()">
           <div class="session-date">
             <div class="date-number">{{ formatArabicDay(session.date) }}</div>
             <div class="date-month">{{ formatArabicMonth(session.date) }}</div>
@@ -154,7 +154,7 @@
 
             <div class="session-meta">
               <span class="session-time">🕐 {{session.time || 'غير محدد'}}</span>
-              <span class="session-status-badge" [class]="session.status">
+              <span class="session-status-badge" [ngClass]="(session.status || '').toLowerCase()">
                 {{session.status === 'COMPLETED' ? 'مكتملة' : session.status === 'ONGOING' ? 'جارية' : 'لم تبدأ'}}
               </span>
             </div>
@@ -181,7 +181,7 @@
       <div class="cards-container">
         <div class="session-card-item"
              *ngFor="let session of getUpcomingSessions()"
-             [class]="session.status">
+             [ngClass]="(session.status || '').toLowerCase()">
 
           <div class="card-header">
             <div class="card-date">
@@ -189,7 +189,7 @@
               <div class="card-month">{{ formatArabicMonth(session.date) }}</div>
             </div>
 
-            <div class="card-status-badge" [class]="session.status">
+            <div class="card-status-badge" [ngClass]="(session.status || '').toLowerCase()">
               <span class="status-dot"></span>
               <span class="status-text">
                 {{ session.status === 'COMPLETED' ? 'مكتملة' :
@@ -221,7 +221,7 @@
               </div>
 
               <div class="card-type" *ngIf="session.sessionType">
-                <span class="type-badge" [class]="session.sessionType.toLowerCase()">
+                <span class="type-badge" [ngClass]="(session.sessionType || '').toLowerCase()">
                   {{ session.sessionType === 'SUMMARY' ? '📝 ملخص' :
                      session.sessionType === 'QUIZ' ? '❓ اختبار' :
                      session.sessionType === 'QNA' ? '💬 أسئلة' : session.sessionType }}
@@ -278,7 +278,7 @@
     <div class="activities-list">
       <div class="activity-item"
            *ngFor="let activity of recentActivities"
-           [class]="activity.status">
+           [ngClass]="(activity.status || '').toLowerCase()">
 
         <div class="activity-icon-wrapper">
           <span class="activity-emoji">{{activity.icon}}</span>
@@ -291,7 +291,7 @@
         </div>
 
         <div class="activity-status">
-          <span class="status-badge" [class]="activity.status">
+          <span class="status-badge" [ngClass]="(activity.status || '').toLowerCase()">
             {{activity.status === 'COMPLETED' ? 'مكتمل' : activity.status === 'ONGOING' ? 'جاري' : 'لم يبدأ'}}
           </span>
         </div>
@@ -359,7 +359,7 @@
           <div class="difficulty-tags">
           <span class="difficulty-tag"
                 *ngFor="let difficulty of difficulties"
-                [class]="difficulty.severity">
+                [ngClass]="difficulty.severity || ''">
             {{ difficulty.name }}
           </span>
           </div>
@@ -399,7 +399,7 @@
 
       <div class="message"
            *ngFor="let message of chatMessagesList"
-           [class]="message.sender">
+           [ngClass]="message.sender || ''">
 
         <div class="message-avatar">
           <img *ngIf="message.sender === 'agent'" src="assets/images/robot.png" alt="agent" />
@@ -653,7 +653,7 @@
       <div class="modal-content">
         <div class="session-card"
              *ngFor="let session of selectedDay.sessions"
-             [class]="session.status">
+             [ngClass]="(session.status || '').toLowerCase()">
 
           <div class="session-header">
             <div class="session-info">
@@ -661,7 +661,7 @@
               <p class="chapter-name">{{ session.lesson }}</p>
             </div>
 
-            <div class="session-status" [class]="session.status">
+            <div class="session-status" [ngClass]="(session.status || '').toLowerCase()">
               <span class="status-text">
                 {{session.status === 'COMPLETED' ? 'مكتملة' : session.status === 'ONGOING' ? 'جارية' : 'لم تبدأ'}}
               </span>
