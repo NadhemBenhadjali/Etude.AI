@@ -1,5 +1,4 @@
 import nest_asyncio, uvicorn
-from fastapi import FastAPI
 from app.app import app
 
 if __name__ == "__main__":

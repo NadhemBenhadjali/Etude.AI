@@ -9,6 +9,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError as PydanticValidationError
 import uuid
+
+from starlette import status
+
 from app.crew.config import URI, USER, PASSWORD
 from app.crew.knowledge_graph import Neo4jKG
 from app.crew.planner_crew import PlannerCrew
@@ -22,7 +25,7 @@ from app.exceptions import (
     LLMQuotaExhaustedError,
     Neo4jConnectionError,
     RedisConnectionError,
-    TTSServiceError
+
 )
 
 from crewai import Crew, Task
@@ -149,7 +152,7 @@ CIRCUIT_BREAKER_STATE = Gauge(
 CACHE_HIT_RATE = Counter(
     "cache_operations_total",
     "Cache operations",
-    ["operation", "result"],  # operation=embedding, result=hit/miss
+    ["operation", "result"],
 )
 
 # -------------------------------------------------------------------
@@ -216,7 +219,6 @@ async def logging_middleware(request: Request, call_next):
             path=path,
         ).observe(process_time)
     except Exception:
-        # Never let metrics crash the request
         pass
 
     return response
@@ -493,25 +495,33 @@ def get_session_id(request: Request) -> str:
     tags=["AI Content"],
 )
 @limiter.limit("5/minute")
-async def summary_endpoint(request: Request, body: SummaryRequest):
-    """Generate lesson summary with validation and error handling."""
+def summary_endpoint(request: Request, body: SummaryRequest):
     session_id = get_session_id(request)
 
     try:
         logger.info("summary_request", session_id=session_id, module=body.module)
-        user_in = f"ملخص محور {body.module}"
-        result = generate_summary_json(user_in, neo_kg)
+        result = generate_summary_json(body.module, neo_kg)
+
         memory_manager.log_event(session_id, "chapter_summary", result["data"])
         logger.info("summary_success", session_id=session_id, module=body.module)
         return JSONResponse(result)
 
     except TopicNotFoundError as e:
-        # Already logged in exception handler
-        raise
+        logger.warning("summary_topic_not_found", session_id=session_id, module=body.module, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"error": "topic_not_found", "message": str(e)}
+        )
+    except InvalidResponseError as e:
+        logger.error("summary_invalid_llm_response", session_id=session_id, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail={"error": "invalid_llm_response", "message": str(e)}
+        )
     except Exception as e:
         logger.error("summary_unexpected_error", session_id=session_id, error=str(e))
         raise HTTPException(
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"error": "internal_failure", "message": str(e)}
         )
 

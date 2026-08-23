@@ -15,18 +15,18 @@ class Settings(BaseSettings):
 
     # AI Keys
     LLM_API_KEY: str  # used for Mistral LLM
-    GEMINI_API_KEY: str = ""  # used for Google embeddings (LiteLLM expects GEMINI_API_KEY)
-    CHROMA_GOOGLE_GENAI_API_KEY: str = ""  # legacy alias (optional)
+    GEMINI_API_KEY: str = ""  # used for Google embeddings
+    CHROMA_GOOGLE_GENAI_API_KEY: str = ""  # legacy alias
 
     # AI Models
     LLM_MODEL: str = "mistral/mistral-large-latest"
-    # IMPORTANT: must be 768-dim to match your existing Qdrant collection
+    # Must be 768-dim to match  existing Qdrant collection
     EMBEDDING_MODEL: str = "gemini/text-embedding-004"
     MISTRAL_API_KEY: str = ""
 
     # Qdrant
     QDRANT_URL: str
-    QDRANT_API_KEY: str = ""  # Optional - not needed for local Docker
+    QDRANT_API_KEY: str = ""
 
     # Neo4j
     NEO4J_URI: str
@@ -113,7 +113,7 @@ MAX_IMG_W = 180
 MAX_IMG_H = 140
 
 # Markdown image tag regex
-MD_IMG = re.compile(r"!\[(.*?)\]\((.*?)\)")
+MD_IMG = re.compile(r"!\[(.*?)]\((.*?)\)")
 
 # Register the Arabic font safely
 try:

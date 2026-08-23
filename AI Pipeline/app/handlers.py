@@ -1,6 +1,5 @@
 from __future__ import annotations
 import json
-import re
 import structlog
 from crewai import Crew
 from app.crew.knowledge_graph import Neo4jKG
@@ -15,52 +14,26 @@ from app.exceptions import (
 
 logger = structlog.get_logger()
 
-def generate_summary_json(user_in: str, kg: Neo4jKG) -> dict:
-    """
-    Generate lesson summary with robust error handling.
-
-    Args:
-        user_in: User input containing topic name
-        kg: Knowledge graph instance
-
-    Returns:
-        Dictionary with path and data
-
-    Raises:
-        TopicNotFoundError: If topic not found in KG
-        InvalidResponseError: If LLM returns invalid JSON
-    """
+def generate_summary_json(topic_input: str, kg: Neo4jKG) -> dict:
     try:
-        # Parse topic from input
-        m = re.match(r"ملخص\s+(?:محور\s+)?(?P<topic>[\u0600-\u06FF ]+)", user_in)
-        if not m:
-            raise TopicNotFoundError(
-                f"Could not parse topic from input: {user_in}",
-                details={"input": user_in}
-            )
-
-        topic = m.group("topic").strip()
+        topic = topic_input.strip()
         logger.info("generating_summary", topic=topic)
 
-        # Fetch data from KG
         branch = kg.find_branch_for_topic(topic)
         lessons_info = kg.get_lessons_for_topic(topic)
 
-        # Validate results
         if not branch or not lessons_info:
             raise TopicNotFoundError(
                 f"Topic '{topic}' not found in knowledge graph",
-                details={"topic": topic, "branch": branch, "lessons_count": len(lessons_info)}
+                details={"topic": topic, "branch": branch, "lessons_count": len(lessons_info) if lessons_info else 0}
             )
 
         images_section = kg.extract_images(topic)
         sub_lessons_md = "\n".join(f"• {ld['title']}" for ld in lessons_info)
 
-        # Generate summary
         task = summary_task(sub_lessons_md, images_section, topic, branch, summary_agent=SUMMARY_AGENT)
         raw = Crew(agents=[SUMMARY_AGENT], tasks=[task], verbose=False).kickoff().raw
 
-        # Parse and validate JSON
         cleaned = _clean_json_block(raw)
         start = cleaned.find("{")
         end = cleaned.rfind("}")
@@ -73,7 +46,6 @@ def generate_summary_json(user_in: str, kg: Neo4jKG) -> dict:
 
         data = json.loads(cleaned[start:end+1])
 
-        # Save to file
         filename = f"{branch}_{topic}.json".replace(" ", "_")
         out_dir = Path("lessons")
         out_dir.mkdir(exist_ok=True)
@@ -84,19 +56,16 @@ def generate_summary_json(user_in: str, kg: Neo4jKG) -> dict:
         return {"path": f"/lessons/{filename}", "data": data}
 
     except (TopicNotFoundError, InvalidResponseError):
-        raise  # Re-raise domain exceptions
+        raise
     except json.JSONDecodeError as e:
-        topic_name = topic if 'topic' in locals() else 'unknown'
-        logger.error("summary_json_parse_failed", error=str(e), topic=topic_name)
+        logger.error("summary_json_parse_failed", error=str(e), topic=topic_input)
         raise InvalidResponseError(
             "Failed to parse LLM response as JSON",
             details={"error": str(e)}
         )
     except Exception as e:
-        topic_name = topic if 'topic' in locals() else 'unknown'
-        logger.error("summary_generation_failed", error=str(e), topic=topic_name)
+        logger.error("summary_generation_failed", error=str(e), topic=topic_input)
         raise
-
 
 def handle_qa(question: str, kg,QA_MEMORY) -> str:
     """
