@@ -63,6 +63,94 @@
     </nav>
   </div>
 
+  <!-- 🌟 KID HERO BANNER & STATS -->
+  <div class="kid-hero-banner">
+    <div class="hero-left">
+      <div class="hero-greeting">
+        <span class="flag-badge">🇹🇳 تونس</span>
+        <h2>عسلامة يا بطل، <span class="hero-name">{{studentData.name || 'صغيرنا الذكي'}}</span>! 👋✨</h2>
+        <p class="hero-subtext">جاهز اليوم لمغامرة جديدة؟ كل درس تقراه وكل تمرين تكملو يزيدك نقاط ونجوم! 🌟</p>
+      </div>
+
+      <div class="hero-stats-chips">
+        <div class="stat-chip stars">
+          <span class="stat-icon">⭐</span>
+          <div class="stat-info">
+            <span class="stat-val">{{userStats.elo || 0}}</span>
+            <span class="stat-lbl">نقاط التميز</span>
+          </div>
+        </div>
+
+        <div class="stat-chip lessons">
+          <span class="stat-icon">📚</span>
+          <div class="stat-info">
+            <span class="stat-val">{{userStats.totalSummaries || 0}}</span>
+            <span class="stat-lbl">دروس مكملة</span>
+          </div>
+        </div>
+
+        <div class="stat-chip quizzes">
+          <span class="stat-icon">🏆</span>
+          <div class="stat-info">
+            <span class="stat-val">{{userStats.totalQuizzes || 0}}</span>
+            <span class="stat-lbl">اختبارات ناجحة</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right-mascot">
+      <img src="assets/images/panda.png" alt="Mascot" class="hero-mascot-img" />
+      <div class="mascot-speech-bubble">"شنيّة تحب تقرا اليوم؟" 🎈</div>
+    </div>
+  </div>
+
+  <!-- 🚀 BIG PLAYFUL ACTION LAUNCHPAD (4 BIG CARDS) -->
+  <div class="kids-launchpad-grid">
+    <a routerLink="/select-subject" class="launchpad-card card-learning">
+      <div class="launch-icon-bg">
+        <span class="launch-emoji">📚</span>
+      </div>
+      <div class="launch-text">
+        <h3>أبدأ نقرا توا! 🚀</h3>
+        <p>اكتشف دروسك في الإيقاظ العلمي، الرياضيات، والعربية مع المعلم الذكي</p>
+        <span class="launch-action-btn">دخول للدروس 👈</span>
+      </div>
+    </a>
+
+    <a routerLink="/select-module" [queryParams]="{ mode: 'quiz' }" class="launchpad-card card-quiz">
+      <div class="launch-icon-bg">
+        <span class="launch-emoji">🎯</span>
+      </div>
+      <div class="launch-text">
+        <h3>تحدي ومسابقات! 🏆</h3>
+        <p>جاوب على الأسئلة التفاعلية، اربح نجوم، وشوف روحك قداش فاهم</p>
+        <span class="launch-action-btn">بدء التحدي 👈</span>
+      </div>
+    </a>
+
+    <a routerLink="/chatbot" class="launchpad-card card-chatbot">
+      <div class="launch-icon-bg">
+        <span class="launch-emoji">🤖</span>
+      </div>
+      <div class="launch-text">
+        <h3>اسأل المعلم الذكي! 💬</h3>
+        <p>أي حاجة ما فهمتهاش في القسم، المعلم الذكي يفسرهالك بالتونسي المبسط</p>
+        <span class="launch-action-btn">تحدث معه 👈</span>
+      </div>
+    </a>
+
+    <div class="launchpad-card card-planner" (click)="startPlanningWizard()">
+      <div class="launch-icon-bg">
+        <span class="launch-emoji">🗓️</span>
+      </div>
+      <div class="launch-text">
+        <h3>خطة ذكية بالذكاء الاصطناعي ✨</h3>
+        <p>اصنع برنامج مراجعة خاص بيك حسب أوقاتك والمواد اللي تحب تقوّي روحك فاها</p>
+        <span class="launch-action-btn">إنشاء خطة 👈</span>
+      </div>
+    </div>
+  </div>
 
   <!-- ✅ Calendar Section -->
   <div class="section calendar-section">

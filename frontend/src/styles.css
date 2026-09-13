@@ -1,8 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
-@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap");
 
-/* Define the custom fonts used in your friend's UI */
+/* Define custom fonts */
 @font-face {
   font-family: 'FredFredburgerARAHeadBlack';
   src: url('/assets/fonts/19188-fred-fredburger-arabic.ttf') format('truetype');
@@ -20,34 +21,82 @@
 }
 
 :root {
-  --app-font: 'FredFredburgerARAHeadBlack', 'Cairo', sans-serif;
+  --app-font: 'FredFredburgerARAHeadBlack', 'Tajawal', 'Cairo', sans-serif;
+  --primary: #0284c7;
+  --primary-light: #e0f2fe;
+  --primary-glow: rgba(2, 132, 199, 0.35);
+  --success: #10b981;
+  --success-light: #d1fae5;
+  --accent-gold: #f59e0b;
+  --accent-gold-light: #fef3c7;
+  --coral: #f43f5e;
+  --coral-light: #ffe4e6;
+  --purple: #8b5cf6;
+  --purple-light: #ede9fe;
+  --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #fefce8 40%, #fce7f3 75%, #e0e7ff 100%);
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --card-border: rgba(255, 255, 255, 0.8);
+  --card-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+  --card-shadow-hover: 0 20px 48px rgba(15, 23, 42, 0.15);
 }
 
-html, body, app-root {
-  height: 100%;
-  margin: 0;
-  font-family: var(--app-font), serif;
-}
-
-/* Force the font globally to ensure consistency across merged components */
 * {
-  font-family: var(--app-font), serif !important;
+  box-sizing: border-box;
+  font-family: var(--app-font), sans-serif !important;
 }
 
-/* Scrollbar Styling for a polished look */
+html, body {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global Keyframe Animations */
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+}
+
+@keyframes bounceSlight {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.05); }
+}
+
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: rgba(241, 245, 249, 0.7);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #5BBCFF;
-  border-radius: 5px;
+  background: #38bdf8;
+  border-radius: 99px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #7EA1FF;
+  background: #0284c7;
 }

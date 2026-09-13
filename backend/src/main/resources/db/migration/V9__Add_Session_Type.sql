@@ -1,4 +1,4 @@
--- V10__Add_Session_Type.sql
+-- V9__Add_Session_Type.sql
 -- Add session_type column to session table to differentiate between QUIZ, QNA, and SUMMARY sessions
 
 ALTER TABLE session ADD COLUMN session_type VARCHAR(50);

@@ -7,7 +7,7 @@ import { AvatarComponent } from '../../shared/avatar/avatar.component';
 @Component({
   selector: 'app-select-mode',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, AvatarComponent],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './select-mode.component.html',
   styleUrls: ['./select-mode.component.css']
 })

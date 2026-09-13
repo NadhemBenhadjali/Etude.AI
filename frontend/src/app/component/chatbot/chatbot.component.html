@@ -1,89 +1,100 @@
-<nav class="navbar">
-  <ul>
-    <li><a routerLink="/"> الرئيسية </a></li>
-    <li><a routerLink="/about"> شكون احنا؟</a></li>
-    <li><a routerLink="/contact">كلمنا</a></li>
-  </ul>
-</nav>
-<app-avatar></app-avatar>
-<div class="chat-container" dir="rtl">
-  <div class="chat-box">
-    <div class="chat-header">
-      <div class="bot-avatar">
-        <img src="/assets/images/bot.png" alt="Chatbot Avatar" />
-        <div class="status-dot"></div>
+<div class="chatbot-page" dir="rtl">
+  <!-- Studio Top Bar -->
+  <header class="chat-top-bar">
+    <div class="bot-profile-badge">
+      <div class="bot-avatar-wrap">
+        <img src="/assets/images/bot.png" alt="AI Robot" class="bot-avatar" />
+        <span class="online-indicator"></span>
       </div>
-      <div class="header-text">
-        <h2>المساعد الذكي</h2>
-        <div class="status">متصل الآن</div>
+      <div class="bot-meta">
+        <div class="bot-name-row">
+          <span class="bot-name">المعلم الذكي</span>
+          <span class="bot-chip">🇹🇳 تونسي 100%</span>
+        </div>
+        <span class="bot-status-text">جاهز لتفسير كل دروسك بالتونسي المبسط</span>
       </div>
-      <div class="header-decoration">
-        <span class="star">⭐</span>
-        <span class="star">⭐</span>
-        <span class="star">⭐</span>
-      </div>
-      <button class="exit-button" routerLink="/select-mode">
-        <span>العودة</span>
+    </div>
+
+    <div class="chat-actions">
+      <button class="save-chat-btn" (click)="saveSession()" [disabled]="messages.length <= 1">
+        <span>💾 حفظ الجلسة وإنهاء</span>
+      </button>
+      <button class="exit-btn" routerLink="/dashboard">
+        <span>🏠 الرئيسية</span>
       </button>
     </div>
+  </header>
 
-    <div class="messages-container">
-      <div *ngFor="let message of messages"
-        [ngClass]="{'message': true, 'user-message': message.isUser, 'bot-message': !message.isUser}">
-        <div class="message-content">
-          <!-- use innerHTML so <br> tags show as line breaks -->
-          <div class="message-bubble" [innerHTML]="message.text"></div>
-          <div class="message-time">
-            {{ message.isUser ? 'أنت' : 'المساعد' }}
-          </div>
+  <!-- Main Chat Conversation Arena -->
+  <main class="chat-arena">
+    <div class="messages-flow">
+      <div
+        *ngFor="let message of messages"
+        class="message-row"
+        [ngClass]="{ 'user-row': message.isUser, 'bot-row': !message.isUser }"
+      >
+        <div class="msg-avatar">
+          <img *ngIf="!message.isUser" src="/assets/images/bot.png" alt="Tutor" />
+          <img *ngIf="message.isUser" src="/assets/images/panda.png" alt="Student" />
+        </div>
+
+        <div class="msg-bubble-wrap">
+          <div class="msg-bubble" [innerHTML]="message.text"></div>
+          <span class="msg-sender-tag">{{ message.isUser ? 'أنت (البطل) 🎒' : 'المعلم الذكي 🤖' }}</span>
         </div>
       </div>
 
-      <div *ngIf="isLoading" class="message bot-message">
-        <div class="message-content">
-          <div class="message-bubble loading-bubble">
-            <div class="typing-indicator">
-              <span></span>
-              <span></span>
-              <span></span>
+      <!-- Typing Indicator -->
+      <div *ngIf="isLoading" class="message-row bot-row">
+        <div class="msg-avatar">
+          <img src="/assets/images/bot.png" alt="Tutor" />
+        </div>
+        <div class="msg-bubble-wrap">
+          <div class="msg-bubble typing-bubble">
+            <div class="dots-wave">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
             </div>
           </div>
-          <div class="message-time">المساعد</div>
+          <span class="msg-sender-tag">المعلم يكتب الآن... ⏳</span>
         </div>
       </div>
     </div>
 
-    <div class="input-container">
-      <div class="input-wrapper">
-        <input type="text" [(ngModel)]="userInput" (keyup.enter)="sendMessage()" placeholder="اكتب رسالتك هنا..."
-          dir="rtl" [disabled]="isLoading" />
-        <button class="send-button" (click)="sendMessage()" [disabled]="isLoading">
-          <img src="/assets/images/sent.png" alt="Send" />
+    <!-- Quick Tunisian Prompt Chips -->
+    <div class="quick-chips-bar">
+      <span class="chips-label">💡 أسئلة مقترحة:</span>
+      <div class="chips-scroll">
+        <button class="chip-btn" (click)="sendQuickResponse('فسرلي كيفاش تخدم الحواس الخمسة؟')">
+          🌿 فسرلي الحواس الخمسة
+        </button>
+        <button class="chip-btn" (click)="sendQuickResponse('عطيني مسألة رياضية مسلية لسنة رابعة')">
+          🔢 مسألة رياضيات مسلية
+        </button>
+        <button class="chip-btn" (click)="sendQuickResponse('كيفاش نفرق بين الفعل والاسم؟')">
+          📖 الفرق بين الفعل والاسم
+        </button>
+        <button class="chip-btn" (click)="sendQuickResponse('احكيلي نكتة تونسية خفيفة!')">
+          😄 احكيلي نكتة
         </button>
       </div>
-      <div class="quick-responses">
-        <button class="quick-response"
-                (click)="sendQuickResponse('مرحباً!')"
-                [disabled]="isLoading">
-          مرحباً!
-        </button>
-
-        <button class="quick-response"
-                *ngFor="let suggestion of ['كيف حالك؟', 'احكلي نكتة', 'شنوة الطقس؟']"
-                (click)="sendQuickResponse(suggestion)"
-                [disabled]="isLoading">
-          {{suggestion}}
-        </button>
-      </div>
-
-      <div class="save-actions">
-        <button class="save-session-btn"
-                (click)="saveSession()"
-                [disabled]="messages.length === 0">
-          💾 حفظ الجلسة وإنهاء
-        </button>
-      </div>
-
     </div>
-  </div>
+
+    <!-- Bottom Input Bar -->
+    <div class="chat-input-bar">
+      <div class="input-shell">
+        <input
+          type="text"
+          [(ngModel)]="userInput"
+          (keyup.enter)="sendMessage()"
+          placeholder="اكتب سؤالك هنا أو اسأل المعلم على أي درس..."
+          [disabled]="isLoading"
+        />
+        <button class="send-action-btn" (click)="sendMessage()" [disabled]="isLoading || !userInput.trim()">
+          <span>إرسال 🚀</span>
+        </button>
+      </div>
+    </div>
+  </main>
 </div>

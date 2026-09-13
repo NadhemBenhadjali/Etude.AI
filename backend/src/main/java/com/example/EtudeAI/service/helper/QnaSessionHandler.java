@@ -27,7 +27,6 @@ public class QnaSessionHandler implements SessionTypeHandler {
 
     @Override
     public void handle(Session session, SessionDTO sessionDTO, User user) {
-        // Clear other type-specific data
         session.setQuizPointsOfFocus(null);
         session.setQuizScore(null);
         session.setSummaryPointsOfFocus(null);
@@ -35,7 +34,6 @@ public class QnaSessionHandler implements SessionTypeHandler {
         clearQuizElements(session);
         clearSummaryElements(session);
 
-        // Handle QnA Elements
         handleQnaElements(session, sessionDTO, user);
     }
 
@@ -50,7 +48,6 @@ public class QnaSessionHandler implements SessionTypeHandler {
                 qna.setAnswer(qnaDTO.answer());
                 session.addQnAElement(qna);
             }
-            // Trigger gamification for QnA completion
             if (!sessionDTO.qnaElements().isEmpty()) {
                 gamificationService.processQnaCompletion(user);
             }

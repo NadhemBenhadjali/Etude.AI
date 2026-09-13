@@ -56,13 +56,29 @@ def ensure_qdrant_payload_indexes() -> None:
         return
 
     try:
-        # API key is optional for local Docker deployments
         api_key = settings.QDRANT_API_KEY if settings.QDRANT_API_KEY else None
-        client = QdrantClient(
-            url=settings.QDRANT_URL,
-            api_key=api_key,
-            timeout=15.0,
-        )
+        client = None
+        for key in [api_key, None]:
+            try:
+                candidate = QdrantClient(
+                    url=settings.QDRANT_URL,
+                    api_key=key,
+                    timeout=15.0,
+                    check_compatibility=False,
+                )
+                candidate.get_collections()
+                client = candidate
+                break
+            except Exception as inner_e:
+                if "403" not in str(inner_e) and "api-key" not in str(inner_e).lower():
+                    break
+        if client is None:
+            client = QdrantClient(
+                url=settings.QDRANT_URL,
+                api_key=api_key,
+                timeout=15.0,
+                check_compatibility=False,
+            )
     except Exception as e:
         logger.warning("qdrant_client_init_failed", error=str(e))
         return

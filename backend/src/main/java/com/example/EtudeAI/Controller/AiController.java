@@ -8,7 +8,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -22,9 +24,9 @@ public class AiController {
 
         private final AiPipelineService aiPipelineService;
 
-        @PostMapping("/summary")
-        @Operation(summary = "Generate Summary", description = "Generates a lesson summary for a specific module.")
-        public Mono<ResponseEntity<Map>> getSummary(@RequestBody Map<String, String> payload,
+        @PostMapping(value = "/summary", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+        @Operation(summary = "Generate Summary (SSE)", description = "Generates and streams a lesson summary for a specific module using Server-Sent Events (SSE).")
+        public Flux<ServerSentEvent<String>> getSummary(@RequestBody Map<String, String> payload,
                         @Parameter(description = "Session ID for tracking context") @RequestHeader(value = "X-Session-ID", required = false) String sessionId) {
                 String finalSessionId = (sessionId != null && !sessionId.isEmpty()) ? sessionId
                                 : UUID.randomUUID().toString();
@@ -33,20 +35,24 @@ public class AiController {
                 String module = payload.get("module");
 
                 if (subject == null || subject.isEmpty()) {
-                        throw new IllegalArgumentException("Subject is required");
+                        return Flux.just(ServerSentEvent.<String>builder()
+                                        .event("error")
+                                        .data("{\"error\": \"IllegalArgumentException\", \"message\": \"Subject is required\"}")
+                                        .build());
                 }
                 if (module == null || module.isEmpty()) {
-                        throw new IllegalArgumentException("Module is required");
+                        return Flux.just(ServerSentEvent.<String>builder()
+                                        .event("error")
+                                        .data("{\"error\": \"IllegalArgumentException\", \"message\": \"Module is required\"}")
+                                        .build());
                 }
 
-                return aiPipelineService.getSummary(subject, module, finalSessionId)
-                                .map(response -> ResponseEntity.ok().header("X-Session-ID", finalSessionId)
-                                                .body(response));
+                return aiPipelineService.getSummary(subject, module, finalSessionId);
         }
 
         @PostMapping("/qa")
         @Operation(summary = "Ask Question", description = "Asks a question to the AI chatbot within the context of the session.")
-        public Mono<ResponseEntity<Map>> askQuestion(@RequestBody Map<String, String> payload,
+        public Mono<ResponseEntity<Map<String, Object>>> askQuestion(@RequestBody Map<String, String> payload,
                         @Parameter(description = "Session ID for tracking context") @RequestHeader(value = "X-Session-ID", required = false) String sessionId) {
                 String finalSessionId = (sessionId != null && !sessionId.isEmpty()) ? sessionId
                                 : UUID.randomUUID().toString();
@@ -57,7 +63,7 @@ public class AiController {
 
         @PostMapping("/quiz")
         @Operation(summary = "Generate Quiz", description = "Generates a quiz based on a module.")
-        public Mono<ResponseEntity<Map>> generateQuiz(@RequestBody Map<String, Object> payload,
+        public Mono<ResponseEntity<Map<String, Object>>> generateQuiz(@RequestBody Map<String, Object> payload,
                         @Parameter(description = "Session ID for tracking context") @RequestHeader(value = "X-Session-ID", required = false) String sessionId) {
                 String finalSessionId = (sessionId != null && !sessionId.isEmpty()) ? sessionId
                                 : UUID.randomUUID().toString();
@@ -81,7 +87,7 @@ public class AiController {
 
         @PostMapping("/plan")
         @Operation(summary = "Generate Study Plan", description = "Generates a study plan based on goal and available time.")
-        public Mono<ResponseEntity<Map>> generatePlan(
+        public Mono<ResponseEntity<Map<String, Object>>> generatePlan(
                         @RequestBody PlanRequestDTO planRequest,
                         @Parameter(description = "Session ID for tracking context") @RequestHeader(value = "X-Session-ID", required = false) String sessionId,
                         @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
@@ -95,7 +101,7 @@ public class AiController {
         @Operation(
         summary = "AI Health Check",
         description = "Checks the AI pipeline service health and returns its status." )
-        public Mono<ResponseEntity<Map>> health() {
+        public Mono<ResponseEntity<Map<String, Object>>> health() {
             return aiPipelineService.health()
                     .map(ResponseEntity::ok);
         }

@@ -1,7 +1,7 @@
 package com.example.EtudeAI.service.Implementation;
 
 import com.example.EtudeAI.constants.ErrorMessages;
-import com.example.EtudeAI.exception.ResourceNotFoundException;
+import com.example.EtudeAI.exception.UserNotFound;
 import com.example.EtudeAI.model.dto.AchievementDTO;
 import com.example.EtudeAI.model.entity.Achievement;
 import com.example.EtudeAI.model.entity.User;
@@ -35,7 +35,7 @@ public class AchievementServiceImpl implements AchievementService {
     @Override
     public List<AchievementDTO> getUserAchievements(String keycloakUserId) {
         User user = userRepository.findByKeycloakUserId(keycloakUserId)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorMessages.USER_NOT_FOUND));
+                .orElseThrow(() -> new UserNotFound(ErrorMessages.USER_NOT_FOUND));
 
         List<Achievement> allAchievements = achievementRepository.findAll();
         List<UserAchievement> unlocked = userAchievementRepository.findByUserId(user.getId());
@@ -45,9 +45,8 @@ public class AchievementServiceImpl implements AchievementService {
 
         return allAchievements.stream().map(a -> {
             UserAchievement ua = unlockedMap.get(a.getId());
+
             boolean isUnlocked = ua != null;
-            
-            // Calculate progress based on achievement criteria
             int currentValue = getCurrentValueForCriteria(user, a.getCriteriaType());
             int targetValue = a.getCriteriaValue();
             int progress = isUnlocked ? 100 : Math.min(100, (int) ((currentValue * 100.0) / targetValue));
@@ -73,7 +72,7 @@ public class AchievementServiceImpl implements AchievementService {
         List<Achievement> potentiallyUnlockable = achievementRepository.findAll().stream()
                 .filter(a -> a.getCriteriaType() == type)
                 .filter(a -> currentValue >= a.getCriteriaValue())
-                .collect(Collectors.toList());
+                .toList();
 
         for (Achievement a : potentiallyUnlockable) {
             if (!userAchievementRepository.existsByUserIdAndAchievementId(user.getId(), a.getId())) {

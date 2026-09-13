@@ -1,250 +1,193 @@
 <div class="history-page" dir="rtl">
-
-  <!-- ✅ NAV -->
-  <nav class="history-nav">
-    <button class="nav-back-btn" routerLink="/dashboard">
-      <img class="btn-icon-img" src="assets/images/back.png" alt="back">
-      <span>العودة للوحة القيادة</span>
-    </button>
-
-    <h1 class="page-title">
-      <img class="title-img" src="assets/images/trophy.png" alt="trophy">
-      سجل المغامرات
-    </h1>
-  </nav>
-
-  <!-- ✅ LOADING -->
-  @if (loading) {
-    <div class="loading-state">
-      <img class="state-icon" src="assets/images/robot.png" alt="loading">
-      <p>جاري استرجاع ذكريات المغامرة...</p>
+  <!-- Top Navigation Bar -->
+  <header class="history-top-bar">
+    <div class="brand-side">
+      <button class="back-pill-btn" routerLink="/dashboard">
+        <span>◀ العودة للوحة القيادة</span>
+      </button>
+      <div class="page-title-chip">
+        <span>📜 سجل المغامرات والدروس</span>
+      </div>
     </div>
-  }
+  </header>
 
-  @else if (error) {
-    <div class="error-state">
-      <img class="state-icon" src="assets/images/empty.png" alt="error">
-      <p>{{ error }}</p>
-      <button class="retry-btn" routerLink="/dashboard">حاول مرة أخرى</button>
-    </div>
-  }
+  <!-- LOADING STATE -->
+  <div class="state-card" *ngIf="loading">
+    <div class="state-spinner"></div>
+    <h3>جاري استرجاع ذكريات المغامرة... ✨</h3>
+  </div>
 
-  @else {
-    <div class="content-container">
+  <!-- ERROR STATE -->
+  <div class="state-card error-card" *ngIf="!loading && error">
+    <span class="state-emoji">⚠️</span>
+    <h3>{{ error }}</h3>
+    <button class="retry-action-btn" routerLink="/dashboard">العودة للرئيسية</button>
+  </div>
 
-      <!-- ✅ HERO CARD -->
-      <div class="hero-card">
-
-        <div class="hero-content">
-          <div class="session-badge">
-            <img class="badge-icon" src="assets/images/note.png" alt="session">
-            {{ session?.lesson || session?.module }}
-          </div>
-
-          <h2 class="session-date">
-            <img class="date-icon" src="assets/images/calendar.png" alt="date">
-            {{ session?.createdAt | date:'fullDate':'':'ar-TN' }}
-          </h2>
-
-          <p class="session-summary">
-            <img class="summary-icon" src="assets/images/sparkle.png" alt="summary">
-            {{ getSummaryText() }}
-          </p>
+  <!-- MAIN REPORT STAGE -->
+  <main class="history-stage" *ngIf="!loading && !error && session">
+    <!-- Hero Adventure Passport Card -->
+    <div class="hero-adventure-card">
+      <div class="hero-adventure-body">
+        <div class="lesson-chip">
+          <span>📖 {{ session.lesson || session.module || 'جلسة تعليمية' }}</span>
         </div>
 
-        <!-- ✅ SCORE -->
-        <div class="score-badge floating-anim">
-          <img class="score-icon" src="assets/images/score.png" alt="score">
-          <div class="score-title">النتيجة</div>
-          <div class="score-number">
-            {{ session?.quizScore }}
-            <span class="score-max">/10</span>
-          </div>
+        <h1 class="adventure-title">
+          {{ session.lesson || session.module || 'مغامرة الاستكشاف' }}
+        </h1>
 
-          <div class="score-label" [class]="getGradeClass()">
-            {{ getGradeLabel() }}
-          </div>
+        <div class="adventure-meta-row">
+          <span class="meta-pill">
+            <span>📅 {{ session.createdAt | date:'fullDate':'':'ar-TN' }}</span>
+          </span>
+          <span class="meta-pill" *ngIf="session.subject">
+            <span>📚 {{ session.subject }}</span>
+          </span>
         </div>
 
+        <p class="adventure-desc" *ngIf="session.summary || session.notes">
+          {{ session.summary || session.notes }}
+        </p>
       </div>
 
-      <!-- ✅ TABS -->
-      <div class="tabs-container">
-
-        <button class="tab-btn"
-                [class.active]="activeTab === 'summary'"
-                (click)="setActiveTab('summary')">
-          <img class="tab-icon-img" src="assets/images/scroll.png" alt="summary">
-          ملخص الرحلة
-        </button>
-
-        <button class="tab-btn"
-                [class.active]="activeTab === 'quiz'"
-                (click)="setActiveTab('quiz')">
-          <img class="tab-icon-img" src="assets/images/check.png" alt="quiz">
-          نتائج الاختبار
-        </button>
-
-        <button class="tab-btn"
-                [class.active]="activeTab === 'chat'"
-                (click)="setActiveTab('chat')">
-          <img class="tab-icon-img" src="assets/images/chat.png" alt="chat">
-          سجل المحادثة
-        </button>
-
-      </div>
-
-      <!-- ✅ CONTENT -->
-      <div class="tab-content-area">
-
-        <!-- ✅ SUMMARY TAB -->
-        @if (activeTab === 'summary') {
-          <div class="animate-enter">
-
-            <div class="info-grid">
-
-              <!-- ✅ SUMMARY ELEMENTS (Lesson Slides) -->
-              @if (session?.summaryElements?.length) {
-                <div class="info-card points-card">
-                  <h3 class="card-title">
-                    <img class="card-icon" src="assets/images/scroll.png" alt="content">
-                    محتوى الدرس
-                  </h3>
-
-                  <div class="summary-elements-list">
-                    @for (element of session?.summaryElements; track $index) {
-                      <div class="summary-element-item">
-                        <span class="element-number">{{ $index + 1 }}</span>
-                        <div class="element-content" [innerHTML]="element.content"></div>
-                      </div>
-                    }
-                  </div>
-                </div>
-              }
-
-              <!-- ✅ POINTS -->
-              @if (session?.summaryPointsOfFocus?.length) {
-                <div class="info-card points-card">
-                  <h3 class="card-title">
-                    <img class="card-icon" src="assets/images/focus.png" alt="focus">
-                    ماذا تعلمنا؟
-                  </h3>
-
-                  <ul class="points-list">
-                    @for (point of session?.summaryPointsOfFocus; track $index) {
-                      <li>{{ point }}</li>
-                    }
-                  </ul>
-                </div>
-              }
-
-              <!-- ✅ FEEDBACK -->
-              <div class="info-card feedback-card">
-
-                <div class="feedback-header">
-                  <img class="feedback-icon" src="assets/images/robot.png" alt="robot">
-
-                  <div class="feedback-title">
-                    <h3>ملاحظات المساعد الذكي</h3>
-                    <span class="feedback-subtitle">✨ مساعدك الشخصي يقترح عليك هذا</span>
-                  </div>
-                </div>
-
-                <div class="feedback-text">
-                  {{ session?.sessionFeedback || 'أنت بطل! استمر في التقدم.' }}
-                </div>
-
-              </div>
-
-            </div>
-          </div>
-        }
-
-        <!-- ✅ QUIZ TAB -->
-        @if (activeTab === 'quiz') {
-          <div class="animate-enter quiz-review-list">
-
-            @if (!session?.quizElements?.length) {
-              <div class="empty-state premium-empty">
-                <img src="assets/images/empty.png" alt="empty">
-                <p>لم نقم باختبار في هذه الجلسة.</p>
-              </div>
-            }
-
-            @for (item of session?.quizElements; track $index) {
-              <div class="quiz-item-card">
-
-                <div class="quiz-question-header">
-                  <span class="question-num">سؤال {{ $index + 1 }}</span>
-                  <p class="question-text">{{ item.question }}</p>
-                </div>
-
-                <div class="options-grid">
-                  @for (opt of item.options; track opt) {
-                    <div class="option-pill"
-                         [class.is-correct-answer]="opt === item.answer">
-
-                      <img *ngIf="opt === item.answer"
-                           class="opt-icon-img"
-                           src="assets/images/check.png"
-                           alt="correct">
-
-                      {{ opt }}
-                    </div>
-                  }
-                </div>
-              </div>
-            }
-
-          </div>
-        }
-
-        <!-- ✅ CHAT TAB -->
-        @if (activeTab === 'chat') {
-          <div class="animate-enter chat-history-view">
-
-            @if (!session?.qnaElements?.length) {
-              <div class="empty-state premium-empty">
-                <img src="assets/images/empty.png" alt="empty">
-                <p>لم يكن هناك محادثة.</p>
-              </div>
-            }
-
-            <div class="chat-bubbles">
-              @for (msg of session?.qnaElements; track $index) {
-
-                <!-- USER -->
-                <div class="bubble user-bubble">
-                  <div class="bubble-avatar">
-                    <img src="assets/images/user.png" alt="you">
-                  </div>
-
-                  <div class="bubble-content">
-                    <div class="sender-name">أنت</div>
-                    {{ msg.question }}
-                  </div>
-                </div>
-
-                <!-- BOT -->
-                <div class="bubble bot-bubble">
-                  <div class="bubble-avatar">
-                    <img src="assets/images/robot.png" alt="bot">
-                  </div>
-
-                  <div class="bubble-content">
-                    <div class="sender-name">المساعد</div>
-                    {{ msg.answer }}
-                  </div>
-                </div>
-
-              }
-            </div>
-
-          </div>
-        }
-
+      <!-- Score Spotlight Badge -->
+      <div class="score-spotlight-badge" *ngIf="session.quizScore !== undefined && session.quizScore !== null">
+        <div class="score-circle">
+          <span class="score-num">{{ session.quizScore }}</span>
+          <span class="score-denom">/10</span>
+        </div>
+        <div class="grade-pill" [class]="getGradeClass()">
+          <span>{{ getGradeLabel() }}</span>
+        </div>
       </div>
     </div>
-  }
 
+    <!-- Interactive Navigation Tabs -->
+    <div class="history-tabs-dock">
+      <button
+        class="tab-dock-btn"
+        [class.is-active]="activeTab === 'summary'"
+        (click)="setActiveTab('summary')"
+      >
+        <span>📜 ملخص الدرس</span>
+      </button>
+
+      <button
+        class="tab-dock-btn"
+        [class.is-active]="activeTab === 'quiz'"
+        (click)="setActiveTab('quiz')"
+      >
+        <span>🏆 نتائج الاختبار</span>
+      </button>
+
+      <button
+        class="tab-dock-btn"
+        [class.is-active]="activeTab === 'chat'"
+        (click)="setActiveTab('chat')"
+      >
+        <span>💬 سجل المحادثة</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: SUMMARY -->
+    <section class="tab-panel animate-pop" *ngIf="activeTab === 'summary'">
+      <!-- Lesson Slides / Summary Elements -->
+      <div class="panel-card" *ngIf="session.summaryElements?.length">
+        <div class="panel-header">
+          <span class="panel-icon">📑</span>
+          <h2>فقرات ومحتوى الدرس</h2>
+        </div>
+
+        <div class="slides-flow-list">
+          <div class="slide-flow-item" *ngFor="let el of session.summaryElements; let idx = index">
+            <div class="slide-num-badge">الشريحة {{ idx + 1 }}</div>
+            <div class="slide-body" [innerHTML]="el.content"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Focus Points -->
+      <div class="panel-card" *ngIf="session.summaryPointsOfFocus?.length">
+        <div class="panel-header">
+          <span class="panel-icon">💡</span>
+          <h2>ماذا تعلمنا في هذه الجلسة؟</h2>
+        </div>
+
+        <ul class="key-points-grid">
+          <li class="point-chip" *ngFor="let p of session.summaryPointsOfFocus">
+            <span class="point-bullet">⭐</span>
+            <span class="point-text">{{ p }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- AI Feedback -->
+      <div class="panel-card ai-feedback-card">
+        <div class="panel-header">
+          <span class="panel-icon">🤖</span>
+          <h2>ملاحظات المعلم الذكي</h2>
+        </div>
+        <p class="feedback-quote">
+          {{ session.sessionFeedback || 'أنت بطل رائع! كل خطوة تخطوها تقربك من التميز والنجاح. واصل بهذا الحماس!' }}
+        </p>
+      </div>
+    </section>
+
+    <!-- TAB 2: QUIZ REVIEW -->
+    <section class="tab-panel animate-pop" *ngIf="activeTab === 'quiz'">
+      <div class="empty-panel" *ngIf="!session.quizElements?.length">
+        <span class="empty-emoji">🎯</span>
+        <p>لم نقم باختبار في هذه الجلسة بعد.</p>
+      </div>
+
+      <div class="quiz-questions-stack" *ngIf="session.quizElements?.length">
+        <div class="quiz-review-card" *ngFor="let q of session.quizElements; let idx = index">
+          <div class="question-title-row">
+            <span class="question-badge">سؤال {{ idx + 1 }}</span>
+            <h3 class="question-title-text">{{ q.question }}</h3>
+          </div>
+
+          <div class="answers-review-grid">
+            <div
+              class="answer-review-pill"
+              *ngFor="let opt of q.options"
+              [class.correct-highlight]="opt === q.answer"
+            >
+              <span class="answer-check-icon" *ngIf="opt === q.answer">✔</span>
+              <span>{{ opt }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: CHAT LOG -->
+    <section class="tab-panel animate-pop" *ngIf="activeTab === 'chat'">
+      <div class="empty-panel" *ngIf="!session.qnaElements?.length">
+        <span class="empty-emoji">💬</span>
+        <p>لا توجد رسائل مسجلة لهذه الجلسة.</p>
+      </div>
+
+      <div class="chat-bubbles-stack" *ngIf="session.qnaElements?.length">
+        <div class="dialogue-exchange" *ngFor="let msg of session.qnaElements">
+          <!-- Student Message -->
+          <div class="chat-bubble student-bubble">
+            <div class="bubble-speaker">
+              <span>👦 أنت:</span>
+            </div>
+            <p class="bubble-text">{{ msg.question }}</p>
+          </div>
+
+          <!-- AI Bot Response -->
+          <div class="chat-bubble bot-bubble">
+            <div class="bubble-speaker">
+              <span>🤖 المعلم الذكي:</span>
+            </div>
+            <p class="bubble-text">{{ msg.answer }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 </div>

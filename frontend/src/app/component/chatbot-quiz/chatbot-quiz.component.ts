@@ -20,7 +20,7 @@ import {Achievement,PowerUp,Checkpoint,Particle,PowerupNotification} from '../..
 @Component({
   selector: 'app-chatbot-quiz',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, AvatarComponent],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './chatbot-quiz.component.html',
   styleUrls: ['./chatbot-quiz.component.css']
 })
@@ -699,7 +699,6 @@ export class ChatbotQuizComponent implements OnInit, OnDestroy {
     } else {
       // No sessionId - create a new session (ad-hoc quiz)
       const sessionDTO: SessionDTO = {
-        id: crypto.randomUUID(),
         level: level,
         subject: subject,
         module: module,

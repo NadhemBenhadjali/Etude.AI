@@ -53,14 +53,30 @@ def check_qdrant_data() -> bool:
     logger.info("checking_qdrant", url=settings.QDRANT_URL)
 
     try:
-        # API key is optional for local Docker
         api_key = settings.QDRANT_API_KEY if settings.QDRANT_API_KEY else None
+        client = None
+        for key in [api_key, None]:
+            try:
+                candidate = QdrantClient(
+                    url=settings.QDRANT_URL,
+                    api_key=key,
+                    timeout=15,
+                    check_compatibility=False,
+                )
+                candidate.get_collections()
+                client = candidate
+                break
+            except Exception as inner_e:
+                if "403" not in str(inner_e) and "api-key" not in str(inner_e).lower():
+                    break
 
-        client = QdrantClient(
-            url=settings.QDRANT_URL,
-            api_key=api_key,
-            timeout=15
-        )
+        if client is None:
+            client = QdrantClient(
+                url=settings.QDRANT_URL,
+                api_key=api_key,
+                timeout=15,
+                check_compatibility=False,
+            )
 
         collection_name = "etudeai"
 
@@ -111,21 +127,13 @@ def populate_qdrant():
     print("   📊 Building Qdrant vector database...")
 
     try:
-        # Import and run Qdrant_database_construction
-        import os
-        from databases_construction.Qdrant_database_construction import upsert_json
+        from databases_construction.Qdrant_database_construction import upsert_json, find_json_file
 
-        # Find the JSON file
-        candidates = [
-            os.getenv("JSON_PATH", ""),
-            "config_files/Book_with_axes.json",
-            "config_files/ktebjson/Book.pdf.json",
-        ]
-        json_path = next((p for p in candidates if p and os.path.exists(p)), None)
+        json_path = find_json_file()
 
         if not json_path:
-            logger.error("json_file_not_found", candidates=candidates)
-            print(f"   ❌ JSON file not found. Checked: {candidates}")
+            logger.error("json_file_not_found")
+            print("   ❌ JSON file not found (checked Book.pdf.json, Book_with_axes.json).")
             return False
 
         logger.info("using_json_file", path=json_path)

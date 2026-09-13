@@ -1,53 +1,66 @@
-<nav class="navbar">
-  <ul>
-    <li><a routerLink="/">  الرئيسية </a></li>
-    <li><a routerLink="/about"> شكون احنا؟</a></li>
-    <li><a routerLink="/contact">كلمنا</a></li>
-  </ul>
-</nav>
-<app-avatar></app-avatar>
-<div class="mode-container" dir="rtl">
-  <div class="mode-box">
+<div class="mode-page" dir="rtl">
+  <!-- Top Bar -->
+  <div class="top-nav-bar">
+    <button class="back-btn" routerLink="/select-subject">
+      <span>⬅️ تبديل المادة</span>
+    </button>
+
+    <div class="app-brand-pill">
+      <span class="flag">🇹🇳</span>
+      <span>Etude.AI المغامرة التعليمية</span>
+    </div>
+
+    <button class="dash-btn" routerLink="/dashboard">
+      <span>🏠 الرئيسية</span>
+    </button>
+  </div>
+
+  <div class="mode-container">
     <div class="mode-header">
-      <h2>اختار كيفاش تحب تقرا.</h2>
-      <div class="header-decoration">
-        <span class="star">⭐</span>
-        <span class="star">⭐</span>
-        <span class="star">⭐</span>
-      </div>
+      <div class="badge-mode">🎮 اختر نوع النشاط</div>
+      <h1>كيفاش تحب تقرا وتتعلّم اليوم؟ 🌟</h1>
+      <p class="subtitle">كل وضع عندو جوّ خاص، اختار واكتشف السحر!</p>
     </div>
 
-    <div class="options-container">
-      <div class="option-card" (click)="selectMode('summary')" [class.selected]="selectedMode === 'summary'">
-        <div class="option-icon">
-          <img src="/assets/images/read.png" alt="Summary" />
+    <div class="modes-grid">
+      <!-- Mode 1: Summary -->
+      <div class="mode-card summary-card" (click)="selectMode('summary')">
+        <div class="mode-ribbon">⭐ الأكثر شعبية</div>
+        <div class="mode-img-stage">
+          <img src="/assets/images/read.png" alt="Smart Summary" />
         </div>
-        <h3>ملخص</h3>
-        <p>لهنا تلقى ملخص للدروس.</p>
+        <h3>📚 ملخص ذكي وسبورة تفاعلية</h3>
+        <p>ملخصات مركزة ومبسطة بالصوت والصورة للكتب المدرسية مع شرح بالتونسي وشريحة بشريحة.</p>
+        <button class="mode-action-btn">
+          <span>افتح السبورة 🎨</span>
+        </button>
       </div>
 
-      <div class="option-card" (click)="selectMode('quiz')" [class.selected]="selectedMode === 'quiz'">
-        <div class="option-icon">
-          <img src="/assets/images/thinking.png" alt="Quiz" />
+      <!-- Mode 2: Quiz -->
+      <div class="mode-card quiz-card" (click)="selectMode('quiz')">
+        <div class="mode-ribbon">🏆 تحدي ونجوم</div>
+        <div class="mode-img-stage">
+          <img src="/assets/images/thinking.png" alt="Quiz Arena" />
         </div>
-        <h3>اختبار قصير</h3>
-        <p>اختبر معلوماتك بطريقة مسلية</p>
+        <h3>🎯 تحدي الكويز والمسابقات</h3>
+        <p>جاوب على الأسئلة التفاعلية، اجمع نقاط ونجوم، وتحدّى أصحابك في ساحة الأبطال!</p>
+        <button class="mode-action-btn">
+          <span>ابدأ التحدي ⚡</span>
+        </button>
       </div>
 
-      <div class="option-card" (click)="selectMode('general')" [class.selected]="selectedMode === 'general'">
-        <div class="option-icon">
-          <img src="/assets/images/happyy.png" alt="General Questions" />
+      <!-- Mode 3: General Chatbot -->
+      <div class="mode-card tutor-card" (click)="selectMode('general')">
+        <div class="mode-ribbon">🤖 معلمك الخاص</div>
+        <div class="mode-img-stage">
+          <img src="/assets/images/happyy.png" alt="AI Tutor" />
         </div>
-        <h3>أسئلة عامة</h3>
-        <p>اسأل أي سؤال تحب عليه</p>
+        <h3>💬 اسأل المعلم الذكي</h3>
+        <p>اسأل على أي درس أو تمرين ما فهمتوش، والمعلم الذكي يفسرلك بالصوت والنص بكل لطف.</p>
+        <button class="mode-action-btn">
+          <span>تكلم مع المعلم 🎙️</span>
+        </button>
       </div>
-    </div>
-
-    <div class="navigation-buttons">
-      <button class="nav-button" routerLink="/finished">
-        <span>خروج</span>
-        <img src="/assets/images/sent.png" alt="Back" />
-      </button>
     </div>
   </div>
 </div> 

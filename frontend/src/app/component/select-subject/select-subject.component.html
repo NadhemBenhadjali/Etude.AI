@@ -1,19 +1,32 @@
-<app-avatar></app-avatar>
-<div class="select-class-page">
+<nav class="kids-nav">
+  <a routerLink="/dashboard" class="back-home-btn">
+    <span>🏠</span>
+    <span>لوحة التحكم</span>
+  </a>
+  <div class="nav-title">
+    <span class="flag">🇹🇳</span>
+    <span>Etude.AI المواد الدراسية</span>
+  </div>
+  <app-avatar></app-avatar>
+</nav>
 
-
+<div class="select-class-page" dir="rtl">
   <div class="center-container">
-    <h2 class="instruction"> اختار المادة</h2>
+    <div class="page-badge">🎒 اختر مادتك المفضلة</div>
+    <h2 class="instruction">شنيّة المادة اللي تحب تقراها اليوم؟</h2>
+    <p class="sub-instruction">اضغط على المادة باش تكتشف الدروس والملخصات الذكية! 🚀</p>
 
     <div class="class-container">
       <div
         class="class-box"
         *ngFor="let subject of subjects; let i = index"
-        [ngStyle]="{ 'background-color': colors[i % colors.length] }"
         (click)="selectSubject(subject.name)"
       >
-        <img [src]="'assets/images/' + subject.image" alt="{{subject.name}}" />
-        <p>{{ subject.name }}</p>
+        <div class="icon-circle">
+          <img [src]="'assets/images/' + subject.image" [alt]="subject.name" />
+        </div>
+        <p class="subject-title">{{ subject.name }}</p>
+        <span class="explore-tag">دخول للدروس 👈</span>
       </div>
     </div>
   </div>

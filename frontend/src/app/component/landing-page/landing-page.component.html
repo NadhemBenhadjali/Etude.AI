@@ -1,28 +1,73 @@
-<div class="landing-container">
-  <div class="images-wrapper">
-    <div class="center-image-box">
-      <img src="/assets/images/corgi.png" alt="صورة جانبية" class="side-image" />
+<div class="landing-page" dir="rtl">
+  <!-- Top Nav -->
+  <nav class="kids-nav">
+    <div class="brand">
+      <span class="flag">🇹🇳</span>
+      <span class="brand-text">Etude.AI مميزات المنصة</span>
     </div>
-  </div>
+    <div class="nav-links">
+      <a routerLink="/" class="nav-btn-link">🏠 الرئيسية</a>
+      <a routerLink="/about" class="nav-btn-link">ℹ️ من نحن</a>
+      <a routerLink="/contact" class="nav-btn-link">📞 اتصل بنا</a>
+    </div>
+  </nav>
 
-  <h2>مرحبا بكم!</h2>
-  <p class="encouragement">
-حضر روحك، استعد، وانطلق في مغامرة جديدة مليانة تحديات ومتعة! </p>
+  <div class="landing-hero">
+    <div class="badge-hero">🚀 رحلة تعليمية فريدة وممتعة</div>
+    <h1 class="landing-title">كل ما يحتاجه طفلك للتفوّق في دراسته!</h1>
+    <p class="landing-subtitle">
+      صُممت منصة Etude.AI خصيصاً لتلاميذ التعليم الابتدائي في تونس، لتقديم تجربة دراسية تجمع بين الذكاء الاصطناعي والمرح والتربية الحديثة.
+    </p>
 
-  <!-- Voltage button -->
-  <div class="voltage-button" >
-   <button (click)="goToSignIn()"> ابدأ </button> 
+    <!-- Grid of Superpowers -->
+    <div class="features-grid">
+      <div class="feature-card card-1">
+        <div class="feature-icon-wrap">
+          <img src="/assets/images/book.png" alt="Books" />
+        </div>
+        <h3>📚 السبورة التفاعلية الذكية</h3>
+        <p>تلخيص فوري لكتبك المدرسية الرسمية، مقسمة إلى شرائح واضحة وسهلة الفهم مع نطق صوتي وصور توضيحية من الكتاب.</p>
+        <span class="feature-tag">برنامج وزارة التربية 🇹🇳</span>
+      </div>
 
-    <svg viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-      <path class="line-1" d="M0 20 L100 20" stroke-width="2" stroke-linecap="round"/>
-      <path class="line-2" d="M0 10 L100 10" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-    <div class="dots">
-      <div class="dot dot-1"></div>
-      <div class="dot dot-2"></div>
-      <div class="dot dot-3"></div>
-      <div class="dot dot-4"></div>
-      <div class="dot dot-5"></div>
+      <div class="feature-card card-2">
+        <div class="feature-icon-wrap">
+          <img src="/assets/images/robot.png" alt="AI Robot" />
+        </div>
+        <h3>🤖 المعلم المرافق بالتونسي</h3>
+        <p>اسأل المعلم الذكي على أي درس في أي وقت! يفسرلك المصطلحات الصعبة باللهجة التونسية المبسطة بدون ملل.</p>
+        <span class="feature-tag">متاح 24/7 💬</span>
+      </div>
+
+      <div class="feature-card card-3">
+        <div class="feature-icon-wrap">
+          <img src="/assets/images/trophy.png" alt="Trophy" />
+        </div>
+        <h3>🏆 مسابقات واختبارات ممتعة</h3>
+        <p>تحديات كويز تفاعلية، اربح نقاط ونجوم، افتح أوسمة وشوف تقدمك خطوة بخطوة مع نظام مكافآت يحفز طفلك.</p>
+        <span class="feature-tag">ألعاب وتحديات ⭐</span>
+      </div>
+
+      <div class="feature-card card-4">
+        <div class="feature-icon-wrap">
+          <img src="/assets/images/calendar.png" alt="Planner" />
+        </div>
+        <h3>🗓️ مخطط دراسي ذكي</h3>
+        <p>برنامج مراجعة خاص بكل تلميذ ينظم أوقات الدراسة والتمارين حسب مستواه والمواد اللي يحب يركز عليها.</p>
+        <span class="feature-tag">تنظيم الوقت ⏱️</span>
+      </div>
+    </div>
+
+    <!-- Bottom Action CTA -->
+    <div class="landing-cta-box">
+      <img src="/assets/images/corgi.png" alt="Happy Friend" class="cta-mascot" />
+      <div class="cta-box-text">
+        <h2>جاهز للمغامرة يا بطل؟</h2>
+        <p>ادخل الآن واكتشف دروسك بطريقة ما شفتهاش قبل!</p>
+      </div>
+      <button class="cta-big-btn" (click)="goToSignIn()">
+        <span>انطلق الآن 🚀</span>
+      </button>
     </div>
   </div>
 </div>

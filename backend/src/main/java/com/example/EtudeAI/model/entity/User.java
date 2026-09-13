@@ -27,6 +27,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,6 +38,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -72,15 +74,16 @@ public class User {
     @Column(nullable = false)
     private Level level;
 
+    @Builder.Default
     @NotNull(message = "Elo is required")
     @Min(value = 0, message = "Elo cannot be negative")
-    @Column(nullable = false)
-    private Integer elo;
+    private Integer elo = 0;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Role is required")
     @Column(nullable = false)
-    private Role role;
+    private Role role = Role.ROLE_USER;
 
     @Column(length = 255)
     private String avatar;
@@ -93,11 +96,13 @@ public class User {
     @Column(nullable = false)
     private ZonedDateTime updatedAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Session> sessions;
+    private List<Session> sessions =  new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Note> notes;
+    private List<Note> notes =  new ArrayList<>();
 
     @Column(nullable = false)
     @Builder.Default

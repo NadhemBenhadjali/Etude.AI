@@ -31,21 +31,36 @@ class Neo4jKG:
     @property
     def driver(self):
         if self._driver is None:
-            try:
-                self._driver = GraphDatabase.driver(
-                    self.uri,
-                    auth=(self.user, self.pwd),
-                    max_connection_pool_size=50,
-                    connection_acquisition_timeout=10.0,
-                    max_transaction_retry_time=10.0,
-                )
-                if not self._connection_verified:
-                    self._driver.verify_connectivity()
+            uris = [
+                self.uri,
+                "bolt://neo4j:7687",
+                "bolt://localhost:7687",
+                "neo4j://localhost:7687",
+            ]
+            seen = set()
+            unique_uris = [u for u in uris if u and not (u in seen or seen.add(u))]
+
+            last_err = None
+            for uri in unique_uris:
+                try:
+                    candidate = GraphDatabase.driver(
+                        uri,
+                        auth=(self.user, self.pwd),
+                        max_connection_pool_size=50,
+                        connection_acquisition_timeout=10.0,
+                        max_transaction_retry_time=10.0,
+                    )
+                    candidate.verify_connectivity()
+                    self._driver = candidate
                     self._connection_verified = True
-                    logger.info("neo4j_connected", uri=self.uri)
-            except Exception as e:
-                logger.error("neo4j_connection_failed", uri=self.uri, error=str(e))
-                raise
+                    logger.info("neo4j_connected", uri=uri)
+                    return self._driver
+                except Exception as e:
+                    last_err = e
+                    logger.warning("neo4j_connection_attempt_failed", uri=uri, error=str(e))
+
+            logger.error("neo4j_all_connections_failed", error=str(last_err))
+            raise last_err
         return self._driver
 
     def close(self):
@@ -160,6 +175,6 @@ class Neo4jKG:
         for ld in lessons:
             pics = self.fetch_lesson_images(ld["title"])
             if pics:
-                md = "\n".join(f"* [{p['caption']}]({p['name']})" for p in pics)
+                md = "\n".join(f"* [{p['caption']}](assets/book_images/{p['name']})" for p in pics)
                 images_blocks.append(f"درس «{ld['title']}» – التصاور:\n{md}\n")
         return "\n".join(images_blocks) if images_blocks else "ما ثـمّـة حتى تصاور."

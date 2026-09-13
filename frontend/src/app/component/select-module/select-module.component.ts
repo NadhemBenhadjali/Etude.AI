@@ -7,9 +7,8 @@ import { AvatarComponent } from "../../shared/avatar/avatar.component";
 import { QuizService } from '../../services/quiz.service';
 import { AiService } from '../../services/ai.service';
 import { AuthService } from '../../services/auth.service';
-import { firstValueFrom } from 'rxjs';
-import {SessionStateService} from '../../services/session-state.service';
-import {ModuleOption,SubjectOption} from '../../model/shared.model';
+import { SessionStateService } from '../../services/session-state.service';
+import { ModuleOption, SubjectOption } from '../../model/shared.model';
 
 @Component({
   selector: 'app-select-module',
@@ -19,30 +18,29 @@ import {ModuleOption,SubjectOption} from '../../model/shared.model';
   styleUrls: ['./select-module.component.css']
 })
 export class SelectModuleComponent implements OnInit {
-  // Friend's Data Structure with Icons
   subjects: SubjectOption[] = [
     {
-      name: 'أحياء',
+      name: 'أحياء (إيقاظ علمي)',
       value: 'أحياء',
-      color: '#e53935',
+      color: '#059669',
       icon: '/assets/images/panda.png',
       modules: [
-        { name: 'الحواس',       value: 'الحواس',      icon: '/assets/images/senses-kid.png' },
-        { name: 'التنقل',       value: 'التنقل',    icon: '/assets/images/movement-kid.png' },
-        { name: 'مصادر الأغذية', value: 'مصادر الأغذية',   icon: '/assets/images/food-kid.png' },
-        { name: 'التكاثر',      value: 'التكاثر', icon: '/assets/images/growth-kid.png' },
-        { name: 'التنفس',       value: 'التنفس',  icon: '/assets/images/lungs-kid.png' }
+        { name: 'الحواس', value: 'الحواس', icon: '/assets/images/senses-kid.png' },
+        { name: 'التنقل', value: 'التنقل', icon: '/assets/images/movement-kid.png' },
+        { name: 'مصادر الأغذية', value: 'مصادر الأغذية', icon: '/assets/images/food-kid.png' },
+        { name: 'التكاثر', value: 'التكاثر', icon: '/assets/images/growth-kid.png' },
+        { name: 'التنفس', value: 'التنفس', icon: '/assets/images/lungs-kid.png' }
       ]
     },
     {
       name: 'فيزياء',
       value: 'فيزياء',
-      color: '#d32f2f',
+      color: '#3B82F6',
       icon: '/assets/images/science.png',
       modules: [
-        { name: 'الزمن',   value: 'الزمن',   icon: '/assets/images/clock-kid.png' },
-        { name: 'المادة',  value: 'المادة', icon: '/assets/images/atom-kid.png'  },
-        { name: 'الطاقة',  value: 'الطاقة', icon: '/assets/images/energy-kid.png'}
+        { name: 'الزمن', value: 'الزمن', icon: '/assets/images/clock-kid.png' },
+        { name: 'المادة', value: 'المادة', icon: '/assets/images/atom-kid.png' },
+        { name: 'الطاقة', value: 'الطاقة', icon: '/assets/images/energy-kid.png' }
       ]
     }
   ];
@@ -50,11 +48,28 @@ export class SelectModuleComponent implements OnInit {
   selectedSubject: SubjectOption | null = null;
   currentMode: string | null = null;
 
-  loading  = false;
-  errorMsg : string | null = null;
+  // SSE Live Streaming State
+  isStreaming = false;
+  streamStatus = 'جاري البحث في كتابك المدرسي... 🔍';
+  streamTokens = '';
+  streamStep = 1;
+  selectedModuleName = '';
+  errorMsg: string | null = null;
 
-  // URL from your environment
-  private readonly summaryUrl = environment.apiBase + '/summary';
+  get cleanStreamPreview(): string {
+    if (!this.streamTokens) return '';
+    // Strip raw JSON keys, syntax, and file paths so children only see clear Arabic sentences
+    const text = this.streamTokens
+      .replace(/```json|```/gi, '')
+      .replace(/"(title|slides|number|text|image)"\s*:\s*/gi, '')
+      .replace(/assets\/book_images\/[^\s",}]+/gi, '')
+      .replace(/[\{\}\[\]"\\`:]+/g, ' ')
+      .replace(/,\s*/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    return text.length > 220 ? '...' + text.slice(-220) : text;
+  }
 
   constructor(
     private router: Router,
@@ -68,78 +83,78 @@ export class SelectModuleComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(p => {
-      this.currentMode = p['mode'] || null;
+      this.currentMode = p['mode'] || 'summary';
     });
   }
 
   selectSubject(subject: SubjectOption) {
     this.selectedSubject = subject;
-    this.loading = false;
     this.errorMsg = null;
+    this.isStreaming = false;
   }
 
-  async selectModule(module: ModuleOption): Promise<void> {
+  selectModule(module: ModuleOption): void {
     if (!this.selectedSubject || !this.currentMode) return;
 
-
     this.sessionStateService.setModule(module.name);
+    this.selectedModuleName = module.name;
 
-    // --- LOGIC FROM FRONT 1 (Backend Connection) ---
     if (this.currentMode === 'summary') {
-      this.loading  = true;
+      this.isStreaming = true;
+      this.streamStatus = 'جاري البحث في كتابك المدرسي... 🔍';
+      this.streamTokens = '';
+      this.streamStep = 1;
       this.errorMsg = null;
 
-      const payload = {
-        subject: this.selectedSubject.value,
-        module: module.name // Pass the module name to backend
-      };
-
-      try {
-        // Use HttpClient instead of fetch to ensure token interceptor works
-        const data = await firstValueFrom(
-          this.http.post<any>(this.summaryUrl, payload)
-        );
-
-        if (data?.data) {
-          // Success! Navigate to Lesson Board
-          await this.router.navigate(['/lesson'], {
-            queryParams: {
-              subject: this.selectedSubject.value,
-              module:  module.value,
-              mode:    this.currentMode,
-              path:    data.path
-            },
-            state: {
-              summaryPath: data.path,
-              summaryData: data.data // Pass generated slides
+      this.aiService.generateSummaryStream(this.selectedSubject.value, module.name).subscribe({
+        next: ({ event, data }) => {
+          if (event === 'status') {
+            this.streamStatus = data.message || 'الذكاء الاصطناعي يحضر في الدرس بالتونسي... 🪄';
+            this.streamStep = 2;
+          } else if (event === 'token') {
+            if (data.token) {
+              this.streamTokens += data.token;
+              this.streamStep = 2;
             }
-          });
-        } else {
-          throw new Error('No data received');
-        }
-      } catch (err: any) {
-        console.error(err);
-
-        // Check if it's an authentication error
-        if (err instanceof HttpErrorResponse && err.status === 401) {
-          this.errorMsg = 'انتهت الجلسة. الرجاء تسجيل الدخول مرة أخرى.';
-          // Clear tokens and redirect to login after 2 seconds
-          this.authService.logout().then(() => {
+          } else if (event === 'complete') {
+            this.streamStatus = 'جاهز يا بطل! 🎉 قاعدين نفتحو في السبورة...';
+            this.streamStep = 3;
             setTimeout(() => {
-              this.router.navigate(['/signin']);
-            }, 2000);
-          });
-        } else {
-          // If backend fails, you might want to load fallback data here or show error
-          this.errorMsg = 'حدث خطأ في توليد الملخص. الرجاء المحاولة لاحقاً.';
+              this.isStreaming = false;
+              this.router.navigate(['/lesson'], {
+                queryParams: {
+                  subject: this.selectedSubject!.value,
+                  module: module.value,
+                  mode: this.currentMode,
+                  path: data.path
+                },
+                state: {
+                  summaryPath: data.path,
+                  summaryData: data.data
+                }
+              });
+            }, 700);
+          } else if (event === 'error') {
+            this.isStreaming = false;
+            this.errorMsg = data.message || 'حدث خطأ أثناء تحضير الدرس. حاول مرة أخرى!';
+          }
+        },
+        error: (err) => {
+          console.error('SSE stream error:', err);
+          this.isStreaming = false;
+          if (err?.status === 401) {
+            this.errorMsg = 'انتهت الجلسة. الرجاء تسجيل الدخول من جديد.';
+            this.authService.logout().then(() => this.router.navigate(['/signin']));
+          } else {
+            this.errorMsg = 'حدث خطأ في الاتصال بالمعلم الذكي. حاول مرة أخرى! ⚠️';
+          }
         }
-      } finally {
-        this.loading = false;
-      }
+      });
 
     } else if (this.currentMode === 'quiz') {
-      // Logic for Quiz Mode
-      this.loading = true;
+      this.isStreaming = true;
+      this.streamStatus = 'قاعدين نجهزو في أسئلة التحدي... 🎯';
+      this.streamStep = 2;
       this.errorMsg = null;
 
       const quizRequest = {
@@ -150,28 +165,35 @@ export class SelectModuleComponent implements OnInit {
 
       this.quizService.generateQuiz(quizRequest).subscribe({
         next: (data) => {
+          this.isStreaming = false;
           this.router.navigate(['/chatbot-quiz'], {
             queryParams: {
               subject: this.selectedSubject!.value,
-              module:  module.value,
-              mode:    this.currentMode
+              module: module.value,
+              mode: this.currentMode
             },
             state: {
               quizData: data.data
             }
           });
-          this.loading = false;
         },
         error: (err) => {
           console.error(err);
-          this.errorMsg = 'حدث خطأ في توليد الاختبار.';
-          this.loading = false;
+          this.isStreaming = false;
+          this.errorMsg = 'حدث خطأ أثناء توليد الاختبار. حاول مجدداً.';
         }
       });
     }
   }
 
+  cancelStreaming() {
+    this.isStreaming = false;
+    this.errorMsg = null;
+  }
+
   goBack() {
     this.selectedSubject = null;
+    this.isStreaming = false;
+    this.errorMsg = null;
   }
 }

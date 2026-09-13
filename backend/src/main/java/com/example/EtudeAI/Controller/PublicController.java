@@ -22,16 +22,15 @@ public class PublicController {
     @PostMapping("/register")
     @Operation(summary = "Register User", description = "Registers a new user in Keycloak and the application database.")
     public ResponseEntity<String> register(@Valid @RequestBody RegistrationDTO registrationDTO) {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setEmail(registrationDTO.getEmail());
-        userDTO.setFirstname(registrationDTO.getFirstname());
-        userDTO.setLastname(registrationDTO.getLastname());
-        userDTO.setBirthDate(registrationDTO.getBirthDate());
-        userDTO.setLevel(registrationDTO.getLevel() != null ? registrationDTO.getLevel() : Level.FIRST);
-        userDTO.setAvatar(registrationDTO.getAvatar());
-
+        UserDTO userDTO =  UserDTO.builder()
+                .email(registrationDTO.getEmail())
+                .firstname(registrationDTO.getFirstname())
+                .lastname(registrationDTO.getLastname())
+                .birthDate(registrationDTO.getBirthDate())
+                .level(registrationDTO.getLevel() != null ? registrationDTO.getLevel() : Level.FIRST)
+                .avatar(registrationDTO.getAvatar())
+                .build();
         registrationService.registerUser(userDTO, registrationDTO.getPassword());
-
         return ResponseEntity.ok("User registered successfully");
     }
 }

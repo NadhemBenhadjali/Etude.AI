@@ -4,10 +4,10 @@ server:
 spring:
   application:
     name: EtudeAI
+
   mvc:
     async:
       request-timeout: 180s
-
 
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -23,6 +23,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   flyway:
+    locations: classpath:db/migration
     enabled: true
     baseline-on-migrate: true
 
@@ -33,11 +34,18 @@ spring:
           issuer-uri: ${KEYCLOAK_PUBLIC_URL}/realms/${KEYCLOAK_REALM}
           jwk-set-uri: ${KEYCLOAK_AUTH_SERVER_URL}/realms/${KEYCLOAK_REALM}/protocol/openid-connect/certs
 
-  # Redis Configuration
+
   data:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+    web:
+      pageable:
+        max-page-size: 100
+
+  threads:
+    virtual:
+      enabled: true
 
 keycloak:
   auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL}
@@ -48,16 +56,15 @@ keycloak:
     username: ${KEYCLOAK_ADMIN}
     password: ${KEYCLOAK_ADMIN_PASSWORD}
 
-# Application Custom Config
 ai-pipeline:
   url: ${AI_PIPELINE_URL}
 
-# Observability
 management:
   endpoints:
     web:
       exposure:
         include: health,prometheus,metrics,info
+
   metrics:
     tags:
       application: ${spring.application.name}
@@ -70,7 +77,6 @@ sentry:
   dsn: ${SENTRY_DSN_BACKEND:}
   environment: ${ENVIRONMENT}
   traces-sample-rate: 1.0
-  enable-tracing: true
   release: ${RELEASE_VERSION}
 
 otel:

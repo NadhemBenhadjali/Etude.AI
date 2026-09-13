@@ -30,9 +30,7 @@ services:
       container_name: etudeai-neo4j
       restart: always
       environment:
-        # sets the initial password for the default neo4j user
         NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD}"
-        # Memory settings for better performance
         NEO4J_server_memory_pagecache_size: 1G
         NEO4J_server_memory_heap_max__size: 2G
       ports:
@@ -51,15 +49,14 @@ services:
         start_period: 60s
 
   qdrant:
-      image: qdrant/qdrant:v1.7.4
+      image: qdrant/qdrant:v1.13.2
       container_name: etudeai-qdrant
       restart: always
       environment:
-        # Optional: Set API key for authentication (leave empty for local development)
         QDRANT__SERVICE__API_KEY: "${QDRANT_API_KEY:-}"
       ports:
-        - "6333:6333"  # HTTP API
-        - "6334:6334"  # gRPC
+        - "6333:6333"
+        - "6334:6334"
       volumes:
         - qdrant_data:/qdrant/storage
       networks:

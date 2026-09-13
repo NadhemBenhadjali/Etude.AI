@@ -7,7 +7,7 @@ import { AvatarComponent } from '../../shared/avatar/avatar.component';
 @Component({
   selector: 'app-finished',
   standalone: true,
-  imports: [CommonModule, AvatarComponent],
+  imports: [CommonModule],
   templateUrl: './finished.component.html',
   styleUrls: ['./finished.component.css']
 })

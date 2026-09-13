@@ -5,12 +5,17 @@ import com.example.EtudeAI.model.dto.PlanRequestDTO;
 import com.example.EtudeAI.service.AiPipelineService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,41 +26,66 @@ public class AiPipelineServiceImpl implements AiPipelineService {
     private final WebClient webClient;
 
     public AiPipelineServiceImpl(WebClient.Builder webClientBuilder,
-            @Value("${ai-pipeline.url}") String aiPipelineUrl) {
+                                 @Value("${ai-pipeline.url}") String aiPipelineUrl) {
         this.webClient = webClientBuilder.baseUrl(aiPipelineUrl).build();
     }
+
     @Override
-    public Mono<Map> getSummary(String subject, String module, String sessionId) {
-        log.info("Calling AI Pipeline /summary with subject='{}', module='{}', sessionId='{}'", subject, module, sessionId);
+    public Flux<ServerSentEvent<String>> getSummary(String subject, String module, String sessionId) {
+        log.info("Calling AI Pipeline SSE /summary with subject='{}', module='{}', sessionId='{}'", subject, module, sessionId);
 
-        Map<String, String> requestBody = Map.of("subject", subject, "module", module);
-        log.debug("Request body: {}", requestBody);
+        Map<String, String> requestBody = Map.of(
+                "subject", subject != null ? subject : "",
+                "module", module != null ? module : ""
+        );
 
-        return webClient.post()
+        ParameterizedTypeReference<ServerSentEvent<String>> typeRef = new ParameterizedTypeReference<>() {};
+
+        var req = webClient.post()
                 .uri("/summary")
-                .header("X-Session-ID", sessionId)
-                .bodyValue(requestBody)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.TEXT_EVENT_STREAM);
+
+        if (StringUtils.hasText(sessionId)) {
+            req = req.header("X-Session-ID", sessionId);
+        }
+
+        return req.bodyValue(requestBody)
                 .retrieve()
-                .bodyToMono(Map.class)
-                .doOnSuccess(response -> log.info("Successfully received summary response"))
-                .doOnError(error -> log.error("Error calling AI Pipeline: {}", error.getMessage()))
-                .onErrorMap(WebClientResponseException.class, e -> {
+                .bodyToFlux(typeRef)
+                .doOnNext(event -> log.debug("Received SSE event: type={}", event.event()))
+                .doOnComplete(() -> log.info("Completed SSE summary stream for module='{}'", module))
+                .onErrorResume(WebClientResponseException.class, e -> {
                     String errorBody = e.getResponseBodyAsString();
-                    log.error("AI Pipeline error while generating summary: Status={}, Response body: {}",
+                    log.error("AI Pipeline error during SSE summary: Status={}, Response body: {}",
                             e.getStatusCode(), errorBody);
+
                     String errorMessage = String.format("AI Pipeline returned %s: %s",
                             e.getStatusCode(),
                             errorBody.isEmpty() ? e.getMessage() : errorBody);
-                    return new AiServiceException("Summary", errorMessage, e);
+
+                    ServerSentEvent<String> errorEvent = ServerSentEvent.<String>builder()
+                            .event("error")
+                            .data("{\"error\": \"AiServiceException\", \"message\": \"" + errorMessage.replace("\"", "\\\"") + "\"}")
+                            .build();
+
+                    return Flux.just(errorEvent);
                 })
-                .onErrorMap(e -> !(e instanceof AiServiceException), e -> {
-                    log.error("Unexpected error while generating summary: {}", e.getMessage());
-                    return new AiServiceException("Summary", "Failed to generate summary", e);
+                .onErrorResume(e -> {
+                    log.error("Unexpected error during SSE summary: {}", e.getMessage());
+                    ServerSentEvent<String> errorEvent = ServerSentEvent.<String>builder()
+                            .event("error")
+                            .data("{\"error\": \"AiServiceException\", \"message\": \"Failed to stream summary: " + (e.getMessage() != null ? e.getMessage().replace("\"", "\\\"") : "Unknown error") + "\"}")
+                            .build();
+                    return Flux.just(errorEvent);
                 });
     }
 
     @Override
-    public Mono<Map> askQuestion(String question, String sessionId) {
+    public Mono<Map<String, Object>> askQuestion(String question, String sessionId) {
+        log.info("Calling AI Pipeline /qa with sessionId='{}'", sessionId);
+        log.debug("Question payload: '{}'", question);
+
         var req = webClient.post()
                 .uri("/qa")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -65,13 +95,19 @@ public class AiPipelineServiceImpl implements AiPipelineService {
             req = req.header("X-Session-ID", sessionId);
         }
 
-        return req
-                .bodyValue(Map.of("question", question))
+        return req.bodyValue(Map.of("question", question != null ? question : ""))
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
+                })
+                .doOnSuccess(response -> log.info("Successfully received QA response"))
                 .onErrorMap(WebClientResponseException.class, e -> {
-                    log.error("AI Pipeline error while answering question: {}", e.getMessage());
-                    return new AiServiceException("QA", e.getMessage(), e);
+                    String errorBody = e.getResponseBodyAsString();
+                    log.error("AI Pipeline error while answering question: Status={}, Response body: {}", e.getStatusCode(), errorBody);
+
+                    String errorMessage = String.format("AI Pipeline returned %s: %s",
+                            e.getStatusCode(), errorBody.isEmpty() ? e.getMessage() : errorBody);
+
+                    return new AiServiceException("QA", errorMessage, e);
                 })
                 .onErrorMap(e -> !(e instanceof AiServiceException), e -> {
                     log.error("Unexpected error while answering question: {}", e.getMessage());
@@ -80,16 +116,39 @@ public class AiPipelineServiceImpl implements AiPipelineService {
     }
 
     @Override
-    public Mono<Map> generateQuiz(String module, int numMc, int numTf, String sessionId) {
-        return webClient.post()
+    public Mono<Map<String, Object>> generateQuiz(String module, int numMc, int numTf, String sessionId) {
+        log.info("Calling AI Pipeline /quiz with module='{}', numMc={}, numTf={}, sessionId='{}'",
+                module, numMc, numTf, sessionId);
+
+        Map<String, Object> requestBody = Map.of(
+                "module", module != null ? module : "",
+                "num_mc", numMc,
+                "num_tf", numTf
+        );
+
+        var req = webClient.post()
                 .uri("/quiz")
-                .header("X-Session-ID", sessionId)
-                .bodyValue(Map.of("module", module, "num_mc", numMc, "num_tf", numTf))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+
+        if (StringUtils.hasText(sessionId)) {
+            req = req.header("X-Session-ID", sessionId);
+        }
+
+        return req.bodyValue(requestBody)
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
+                })
+                .doOnSuccess(response -> log.info("Successfully generated quiz for module='{}'", module))
                 .onErrorMap(WebClientResponseException.class, e -> {
-                    log.error("AI Pipeline error while generating quiz: {}", e.getMessage());
-                    return new AiServiceException("Quiz", e.getMessage(), e);
+                    String errorBody = e.getResponseBodyAsString();
+                    log.error("AI Pipeline error while generating quiz: Status={}, Response body: {}",
+                            e.getStatusCode(), errorBody);
+
+                    String errorMessage = String.format("AI Pipeline returned %s: %s",
+                            e.getStatusCode(), errorBody.isEmpty() ? e.getMessage() : errorBody);
+
+                    return new AiServiceException("Quiz", errorMessage, e);
                 })
                 .onErrorMap(e -> !(e instanceof AiServiceException), e -> {
                     log.error("Unexpected error while generating quiz: {}", e.getMessage());
@@ -99,14 +158,30 @@ public class AiPipelineServiceImpl implements AiPipelineService {
 
     @Override
     public Mono<byte[]> generateTts(String text) {
-        return webClient.post()
+        int textLength = text != null ? text.length() : 0;
+        log.info("Calling AI Pipeline /tts (text length: {} chars)", textLength);
+
+        var req = webClient.post()
                 .uri("/tts")
-                .bodyValue(Map.of("text", text))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_OCTET_STREAM, MediaType.ALL);
+
+        return req.bodyValue(Map.of("text", text != null ? text : ""))
                 .retrieve()
                 .bodyToMono(byte[].class)
+                .doOnSuccess(audioBytes ->
+                        log.info("Successfully generated TTS audio ({} bytes received)", audioBytes != null ? audioBytes.length : 0)
+                )
                 .onErrorMap(WebClientResponseException.class, e -> {
-                    log.error("AI Pipeline error while generating TTS: {}", e.getMessage());
-                    return new AiServiceException("TTS", e.getMessage(), e);
+                    String errorBody = e.getResponseBodyAsString();
+                    log.error("AI Pipeline error while generating TTS: Status={}, Response body: {}",
+                            e.getStatusCode(), errorBody);
+
+                    String errorMessage = String.format("AI Pipeline returned %s: %s",
+                            e.getStatusCode(),
+                            errorBody.isEmpty() ? e.getMessage() : errorBody);
+
+                    return new AiServiceException("TTS", errorMessage, e);
                 })
                 .onErrorMap(e -> !(e instanceof AiServiceException), e -> {
                     log.error("Unexpected error while generating TTS: {}", e.getMessage());
@@ -115,19 +190,22 @@ public class AiPipelineServiceImpl implements AiPipelineService {
     }
 
     @Override
-    public Mono<Map> health() {
-    return webClient
-            .get()
-            .uri("/health")
-            .retrieve()
-            .bodyToMono(Map.class);}
+    public Mono<Map<String, Object>> health() {
+        var req = webClient.get()
+                .uri("/health")
+                .accept(MediaType.APPLICATION_JSON);
+
+        return req.retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                .timeout(Duration.ofSeconds(3))
+                .onErrorReturn(Map.of("status", "DOWN", "error", "AI Pipeline unreachable"));
+    }
 
     @Override
-    public Mono<Map> generatePlan(PlanRequestDTO planRequest, String authorizationHeader, String sessionId) {
+    public Mono<Map<String, Object>> generatePlan(PlanRequestDTO planRequest, String authorizationHeader, String sessionId) {
         log.info("Calling AI Pipeline /plan with goal='{}', time_available='{}', branch='{}', topic='{}', sessionId='{}'",
                 planRequest.getGoal(), planRequest.getTime_available(), planRequest.getBranch(), planRequest.getTopic(), sessionId);
 
-        // Build request body with all fields
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("goal", planRequest.getGoal() != null ? planRequest.getGoal() : "");
         requestBody.put("time_available", planRequest.getTime_available() != null ? planRequest.getTime_available() : "");
@@ -145,7 +223,6 @@ public class AiPipelineServiceImpl implements AiPipelineService {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
 
-        // Add Authorization header if present
         if (StringUtils.hasText(authorizationHeader)) {
             request = request.header("Authorization", authorizationHeader);
             log.debug("Authorization header added to request");
@@ -154,7 +231,7 @@ public class AiPipelineServiceImpl implements AiPipelineService {
         return request
                 .bodyValue(requestBody)
                 .retrieve()
-                .bodyToMono(Map.class)
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
                 .doOnSuccess(response -> log.info("Successfully received plan response"))
                 .doOnError(error -> log.error("Error calling AI Pipeline /plan: {}", error.getMessage()))
                 .onErrorMap(WebClientResponseException.class, e -> {

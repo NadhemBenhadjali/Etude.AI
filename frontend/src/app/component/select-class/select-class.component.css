@@ -1,116 +1,207 @@
 .select-class-page {
-  height: auto;
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  font-family: var(--app-font);
+  padding: 1.5rem 2rem 4rem;
+}
+
+/* Top Bar */
+.top-nav-bar {
+  max-width: 1100px;
+  margin: 0 auto 2.5rem;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  text-align: center;
-  background: linear-gradient(270deg, #5BBCFF, #FFFAB7, #FFD1E3, #7EA1FF);
-  background-size: 800% 800%;
-  animation: gradientMove 15s ease infinite;
-  padding: 20px;
 }
 
-.center-container {
-  width: 100%;
-  max-width: 700px;
-}
-
-/* Animate background */
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-.instruction {
-  font-size: 32px;
-  color: #7EA1FF;
-  margin-bottom: 40px;
-  font-weight: bold;
-  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
-  text-align: center;
-  letter-spacing: 1.2px;
-  text-shadow: 2px 2px 5px #5BBCFF;
-  background: linear-gradient(90deg, #010e17, #5BBCFF);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: pulseText 2s ease-in-out infinite;
-}
-@keyframes pulseText {
- 
-  50% {
-    transform: scale(1.05);
-    text-shadow: 3px 3px 3px #5BBCFF;
-  }
-}
-
-.class-container {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); 
-  gap: 30px 160px; /* row-gap 12px, column-gap 30px */
-  justify-content: center;
-  align-items: center;
-  padding: 0 10px;
-}
-
-
-.class-box {
-  width: 350px;
-  height: 350px;
-  border-radius: 24px;
-  text-align: center;
+.back-home-btn {
+  background: white;
+  border: 2px solid #e2e8f0;
+  color: #334155;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 0.6rem 1.4rem;
+  border-radius: 18px;
   cursor: pointer;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.back-home-btn:hover {
+  background: #f8fafc;
+  border-color: #38bdf8;
+  color: #0284c7;
+  transform: translateY(-2px);
+}
+
+.user-passport-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 22px;
+  border: 3px solid #fef08a;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  transition: all 0.25s ease;
+}
+
+.user-passport-badge:hover {
+  transform: translateY(-2px) scale(1.02);
+  border-color: #fed7aa;
+}
+
+.passport-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: contain;
+}
+
+.passport-info {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  background-blend-mode: overlay;
+  text-align: right;
 }
 
-.class-box:hover {
-  transform: scale(1.07);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+.passport-title {
+  font-weight: 900;
+  font-size: 0.95rem;
+  color: #0f172a;
 }
 
-.class-box img {
-  width: 180px;
-  height: 180px;
-  object-fit: contain;
-  margin: auto;
-}
-
-.class-box p {
+.passport-status {
+  font-size: 0.8rem;
+  color: #d97706;
   font-weight: bold;
-  font-size: 22px;
-  margin-top: 2px;
-  color: #06033a;
-  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
-}
-.avatar-container {
-  position: absolute;
-  top: 60px;
-  right: 120px;
-  z-index: 1000;
 }
 
-.avatar {
-  position: fixed;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  border: 3px solid #FFFAB7;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  object-fit: cover;
-  background-color: white;
+/* Hero Header */
+.class-hero-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 3rem;
 }
-@media (max-width: 600px) {
-  .avatar {
-    width: 60px;
-    height: 60px;
-  }
+
+.hero-chip {
+  display: inline-block;
+  background: #fef08a;
+  color: #854d0e;
+  font-weight: 900;
+  font-size: 0.95rem;
+  padding: 0.35rem 1.2rem;
+  border-radius: 99px;
+  margin-bottom: 0.8rem;
 }
-.avatar {
+
+.hero-heading {
+  font-size: 2.6rem;
+  color: #0f172a;
+  font-weight: 900;
+  margin: 0 0 0.6rem;
+}
+
+.hero-sub {
+  color: #475569;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+/* 6 Grid Cards */
+.class-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.grade-card {
+  position: relative;
+  background: white;
+  border-radius: 32px;
+  padding: 2.2rem 1.8rem;
+  border: 4px solid #e2e8f0;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
   cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+.grade-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  border-color: #38bdf8;
+  box-shadow: 0 20px 48px rgba(56, 189, 248, 0.25);
+}
+
+.grade-number-badge {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 1.1rem;
+  font-weight: 900;
+  padding: 0.2rem 0.8rem;
+  border-radius: 12px;
+}
+
+.grade-illustration {
+  width: 140px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.5rem 0 1.5rem;
+}
+
+.grade-illustration img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.grade-card:hover .grade-illustration img {
+  transform: scale(1.1) rotate(3deg);
+}
+
+.grade-info h3 {
+  font-size: 1.6rem;
+  color: #0f172a;
+  font-weight: 900;
+  margin: 0 0 0.3rem;
+}
+
+.grade-subtext {
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: bold;
+  margin: 0 0 1.2rem;
+}
+
+.grade-hover-arrow {
+  background: #e0f2fe;
+  color: #0284c7;
+  font-weight: 900;
+  font-size: 0.95rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 16px;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.grade-card:hover .grade-hover-arrow {
+  background: #0284c7;
+  color: white;
+}
+
+@media (max-width: 700px) {
+  .hero-heading { font-size: 2rem; }
+  .class-cards-grid { grid-template-columns: 1fr; }
 }

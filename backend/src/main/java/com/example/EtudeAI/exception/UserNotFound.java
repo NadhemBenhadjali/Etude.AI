@@ -1,4 +1,4 @@
-package com.project.siab2b.commun.exception;
+package com.example.EtudeAI.exception;
 
 
 import org.springframework.http.HttpStatus;

@@ -17,17 +17,28 @@ from typing import Dict, Tuple, Optional, List
 
 import pandas as pd
 from neo4j import GraphDatabase, Driver
-from langchain_huggingface import HuggingFaceEmbeddings
 from app.crew import config
-
+from app.helpers import embed
 
 # ──────────────── Configuration ────────────────
 NEO4J_URI:      str = config.URI
 NEO4J_USER:     str = config.USER
 NEO4J_PASSWORD: str = config.PASSWORD
 BASE_DIR = Path(__file__).resolve().parent
-CSV_PATH: Path = BASE_DIR / "captions_ar.csv"
-MODEL_NAME:     str = "Omartificial-Intelligence-Space/GATE-AraBert-v1"
+
+def get_csv_path() -> Path:
+    candidates = [
+        BASE_DIR / "captions_ar.csv",
+        BASE_DIR.parent / "config_files" / "captions_ar.csv",
+        Path("config_files/captions_ar.csv"),
+        Path("databases_construction/captions_ar.csv"),
+    ]
+    for p in candidates:
+        if p.exists():
+            return p
+    return BASE_DIR / "captions_ar.csv"
+
+CSV_PATH: Path = get_csv_path()
 CLEAR_DB_FIRST: bool = True
 # ────────────────────────────────────────────────
 
@@ -79,11 +90,28 @@ KG: Dict[str, Dict[str, Dict[str, Tuple[int, int]]]] = {
 
 # ──────────────── Neo4j helpers ────────────────
 def get_driver() -> Driver:
-    if not NEO4J_PASSWORD:
-        raise RuntimeError(
-            "NEO4J_PASSWORD is empty. Set it as an environment variable before running."
-        )
-    return GraphDatabase.driver(NEO4J_URI, auth=(NEO4J_USER, NEO4J_PASSWORD))
+    uris = [
+        NEO4J_URI,
+        "bolt://neo4j:7687",
+        "bolt://localhost:7687",
+        "neo4j://localhost:7687",
+    ]
+    seen = set()
+    unique_uris = [u for u in uris if u and not (u in seen or seen.add(u))]
+
+    last_err = None
+    for uri in unique_uris:
+        try:
+            print(f"Connecting to Neo4j at: {uri} ...")
+            driver = GraphDatabase.driver(uri, auth=(NEO4J_USER, NEO4J_PASSWORD or "password"))
+            driver.verify_connectivity()
+            print(f"✓ Connected to Neo4j at {uri}")
+            return driver
+        except Exception as e:
+            print(f"  Connection attempt to {uri} failed: {e}")
+            last_err = e
+
+    raise RuntimeError(f"Could not connect to any Neo4j instance: {last_err}")
 
 
 class KGWriter:
@@ -216,22 +244,27 @@ def add_images_from_csv(driver: Driver, csv_path: Path) -> None:
 
 
 # ──────────────── Embeddings ────────────────
-def embed_lessons(driver: Driver, model_name: str) -> None:
-    emb = HuggingFaceEmbeddings(model_name=model_name)
+def embed_lessons(driver: Driver) -> None:
+    try:
+        with driver.session() as sess:
+            lessons = list(sess.run("MATCH (l:Lesson) RETURN l.title AS title"))
 
-    with driver.session() as sess:
-        lessons = list(sess.run("MATCH (l:Lesson) RETURN id(l) AS id, l.title AS title"))
+        with driver.session() as sess:
+            for rec in lessons:
+                title = rec["title"]
+                try:
+                    vec = embed(title)
+                    sess.run(
+                        "MATCH (l:Lesson {title: $title}) SET l.vector_embedding = $vec",
+                        title=title,
+                        vec=vec,
+                    )
+                except Exception as e:
+                    print(f"⚠️ Warning: Could not embed lesson '{title}': {e}")
 
-    with driver.session() as sess:
-        for rec in lessons:
-            vec = emb.embed_query(rec["title"])
-            sess.run(
-                "MATCH (l) WHERE id(l) = $id SET l.vector_embedding = $vec",
-                id=rec["id"],
-                vec=vec,
-            )
-
-    print("✅ embeddings stored")
+        print("✅ embeddings stored")
+    except Exception as e:
+        print(f"⚠️ Warning: embedding generation encountered error: {e}")
 
 
 def main():
@@ -246,7 +279,7 @@ def main():
         kg_writer.create_indexes_and_constraints()
         kg_writer.write(KG)
         add_images_from_csv(driver, CSV_PATH)
-        embed_lessons(driver, MODEL_NAME)
+        embed_lessons(driver)
 
         print("🎉 pipeline finished")
     finally:

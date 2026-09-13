@@ -1,7 +1,9 @@
 from __future__ import annotations
 import json
 import structlog
+import litellm
 from crewai import Crew
+from app.crew.agents import build_llm
 from app.crew.knowledge_graph import Neo4jKG
 from pathlib import Path
 from app.helpers import _clean_json_block, parse_quiz_json, _clean_user_question, _extract_final_answer
@@ -13,6 +15,95 @@ from app.exceptions import (
 )
 
 logger = structlog.get_logger()
+
+def _normalize_summary_images(data: dict) -> dict:
+    if not isinstance(data, dict) or "slides" not in data or not isinstance(data["slides"], list):
+        return data
+    for slide in data["slides"]:
+        if not isinstance(slide, dict):
+            continue
+        img = slide.get("image")
+        if isinstance(img, str) and img.strip():
+            img = img.strip().lstrip("/")
+            if not img.startswith("assets/book_images/") and not img.startswith("http://") and not img.startswith("https://"):
+                if img.startswith("book_images/"):
+                    img = "assets/" + img
+                elif img.startswith("assets/"):
+                    img = img
+                else:
+                    img = f"assets/book_images/{img}"
+            slide["image"] = img
+    return data
+
+def generate_summary_stream(topic_input: str, kg: Neo4jKG, session_id: str | None = None, memory_manager = None):
+    try:
+        topic = topic_input.strip()
+        logger.info("generating_summary_stream", topic=topic, session_id=session_id)
+
+        branch = kg.find_branch_for_topic(topic)
+        lessons_info = kg.get_lessons_for_topic(topic)
+
+        if not branch or not lessons_info:
+            err = {"error": "TopicNotFoundError", "message": f"Topic '{topic}' not found in knowledge graph"}
+            yield f"event: error\ndata: {json.dumps(err, ensure_ascii=False)}\n\n"
+            return
+
+        yield f"event: status\ndata: {json.dumps({'status': 'generating', 'branch': branch, 'topic': topic}, ensure_ascii=False)}\n\n"
+
+        images_section = kg.extract_images(topic)
+        sub_lessons_md = "\n".join(f"• {ld['title']}" for ld in lessons_info)
+        task = summary_task(sub_lessons_md, images_section, topic, branch, summary_agent=SUMMARY_AGENT)
+
+        # Utilize centralized build_llm()
+        llm = build_llm()
+
+        response = litellm.completion(
+            model=llm.model,
+            messages=[
+                {"role": "system", "content": "إنتي معلّمة تونسية توضّح الدروس لتلميذ في السنة الرابعة ابتدائي بالدارجة التونسية. يجب أن تكون المخرجات JSON فقط بدون أي نص إضافي."},
+                {"role": "user", "content": task.description}
+            ],
+            api_key=llm.api_key,
+            base_url=llm.base_url,
+            stream=True,
+        )
+
+        full_raw = ""
+        for chunk in response:
+            delta = chunk.choices[0].delta.content or ""
+            if delta:
+                full_raw += delta
+                yield f"event: token\ndata: {json.dumps({'token': delta}, ensure_ascii=False)}\n\n"
+
+        cleaned = _clean_json_block(full_raw)
+        start = cleaned.find("{")
+        end = cleaned.rfind("}")
+        if start == -1 or end == -1:
+            err = {"error": "InvalidResponseError", "message": "LLM response does not contain valid JSON"}
+            yield f"event: error\ndata: {json.dumps(err, ensure_ascii=False)}\n\n"
+            return
+
+        data = json.loads(cleaned[start:end+1])
+        data = _normalize_summary_images(data)
+        filename = f"{branch}_{topic}.json".replace(" ", "_")
+        out_dir = Path("lessons")
+        out_dir.mkdir(exist_ok=True)
+        (out_dir / filename).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        if memory_manager and session_id:
+            try:
+                memory_manager.log_event(session_id, "chapter_summary", data)
+            except Exception as e:
+                logger.warning("failed_to_log_summary_to_memory", error=str(e))
+
+        complete_data = {"path": f"/lessons/{filename}", "data": data}
+        yield f"event: complete\ndata: {json.dumps(complete_data, ensure_ascii=False)}\n\n"
+        logger.info("summary_stream_completed", topic=topic, filename=filename)
+
+    except Exception as e:
+        logger.error("summary_stream_failed", error=str(e), topic=topic_input)
+        err = {"error": type(e).__name__, "message": str(e)}
+        yield f"event: error\ndata: {json.dumps(err, ensure_ascii=False)}\n\n"
 
 def generate_summary_json(topic_input: str, kg: Neo4jKG) -> dict:
     try:
@@ -45,6 +136,7 @@ def generate_summary_json(topic_input: str, kg: Neo4jKG) -> dict:
             )
 
         data = json.loads(cleaned[start:end+1])
+        data = _normalize_summary_images(data)
 
         filename = f"{branch}_{topic}.json".replace(" ", "_")
         out_dir = Path("lessons")

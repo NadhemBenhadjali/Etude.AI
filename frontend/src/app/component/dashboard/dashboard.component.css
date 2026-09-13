@@ -1,32 +1,229 @@
 .dashboard-container {
-  min-height: 50vh;
-  background: linear-gradient(135deg, #5BBCFF, #FFFAB7, #FFD1E3, #7EA1FF);
-  background-size: 400% 400%;
-  animation: gradientShift 12s ease infinite;
-  padding: 9rem;
-  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f2fe, #fef9c3, #fce7f3, #e0e7ff);
+  background-size: 300% 300%;
+  animation: gradientShift 15s ease infinite;
+  padding: 2.5rem 2rem;
+  font-family: 'FredFredburgerARAHeadBlack', 'Tajawal', 'Cairo', sans-serif;
   direction: rtl;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ===================================
+   🌟 KID HERO BANNER & STATS
+=================================== */
+.kid-hero-banner {
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+  border: 5px solid #86efac;
+  border-radius: 36px;
+  padding: 2rem 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 12px 36px rgba(34, 197, 94, 0.12);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-left {
+  flex: 1;
+}
+
+.flag-badge {
+  display: inline-block;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 0.95rem;
+  font-weight: 900;
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  margin-bottom: 0.5rem;
+}
+
+.hero-greeting h2 {
+  font-size: 2.2rem;
+  color: #1e293b;
+  margin: 0.2rem 0;
+  font-weight: 900;
+}
+
+.hero-name {
+  color: #0284c7;
+}
+
+.hero-subtext {
+  color: #475569;
+  font-size: 1.15rem;
+  margin: 0.5rem 0 1.5rem;
+  line-height: 1.5;
+}
+
+.hero-stats-chips {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.stat-chip {
+  background: white;
+  border: 3px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 0.6rem 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+}
+
+.stat-chip:hover {
+  transform: translateY(-3px) scale(1.03);
+}
+
+.stat-chip.stars { border-color: #fef08a; background: #fefce8; }
+.stat-chip.lessons { border-color: #bae6fd; background: #f0f9ff; }
+.stat-chip.quizzes { border-color: #fbcfe8; background: #fdf2f8; }
+
+.stat-chip .stat-icon {
+  font-size: 1.6rem;
+}
+
+.stat-chip .stat-val {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #1e293b;
+  display: block;
+}
+
+.stat-chip .stat-lbl {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: bold;
+}
+
+.hero-right-mascot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.hero-mascot-img {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+  animation: mascotFloat 3s ease-in-out infinite alternate;
+}
+
+@keyframes mascotFloat {
+  from { transform: translateY(0) rotate(-4deg); }
+  to { transform: translateY(-12px) rotate(4deg); }
+}
+
+.mascot-speech-bubble {
+  background: #fef08a;
+  border: 3px solid #fed7aa;
+  color: #1e293b;
+  font-weight: 900;
+  font-size: 1rem;
+  padding: 0.4rem 1rem;
+  border-radius: 16px;
+  margin-top: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* ===================================
+   🚀 BIG PLAYFUL ACTION LAUNCHPAD
+=================================== */
+.kids-launchpad-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.8rem;
+  margin-bottom: 2.5rem;
+}
+
+.launchpad-card {
+  background: white;
+  border-radius: 30px;
+  padding: 1.8rem;
+  display: flex;
+  gap: 1.2rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border: 4px solid #f1f5f9;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.launchpad-card:hover {
+  transform: translateY(-8px) scale(1.03);
+}
+
+.card-learning { border-color: #86efac; }
+.card-learning:hover { border-color: #22c55e; box-shadow: 0 16px 36px rgba(34, 197, 94, 0.22); }
+
+.card-quiz { border-color: #fef08a; }
+.card-quiz:hover { border-color: #eab308; box-shadow: 0 16px 36px rgba(234, 179, 8, 0.22); }
+
+.card-chatbot { border-color: #7dd3fc; }
+.card-chatbot:hover { border-color: #0284c7; box-shadow: 0 16px 36px rgba(2, 132, 199, 0.22); }
+
+.card-planner { border-color: #f472b6; }
+.card-planner:hover { border-color: #db2777; box-shadow: 0 16px 36px rgba(219, 39, 119, 0.22); }
+
+.launch-icon-bg {
+  width: 70px;
+  height: 70px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.card-learning .launch-icon-bg { background: #dcfce7; }
+.card-quiz .launch-icon-bg { background: #fef9c3; }
+.card-chatbot .launch-icon-bg { background: #e0f2fe; }
+.card-planner .launch-icon-bg { background: #fce7f3; }
+
+.launch-emoji {
+  font-size: 2.2rem;
+}
+
+.launch-text h3 {
+  font-size: 1.35rem;
+  margin: 0 0 0.4rem;
+  color: #1e293b;
+  font-weight: 900;
+}
+
+.launch-text p {
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  margin: 0 0 0.8rem;
+}
+
+.launch-action-btn {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #0284c7;
+  display: inline-block;
 }
 
 /* Header Styles */
-/* ==============================
-   ✅ DASHBOARD HEADER (PREMIUM)
-============================== */
-
 .dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   background: rgba(255, 255, 255, 0.95);
   border-radius: 30px;
-  padding: 2rem;
+  padding: 1.5rem 2rem;
   margin-bottom: 2rem;
-
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  border: 8px solid #FFFAB7;
-
-  animation: float 6s ease-in-out infinite;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 5px solid #fef08a;
   position: relative;
 }
 
@@ -702,213 +899,107 @@
 .day-header {
   text-align: center;
   font-weight: 900;
-  color: rgba(0,0,0,0.6);
+  color: #475569;
   padding: 0.65rem;
-  background: rgba(255, 250, 183, 0.75);
+  background: #fef08a;
   border-radius: 14px;
-  border: 2px solid rgba(255, 250, 183, 1);
+  border: 2px solid #fde047;
+  font-size: 0.9rem;
 }
 
-
-/* ==============================
-   ✅ Day Card (PREMIUM)
-============================== */
-
+/* Day Card */
 .calendar-day {
-  min-height: 105px;
-  border-radius: 18px;
+  min-height: 110px;
+  border-radius: 20px;
   cursor: pointer;
-  padding: 0.7rem 0.55rem;
-
+  padding: 0.75rem 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
-
-  background: rgba(255,255,255,0.88);
-  border: 2px solid rgba(91,188,255,0.12);
-
-  box-shadow: 0 10px 18px rgba(0,0,0,0.06);
-  transition: all 0.25s ease;
+  gap: 0.35rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
 }
 
 .calendar-day:hover {
-  transform: translateY(-4px) scale(1.02);
-  border-color: rgba(91,188,255,0.55);
-  box-shadow: 0 14px 28px rgba(0,0,0,0.10);
+  transform: translateY(-4px);
+  border-color: #38bdf8;
+  box-shadow: 0 10px 24px rgba(56, 189, 248, 0.18);
 }
 
 /* Today highlight */
 .calendar-day.today {
-  background: linear-gradient(135deg, rgba(91,188,255,0.95), rgba(126,161,255,0.9));
+  background: linear-gradient(135deg, #38bdf8, #6366f1);
   color: white;
-  border: 2px solid rgba(255,255,255,0.75);
-  box-shadow: 0 16px 35px rgba(91,188,255,0.35);
+  border: 2px solid #bae6fd;
+  box-shadow: 0 12px 28px rgba(56, 189, 248, 0.35);
 }
 
 .calendar-day.today .day-number {
   color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* other month */
+/* Other month */
 .calendar-day.other-month {
-  opacity: 0.35;
-  filter: grayscale(0.7);
+  opacity: 0.3;
+  filter: grayscale(1);
+  background: #f8fafc;
 }
 
 /* Day number */
 .day-number {
-  font-size: 1.1rem;
-  font-weight: 1000;
-  color: rgba(0,0,0,0.72);
-}
-
-
-/* ==============================
-   ✅ Sessions inside Day
-============================== */
-
-.day-sessions {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  margin-top: 0.3rem;
-}
-
-.session-item {
-  padding: 0.25rem 0.45rem;
-  border-radius: 10px;
-  font-size: 0.7rem;
+  font-size: 1.15rem;
   font-weight: 900;
-
-  background: rgba(229,249,255,0.85);
-  border: 1px solid rgba(91,188,255,0.25);
-
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  color: #0f172a;
 }
 
-/* session status colors */
-.session-item.completed {
-  background: rgba(76, 175, 80, 0.12);
-  border: 1px solid rgba(76, 175, 80, 0.4);
-  color: #2e7d32;
-}
-
-.session-item.in-progress {
-  background: rgba(255, 152, 0, 0.12);
-  border: 1px solid rgba(255, 152, 0, 0.4);
-  color: #ef6c00;
-}
-
-.session-item.pending {
-  background: rgba(244, 67, 54, 0.12);
-  border: 1px solid rgba(244, 67, 54, 0.4);
-  color: #c62828;
-}
-
-/* More sessions badge */
-.more-sessions {
-  text-align: center;
-  font-size: 0.65rem;
-  font-weight: 1000;
-  padding: 0.25rem;
-  border-radius: 10px;
-  background: rgba(255, 250, 183, 0.75);
-  border: 1px solid rgba(255, 250, 183, 1);
-  color: rgba(0,0,0,0.75);
-}
-
-
-/* ==============================
-   ✅ PREMIUM SCROLLBARS (list/card view)
-============================== */
-
-.sessions-list::-webkit-scrollbar,
-.cards-container::-webkit-scrollbar {
-  width: 10px;
-}
-
-.sessions-list::-webkit-scrollbar-track,
-.cards-container::-webkit-scrollbar-track {
-  background: rgba(0,0,0,0.04);
-  border-radius: 999px;
-}
-
-.sessions-list::-webkit-scrollbar-thumb,
-.cards-container::-webkit-scrollbar-thumb {
-  background: rgba(91,188,255,0.55);
-  border-radius: 999px;
-}
-
-.sessions-list::-webkit-scrollbar-thumb:hover,
-.cards-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(91,188,255,0.85);
-}
-
-
-/* ==============================
-   ✅ RESPONSIVE PREMIUM
-============================== */
-
-@media (max-width: 768px) {
-  .calendar-container {
-    padding: 1.3rem;
-  }
-
-  .calendar-days {
-    gap: 0.45rem;
-  }
-
-  .calendar-day {
-    min-height: 85px;
-    padding: 0.55rem 0.35rem;
-  }
-
-  .day-number {
-    font-size: 0.95rem;
-  }
-}
-
-
-
+/* Sessions inside Day */
 .day-sessions {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
-  font-size: 0.7rem;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
 }
 
 .session-item {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 3px;
-  padding: 0.125rem 0.25rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: #e0f2fe;
+  border: 1px solid #7dd3fc;
+  color: #0369a1;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  border-left: 3px solid #ccc;
-}
-.calendar-day.has-sessions {
-  border: 2px solid rgba(255, 111, 145, 0.55);
-  box-shadow: 0 14px 26px rgba(255,111,145,0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
 }
 
-.session-item.completed {
-  border-left-color: #4CAF50;
-  background: rgba(76, 175, 80, 0.1);
+.session-item.completed,
+.session-item.COMPLETED {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #15803d;
 }
 
-.session-item.in-progress {
-  border-left-color: #FF9800;
-  background: rgba(255, 152, 0, 0.1);
+.session-item.in-progress,
+.session-item.ONGOING {
+  background: #fef3c7;
+  border-color: #fde047;
+  color: #b45309;
 }
 
-.session-item.pending {
-  border-left-color: #f44336;
-  background: rgba(244, 67, 54, 0.1);
+.session-item.pending,
+.session-item.PENDING {
+  background: #e0f2fe;
+  border-color: #7dd3fc;
+  color: #0369a1;
 }
 
 .session-item.hidden {
@@ -916,18 +1007,27 @@
 }
 
 .session-name {
-  font-size: 0.65rem;
-  font-weight: bold;
+  font-size: 0.72rem;
+  font-weight: 800;
 }
 
+/* More sessions badge */
 .more-sessions {
-  background: rgba(91, 188, 255, 0.1);
-  color: #5BBCFF;
-  border-radius: 3px;
-  padding: 0.125rem 0.25rem;
-  font-size: 0.6rem;
   text-align: center;
-  font-weight: bold;
+  font-size: 0.68rem;
+  font-weight: 900;
+  padding: 0.2rem 0.4rem;
+  border-radius: 99px;
+  background: #fef08a;
+  border: 1px solid #fde047;
+  color: #854d0e;
+}
+
+@media (max-width: 768px) {
+  .calendar-days { gap: 0.4rem; }
+  .calendar-day { min-height: 80px; padding: 0.4rem 0.2rem; }
+  .day-number { font-size: 0.95rem; }
+  .session-item { font-size: 0.65rem; padding: 0.2rem 0.3rem; }
 }
 
 /* List View Calendar */

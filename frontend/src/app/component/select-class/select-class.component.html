@@ -1,22 +1,43 @@
-<div class="select-class-page">
-  <div class="avatar-container">
-    <a routerLink="/profile" class="avatar-link">
-      <img src="assets/images/panda.png" alt="User Avatar" class="avatar" (click)="goToProfile()" />
-    </a>
+<div class="select-class-page" dir="rtl">
+  <!-- Top Bar -->
+  <div class="top-nav-bar">
+    <button class="back-home-btn" routerLink="/dashboard">
+      <span>🏠 لوحة التحكم</span>
+    </button>
+
+    <div class="user-passport-badge" (click)="goToProfile()">
+      <img src="assets/images/panda.png" alt="User Avatar" class="passport-avatar" />
+      <div class="passport-info">
+        <span class="passport-title">ملفي الشخصي</span>
+        <span class="passport-status">⭐ بطل Etude.AI</span>
+      </div>
+    </div>
   </div>
 
-  <div class="center-container">
-    <h2 class="instruction">اختار قسم القراية اللي تحب عليه.</h2>
+  <!-- Header -->
+  <div class="class-hero-header">
+    <div class="hero-chip">🎒 المرحلة الابتدائية التونسية</div>
+    <h1 class="hero-heading">في أيّة سنة تقرا يا بطل؟ 🌟</h1>
+    <p class="hero-sub">اختار سنتك الدراسية باش نعرضولك المواد والكتب الرسمية المناسبة ليك!</p>
+  </div>
 
-    <div class="class-container">
-      <div
-        class="class-box"
-        *ngFor="let classNumber of classes; let i = index"
-        [ngStyle]="{ 'background-color': colors[i % colors.length] }"
-        (click)="selectClass(classNumber)"
-      >
-        <img [src]="'assets/images/' + classNumber + '.png'" alt="Class {{classNumber}}" />
-        <p>السنة</p>
+  <!-- 6 Grade Cards Grid -->
+  <div class="class-cards-grid">
+    <div
+      class="grade-card"
+      *ngFor="let classNumber of classes; let i = index"
+      (click)="selectClass(classNumber)"
+    >
+      <div class="grade-number-badge">0{{ classNumber }}</div>
+      <div class="grade-illustration">
+        <img [src]="'assets/images/' + classNumber + '.png'" alt="السنة {{ classNumber }}" />
+      </div>
+      <div class="grade-info">
+        <h3>السنة {{ getGradeLabel(classNumber) }}</h3>
+        <p class="grade-subtext">التعليم الابتدائي 🇹🇳</p>
+      </div>
+      <div class="grade-hover-arrow">
+        <span>انطلق 👈</span>
       </div>
     </div>
   </div>

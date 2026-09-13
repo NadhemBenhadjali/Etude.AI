@@ -1,10 +1,13 @@
-FROM python:3.11-slim AS builder
+FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
 
 WORKDIR /app
 
+# Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libfreetype6-dev \
@@ -12,20 +15,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Copy dependencies file
 COPY requirements.txt .
 
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+# Create virtualenv and install dependencies via uv
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN uv venv /opt/venv && uv pip install -r requirements.txt
 
 
 FROM python:3.11-slim AS final
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH"
 
 WORKDIR /app
 
-# Copy installed Python dependencies
-COPY --from=builder /install /usr/local
+# Copy virtualenv from builder
+COPY --from=builder /opt/venv /opt/venv
 
 # Runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \

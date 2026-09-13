@@ -1,5 +1,12 @@
 package com.example.EtudeAI.exception;
 
+
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@Getter
+@ResponseStatus(HttpStatus.CONFLICT)
 public class DuplicateResourceException extends RuntimeException {
 
     private final String resourceName;
@@ -20,16 +27,5 @@ public class DuplicateResourceException extends RuntimeException {
         this.fieldValue = null;
     }
 
-    public String getResourceName() {
-        return resourceName;
-    }
-
-    public String getFieldName() {
-        return fieldName;
-    }
-
-    public Object getFieldValue() {
-        return fieldValue;
-    }
 }
 
