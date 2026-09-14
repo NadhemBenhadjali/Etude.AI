@@ -15,7 +15,7 @@ import {SessionStateService} from '../../services/session-state.service';
 @Component({
   selector: 'app-chatbot',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, AvatarComponent],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './chatbot.component.html',
   styleUrls: ['./chatbot.component.css']
 })
@@ -192,7 +192,6 @@ export class ChatbotComponent implements OnInit {
     } else {
       // No sessionId - create a new session (ad-hoc QnA)
       const sessionDTO: SessionDTO = {
-        id: crypto.randomUUID(),
         level: level,
         subject: subject,
         module: module,

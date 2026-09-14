@@ -1,73 +1,121 @@
 <nav class="navbar">
+  <div class="nav-brand">
+    <span class="flag-icon">🇹🇳</span>
+    <span class="brand-title">Etude.AI Kids</span>
+  </div>
   <ul>
-    <li><a routerLink="/">  الرئيسية </a></li>
-    <li><a routerLink="/about"> شكون احنا؟</a></li>
-    <li><a routerLink="/contact">كلمنا</a></li>
+    <li><a routerLink="/dashboard">🏠 لوحة التحكم</a></li>
+    <li><a routerLink="/select-subject">📚 المواد</a></li>
+    <li><a routerLink="/chatbot">🤖 المعلم الذكي</a></li>
   </ul>
 </nav>
+
 <app-avatar></app-avatar>
 
 <div class="module-container" dir="rtl">
   <div class="module-box">
 
-    <!-- Loading overlay (From your Logic) -->
-    <div *ngIf="loading" class="loading-overlay">
-      <div class="spinner"></div>
-      <p style="margin-top: 1rem; color: #5BBCFF; font-weight: bold;">جاري تحضير الدرس...</p>
-    </div>
+    <!-- 🪄 MAGIC SSE STREAMING OVERLAY -->
+    <div *ngIf="isStreaming" class="streaming-overlay">
+      <div class="streaming-card">
+        <div class="mascot-animation">
+          <img src="/assets/images/panda.png" alt="Mascot" class="bouncing-mascot" />
+          <div class="magic-sparkles">✨ 🪄 ⭐</div>
+        </div>
 
-    <div class="module-header">
-      <h2 *ngIf="!selectedSubject">اختر المادة</h2>
-      <h2 *ngIf="selectedSubject">
-        اختر المحور في
-        <span [style.color]="selectedSubject.color">
-          {{selectedSubject.name}}
-        </span>
-      </h2>
-      <div class="header-decoration">
-        <span class="star">⭐</span>
-        <span class="star">⭐</span>
-        <span class="star">⭐</span>
+        <h3 class="streaming-title">المعلم الذكي يحضر في الدرس!</h3>
+        <p class="module-target-badge">{{selectedModuleName}}</p>
+
+        <!-- Live Step Progress -->
+        <div class="steps-progress">
+          <div class="step-item" [class.active]="streamStep >= 1" [class.done]="streamStep > 1">
+            <span class="step-num">1</span>
+            <span class="step-label">البحث في الكتاب 📖</span>
+          </div>
+          <div class="step-divider" [class.filled]="streamStep >= 2"></div>
+          <div class="step-item" [class.active]="streamStep >= 2" [class.done]="streamStep > 2">
+            <span class="step-num">2</span>
+            <span class="step-label">كتابة الملخص ✍️</span>
+          </div>
+          <div class="step-divider" [class.filled]="streamStep >= 3"></div>
+          <div class="step-item" [class.active]="streamStep >= 3">
+            <span class="step-num">3</span>
+            <span class="step-label">فتح السبورة 🎨</span>
+          </div>
+        </div>
+
+        <p class="streaming-status-text">{{streamStatus}}</p>
+
+        <!-- Live Token Ticker Preview (Shows AI writing live) -->
+        <div class="live-token-container" *ngIf="cleanStreamPreview">
+          <div class="live-token-header">
+            <span class="live-pulse-dot"></span>
+            <span>الذكاء الاصطناعي يكتب الآن:</span>
+          </div>
+          <div class="live-token-text">
+            {{ cleanStreamPreview }}
+            <span class="cursor-blink">|</span>
+          </div>
+        </div>
+
+        <button class="cancel-stream-btn" (click)="cancelStreaming()">إلغاء</button>
       </div>
     </div>
 
-    <!-- Subject Selection Grid (Friend's UI) -->
+    <!-- Header -->
+    <div class="module-header">
+      <div class="header-stars">⭐ 🎈 🌟</div>
+      <h2 *ngIf="!selectedSubject">شنيّة المادة اللي تحب تقراها اليوم؟</h2>
+      <h2 *ngIf="selectedSubject">
+        اختر المحور في
+        <span class="subject-highlight" [style.color]="selectedSubject.color">
+          {{selectedSubject.name}}
+        </span>
+      </h2>
+      <p class="header-subtitle" *ngIf="selectedSubject">اضغط على أي محور باش يبدا المعلم الذكي يشرحلك بالتونسي! 🚀</p>
+    </div>
+
+    <!-- Subject Selection Grid -->
     <div *ngIf="!selectedSubject" class="subjects-container">
       <div
         class="subject-card"
         *ngFor="let subject of subjects"
         (click)="selectSubject(subject)"
       >
-        <div class="subject-icon">
-          <img [src]="subject.icon" [alt]="'أيقونة ' + subject.name" />
+        <div class="subject-icon-wrap">
+          <img [src]="subject.icon" [alt]="subject.name" />
         </div>
         <h3 [style.color]="subject.color">{{subject.name}}</h3>
+        <span class="card-action-hint">اختر المادة 👈</span>
       </div>
     </div>
 
-    <!-- Module Selection Grid (Friend's UI) -->
+    <!-- Module Selection Grid -->
     <div *ngIf="selectedSubject" class="modules-container">
       <div
         class="module-card"
         *ngFor="let module of selectedSubject.modules"
         (click)="selectModule(module)"
       >
-        <div class="module-icon">
-          <img [src]="module.icon" [alt]="'أيقونة ' + module.name" />
+        <div class="module-icon-wrap">
+          <img [src]="module.icon" [alt]="module.name" />
         </div>
         <h4>{{module.name}}</h4>
+        <button class="start-module-btn">ابدأ الدرس 🚀</button>
       </div>
 
       <!-- Error Message Display -->
       <div *ngIf="errorMsg" class="error-box">
-        ⚠️ {{ errorMsg }}
+        <span>⚠️ {{ errorMsg }}</span>
       </div>
     </div>
 
     <!-- Back Button -->
-    <button *ngIf="selectedSubject" class="back-button" (click)="goBack()">
-      <img src="/assets/images/sent.png" alt="Back" />
-      <span>عودة</span>
-    </button>
+    <div class="bottom-actions" *ngIf="selectedSubject">
+      <button class="back-button" (click)="goBack()">
+        <img src="/assets/images/sent.png" alt="Back" />
+        <span>رجوع للمواد</span>
+      </button>
+    </div>
   </div>
 </div>

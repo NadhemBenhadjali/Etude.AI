@@ -8,6 +8,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -41,7 +45,7 @@ public class SessionController {
     @Operation(summary = "Save Session", description = "Saves the current session state, including generated content.")
     public ResponseEntity<SessionDTO> saveSession(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestBody com.example.EtudeAI.model.dto.SessionDTO sessionDTO) {
+            @RequestBody SessionDTO sessionDTO) {
         String keycloakUserId = jwt.getSubject();
         SessionDTO savedSession = sessionService.saveSession(sessionDTO, keycloakUserId);
         return ResponseEntity.ok(savedSession);
@@ -60,12 +64,11 @@ public class SessionController {
 
     @GetMapping
     @Operation(summary = "Get User Sessions", description = "Retrieves a paginated list of study sessions for the current user.")
-    public ResponseEntity<org.springframework.data.domain.Page<SessionDTO>> getUserSessions(
+    public ResponseEntity<Page<SessionDTO>> getUserSessions(
             @AuthenticationPrincipal Jwt jwt,
-            org.springframework.data.domain.Pageable pageable) {
+            @PageableDefault(sort = "createdAt",direction = Sort.Direction.DESC) Pageable pageable) {
         String keycloakUserId = jwt.getSubject();
-        org.springframework.data.domain.Page<SessionDTO> sessions = sessionService
-                .getUserSessions(keycloakUserId, pageable);
+        Page<SessionDTO> sessions = sessionService.getUserSessions(keycloakUserId, pageable);
         return ResponseEntity.ok(sessions);
     }
 

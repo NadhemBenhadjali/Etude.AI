@@ -8,10 +8,6 @@ import lombok.Data;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-/**
- * DTO for partial session updates.
- * All fields are optional - only non-null fields will be updated.
- */
 @Data
 public class SessionUpdateDTO {
     private Status status;

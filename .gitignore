@@ -90,9 +90,6 @@ AI Pipeline/reports/*.json
 # Uncomment the line below if you generate dynamic lessons you don't want tracked
 # AI Pipeline/lessons/*.json
 
-# OCR Cache / Temporary JSONs
-AI Pipeline/config_files/ktebjson/
-
 # Local Vector DB storage (if saving to disk instead of cloud)
 chroma_db/
 qdrant_storage/

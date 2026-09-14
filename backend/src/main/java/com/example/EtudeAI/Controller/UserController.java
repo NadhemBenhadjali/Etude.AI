@@ -24,7 +24,8 @@ public class UserController {
 
     @PostMapping()
     @Operation(summary = "Create User", description = "Creates a new user profile linked to Keycloak ID.")
-    public ResponseEntity<UUID> createUser(@AuthenticationPrincipal Jwt jwt,
+    public ResponseEntity<UUID> createUser(
+            @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody UserDTO userDTO) {
         String keycloakUserId = jwt.getSubject();
         UUID userId = userService.createUser(keycloakUserId, userDTO);
@@ -33,7 +34,8 @@ public class UserController {
 
     @GetMapping("/me")
     @Operation(summary = "Get Current User", description = "Retrieves the profile of the currently authenticated user.")
-    public ResponseEntity<UserDTO> getUser(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<UserDTO> getUser(
+            @AuthenticationPrincipal Jwt jwt) {
         String keycloakUserId = jwt.getSubject();
         UserDTO userDTO = userService.getUser(keycloakUserId);
         return ResponseEntity.ok(userDTO);
@@ -41,7 +43,8 @@ public class UserController {
 
     @PutMapping("/me")
     @Operation(summary = "Update Current User", description = "Updates the profile of the currently authenticated user.")
-    public ResponseEntity<UserDTO> updateUser(@AuthenticationPrincipal Jwt jwt,
+    public ResponseEntity<UserDTO> updateUser(
+            @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody UserDTO userDTO) {
         String keycloakUserId = jwt.getSubject();
         UserDTO updatedUserDTO = userService.updateUser(keycloakUserId, userDTO);
@@ -58,8 +61,9 @@ public class UserController {
 
     @PostMapping("/me/change-password")
     @Operation(summary = "Change password", description = "Changes the current user password in Keycloak.")
-    public ResponseEntity<Void> changePassword(@AuthenticationPrincipal Jwt jwt,
-                                               @Valid @RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<Void> changePassword(
+            @AuthenticationPrincipal Jwt jwt,
+            @Valid @RequestBody ChangePasswordRequest request) {
         String keycloakUserId = jwt.getSubject();
         userService.changePassword(keycloakUserId, request.newPassword());
 

@@ -1,19 +1,40 @@
 
-<app-avatar></app-avatar>
-<div class="finished-container">
-  <div class="celebrate-image">
-    <div class="shine-box">
-      <img src="/assets/images/good.png" alt="احتفال" class="finish-img" />
+<div class="finished-page" dir="rtl">
+  <div class="celebration-card">
+    <div class="trophy-stage">
+      <div class="floating-stars">✨ 🌟 🎈 🏆 🪄</div>
+      <img src="/assets/images/trophy.png" alt="مبروك" class="trophy-img" />
     </div>
-  </div>
 
-  <h2><span class="emoji">🎉!</span> كملت المغامرة!</h2>
+    <div class="victory-badge">🎉 بطل اليوم</div>
+    <h1 class="victory-title">يعطيك الصحة يا بطل! كملت بنجاح 🇹🇳</h1>
 
-  <p class="finished-text">
-    خدمة هايلة! ورّيت برشا مثابرة و ذكاء. ارتاح توا، تستاهلها.
-  </p>
+    <p class="victory-desc">
+      خدمة ممتازة برشا! ورّيت تركيز ومثابرة وذكاء عالي. زدت نقاط لخبرتك ورصيدك في منصة Etude.AI! 🚀
+    </p>
 
-  <div class="go-home">
-    <button (click)="goHome()"> حمل الملخص</button>
+    <div class="rewards-summary">
+      <div class="reward-pill">
+        <span class="reward-icon">⭐</span>
+        <span class="reward-label">+50 نقطة خبرة</span>
+      </div>
+      <div class="reward-pill">
+        <span class="reward-icon">🔥</span>
+        <span class="reward-label">يوم إضافي في التتابع</span>
+      </div>
+      <div class="reward-pill">
+        <span class="reward-icon">🎖️</span>
+        <span class="reward-label">وسام التفوّق</span>
+      </div>
+    </div>
+
+    <div class="celebration-actions">
+      <button class="btn-main" (click)="goHome()">
+        <span>🏠 الرجوع للوحة التحكم</span>
+      </button>
+      <button class="btn-sub" routerLink="/select-class">
+        <span>🚀 درس أو اختبار جديد</span>
+      </button>
+    </div>
   </div>
 </div>

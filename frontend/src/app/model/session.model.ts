@@ -15,7 +15,7 @@ export enum SessionType {
 }
 
 export interface SessionDTO {
-    id: string;
+    id?: string;
     level?: string;
     subject?: string;
     module?: string;

@@ -1,12 +1,14 @@
 package com.example.EtudeAI.service.Implementation;
 
+import com.example.EtudeAI.exception.KeycloakException;
 import com.example.EtudeAI.exception.ResourceNotFoundException;
+import com.example.EtudeAI.exception.UserAlreadyExists;
+import com.example.EtudeAI.exception.UserNotFound;
 import com.example.EtudeAI.model.dto.UserDTO;
 import com.example.EtudeAI.model.entity.User;
-import com.example.EtudeAI.model.enums.Role;
+import com.example.EtudeAI.model.mapper.UserMapper;
 import com.example.EtudeAI.repository.UserRepository;
 import com.example.EtudeAI.service.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -19,7 +21,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -29,6 +30,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final Keycloak keycloak;
+    private final UserMapper userMapper;
 
     @Value("${keycloak.realm:etudeai}")
     private String realm;
@@ -38,9 +40,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UUID createUser(String keycloakUserId, UserDTO dto) {
         if (userRepository.findByKeycloakUserId(keycloakUserId).isPresent()) {
-            throw new IllegalStateException("User profile already exists");
+            throw new UserAlreadyExists("User with this email already exists");
         }
-
         User user = User.builder()
                 .keycloakUserId(keycloakUserId)
                 .email(dto.getEmail())
@@ -49,10 +50,6 @@ public class UserServiceImpl implements UserService {
                 .birthDate(dto.getBirthDate())
                 .level(dto.getLevel())
                 .avatar(dto.getAvatar())
-                .elo(0)
-                .role(Role.ROLE_USER)
-                .sessions(List.of())
-                .notes(List.of())
                 .build();
 
         return userRepository.save(user).getId();
@@ -62,28 +59,8 @@ public class UserServiceImpl implements UserService {
     @Cacheable(value = "users", key = "#keycloakUserId")
     @Override
     public UserDTO getUser(String keycloakUserId) {
-        User user = userRepository.findByKeycloakUserId(keycloakUserId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        return UserDTO.builder()
-                .id(user.getId())
-                .keycloakUserId(user.getKeycloakUserId())
-                .email(user.getEmail())
-                .firstname(user.getFirstname())
-                .lastname(user.getLastname())
-                .birthDate(user.getBirthDate())
-                .level(user.getLevel())
-                .elo(user.getElo())
-                .role(user.getRole())
-                .avatar(user.getAvatar())
-                .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
-                .totalQuizzes(user.getTotalQuizzes())
-                .highestScore(user.getHighestScore())
-                .totalQna(user.getTotalQna())
-                .totalSummaries(user.getTotalSummaries())
-                .build();
-
+        return  userRepository.findByKeycloakUserId(keycloakUserId).map(userMapper::toDto)
+                .orElseThrow(() -> new UserNotFound("User with this Keycloak ID not found"));
     }
 
     @Transactional
@@ -91,49 +68,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO updateUser(String keycloakUserId, UserDTO dto) {
         User user = userRepository.findByKeycloakUserId(keycloakUserId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFound("User not found"));
 
-        // 1) EMAIL: update in Keycloak THEN DB, if changed
+        userMapper.updateUserFromDto(dto, user);
         if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
             updateKeycloakEmail(keycloakUserId, dto.getEmail());
-            user.setEmail(dto.getEmail());
         }
-
-        // 2) Other profile fields (existing logic)
-        if (dto.getFirstname() != null)
-            user.setFirstname(dto.getFirstname());
-        if (dto.getLastname() != null)
-            user.setLastname(dto.getLastname());
-        if (dto.getBirthDate() != null)
-            user.setBirthDate(dto.getBirthDate());
-        if (dto.getLevel() != null)
-            user.setLevel(dto.getLevel());
 
         User updated = userRepository.save(user);
 
-        return UserDTO.builder()
-                .id(updated.getId())
-                .keycloakUserId(updated.getKeycloakUserId())
-                .email(updated.getEmail())
-                .firstname(updated.getFirstname())
-                .lastname(updated.getLastname())
-                .birthDate(updated.getBirthDate())
-                .level(updated.getLevel())
-                .elo(updated.getElo())
-                .role(updated.getRole())
-                .avatar(updated.getAvatar())
-                .createdAt(updated.getCreatedAt())
-                .updatedAt(updated.getUpdatedAt())
-                .totalQuizzes(updated.getTotalQuizzes())
-                .highestScore(updated.getHighestScore())
-                .totalQna(updated.getTotalQna())
-                .totalSummaries(updated.getTotalSummaries())
-                .build();
+        return userMapper.toDto(updated);
     }
 
     private void updateKeycloakEmail(String keycloakUserId, String newEmail) {
         UsersResource usersResource = keycloak.realm(realm).users();
-
         UserRepresentation kcUser = usersResource.get(keycloakUserId).toRepresentation();
         kcUser.setEmail(newEmail);
         usersResource.get(keycloakUserId).update(kcUser);
@@ -143,7 +91,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changePassword(String keycloakUserId, String newPassword) {
         UsersResource usersResource = keycloak.realm(realm).users();
-
         CredentialRepresentation credential = new CredentialRepresentation();
         credential.setType(CredentialRepresentation.PASSWORD);
         credential.setTemporary(false);
@@ -158,10 +105,17 @@ public class UserServiceImpl implements UserService {
     @CacheEvict(value = {"users", "achievements"}, key = "#keycloakUserId")
     @Override
     public void deleteUser(String keycloakUserId) {
-        if (!userRepository.existsByKeycloakUserId(keycloakUserId)) {
-            throw new ResourceNotFoundException("User", "keycloakUserId", keycloakUserId);
+        User user = userRepository.findByKeycloakUserId(keycloakUserId)
+                .orElseThrow(() -> new UserNotFound("User with Keycloak ID = "+keycloakUserId+" not found"));
+
+        userRepository.delete(user);
+
+        UsersResource usersResource = keycloak.realm(realm).users();
+        try {
+            usersResource.get(keycloakUserId).remove();
+        } catch (Exception e) {
+            throw new KeycloakException("Failed to delete user from Keycloak: " + e.getMessage(), e,400);
         }
-        userRepository.deleteByKeycloakUserId(keycloakUserId);
     }
 
     @Transactional
@@ -169,7 +123,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateElo(String keycloakUserId, int newElo) {
         User user = userRepository.findByKeycloakUserId(keycloakUserId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "keycloakUserId", keycloakUserId));
+                .orElseThrow(() -> new UserNotFound("User with Keycloak ID = "+keycloakUserId+" not found"));
 
         user.setElo(Math.max(newElo, 0));
         userRepository.save(user);

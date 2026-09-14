@@ -3,17 +3,20 @@ import time
 from pathlib import Path
 import requests
 from fastapi import FastAPI, Request, Response, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError as PydanticValidationError
 import uuid
+
+from starlette import status
+
 from app.crew.config import URI, USER, PASSWORD
 from app.crew.knowledge_graph import Neo4jKG
 from app.crew.planner_crew import PlannerCrew
 from app.pdf_report import render_pdf
-from app.handlers import generate_summary_json, handle_qa, generate_quiz_json
+from app.handlers import generate_summary_json, generate_summary_stream, handle_qa, generate_quiz_json
 from app.models import SummaryRequest, QARequest, QuizRequest, FinishRequest, PlanRequest, TTSRequest
 from app.exceptions import (
     EtudeAIException,
@@ -22,7 +25,7 @@ from app.exceptions import (
     LLMQuotaExhaustedError,
     Neo4jConnectionError,
     RedisConnectionError,
-    TTSServiceError
+
 )
 
 from crewai import Crew, Task
@@ -149,7 +152,7 @@ CIRCUIT_BREAKER_STATE = Gauge(
 CACHE_HIT_RATE = Counter(
     "cache_operations_total",
     "Cache operations",
-    ["operation", "result"],  # operation=embedding, result=hit/miss
+    ["operation", "result"],
 )
 
 # -------------------------------------------------------------------
@@ -216,7 +219,6 @@ async def logging_middleware(request: Request, call_next):
             path=path,
         ).observe(process_time)
     except Exception:
-        # Never let metrics crash the request
         pass
 
     return response
@@ -488,32 +490,24 @@ def get_session_id(request: Request) -> str:
 
 @app.post(
     "/summary",
-    summary="Generate Lesson Summary",
-    description="Generates a detailed lesson summary using the AI Multi-Agent system.",
+    summary="Generate Lesson Summary (SSE)",
+    description="Generates and streams a detailed lesson summary using Server-Sent Events (SSE).",
     tags=["AI Content"],
 )
 @limiter.limit("5/minute")
-async def summary_endpoint(request: Request, body: SummaryRequest):
-    """Generate lesson summary with validation and error handling."""
+def summary_endpoint(request: Request, body: SummaryRequest):
     session_id = get_session_id(request)
+    logger.info("summary_request_sse", session_id=session_id, module=body.module)
 
-    try:
-        logger.info("summary_request", session_id=session_id, module=body.module)
-        user_in = f"ملخص محور {body.module}"
-        result = generate_summary_json(user_in, neo_kg)
-        memory_manager.log_event(session_id, "chapter_summary", result["data"])
-        logger.info("summary_success", session_id=session_id, module=body.module)
-        return JSONResponse(result)
-
-    except TopicNotFoundError as e:
-        # Already logged in exception handler
-        raise
-    except Exception as e:
-        logger.error("summary_unexpected_error", session_id=session_id, error=str(e))
-        raise HTTPException(
-            status_code=500,
-            detail={"error": "internal_failure", "message": str(e)}
-        )
+    return StreamingResponse(
+        generate_summary_stream(body.module, neo_kg, session_id, memory_manager),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 @app.post(

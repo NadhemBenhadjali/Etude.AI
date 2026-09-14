@@ -1,140 +1,135 @@
-<div class="profile-container" dir="rtl">
-  <div class="profile-box">
-
-    <!-- HERO HEADER -->
-    <div class="profile-header">
-
-      <!-- Avatar -->
-      <div class="profile-avatar">
-        <img [src]="avatar" alt="Profile Avatar" />
-
-        <div class="level-badge" [style.background-color]="getLevelColor()"> ⭐ المستوى {{ level }} </div>
+<div class="profile-page" dir="rtl">
+  <!-- Top Navigation Bar -->
+  <header class="profile-top-bar">
+    <div class="brand-side">
+      <button class="back-pill-btn" routerLink="/dashboard">
+        <span>◀ لوحة التحكم</span>
+      </button>
+      <div class="page-title-chip">
+        <span>👤 الملف الشخصي للبطل</span>
       </div>
+    </div>
 
-      <!-- Info -->
-      <div class="profile-info">
-        <h1>{{ username }}</h1>
-        <p class="email" *ngIf="email">{{ email }}</p>
+    <div class="nav-actions">
+      <a class="nav-chip-btn" routerLink="/select-class">
+        <span>📚 ابدأ تعلم</span>
+      </a>
+      <a class="nav-chip-btn" routerLink="/user-management">
+        <span>⚙️ إعدادات الحساب</span>
+      </a>
+      <button class="logout-chip-btn" (click)="logout()">
+        <span>🚪 خروج</span>
+      </button>
+    </div>
+  </header>
 
-        <div class="badges-row">
-          <span class="rank-badge">
-            <img class="mini-badge-icon" src="assets/images/crown.png" alt="rank" />
-            {{ rank }}
-          </span>
-
-          <span class="streak-badge">
-            <img class="mini-badge-icon" src="assets/images/fire.png" alt="streak" />
-            {{ streak }} يوم متتالي
-          </span>
+  <main class="profile-stage">
+    <!-- Hero Passport Card -->
+    <div class="hero-passport-card">
+      <div class="hero-header-row">
+        <!-- Avatar Spotlight -->
+        <div class="avatar-spotlight">
+          <img [src]="avatar || 'assets/images/bot.png'" alt="Avatar" class="avatar-large" />
+          <div class="level-badge" [style.background-color]="getLevelColor()">
+            <span>⭐ المستوى {{ level }}</span>
+          </div>
         </div>
-      </div>
 
-      <!-- Action Dock -->
-      <nav class="action-dock" aria-label="قائمة الإجراءات العائمة">
-        <a class="dock-item start" routerLink="/select-class" aria-label="ابدأ تعلم">
-          <img class="dock-icon" src="assets/images/learn.png" alt="ابدأ تعلم" />
-          <span class="dock-label">ابدأ تعلم</span>
-        </a>
+        <!-- Learner Info -->
+        <div class="learner-details">
+          <h1 class="hero-name">{{ username }}</h1>
+          <p class="hero-email" *ngIf="email">{{ email }}</p>
 
-        <a class="dock-item" routerLink="/dashboard" aria-label="لوحة القيادة">
-          <img class="dock-icon" src="assets/images/dashboard.png" alt="لوحة القيادة" />
-          <span class="dock-label">لوحة القيادة</span>
-        </a>
+          <div class="hero-badges-row">
+            <span class="hero-pill rank-pill">
+              <span class="pill-emoji">👑</span>
+              <span>{{ rank }}</span>
+            </span>
 
-        <a class="dock-item" routerLink="/user-management" aria-label="إدارة الحساب">
-          <img class="dock-icon" src="assets/images/gear.png" alt="إدارة الحساب" />
-          <span class="dock-label">إدارة الحساب</span>
-        </a>
+            <span class="hero-pill streak-pill">
+              <span class="pill-emoji">🔥</span>
+              <span>{{ streak }} أيام متتالية</span>
+            </span>
+          </div>
 
-        <button class="dock-item danger" (click)="logout()" aria-label="تسجيل الخروج" type="button">
-          <img class="dock-icon" src="assets/images/check-out.png" alt="تسجيل الخروج" />
-          <span class="dock-label">تسجيل الخروج</span>
-        </button>
-      </nav>
-
-    </div>
-
-    <!-- XP -->
-    <div class="xp-progress">
-      <div class="xp-header">
-        <img class="section-icon-img" src="assets/images/xp.png" alt="خبرتك" />
-        <h3>خبرتك</h3>
-      </div>
-
-      <div class="xp-bar">
-        <div class="xp-fill" [style.width.%]="getXpPercentage()"></div>
-      </div>
-
-      <div class="xp-text">
-        <span>{{ xp }}</span> / <span>{{ xpToNextLevel }}</span> نقطة
-      </div>
-    </div>
-
-    <!-- Stats -->
-    <div class="stats-container">
-      <div class="stat-card">
-        <img class="stat-img" src="assets/images/book.png" alt="الدروس" />
-        <h3>الدروس إلي كملتهم</h3>
-        <p class="stat-value">{{ completedLessons }}</p>
-      </div>
-
-      <div class="stat-card">
-        <img class="stat-img" src="assets/images/quiz.png" alt="الاختبارات" />
-        <h3>الاختبارات إلي كملتهم</h3>
-        <p class="stat-value">{{ completedQuizzes }}</p>
-      </div>
-
-      <div class="stat-card">
-        <img class="stat-img" src="assets/images/fire.png" alt="التتابع" />
-        <h3>أعلى تتابع</h3>
-        <p class="stat-value">{{ highestStreak }} يوم</p>
-      </div>
-    </div>
-
-    <!-- Achievements -->
-    <div class="achievements-section">
-      <div class="section-header">
-        <img class="section-icon-img" src="assets/images/trophy.png" alt="الإنجازات" />
-        <h2>الإنجازات</h2>
-      </div>
-
-      <div class="achievements-grid">
-        <div class="achievement-card"
-             *ngFor="let achievement of achievements"
-             [class.locked]="!achievement.unlocked">
-
-          <!-- achievement icon can be image too -->
-            <img
-              class="achievement-img"
-              [src]="achievement.icon"
-              [alt]="achievement.name"/>
-
-
-
-          <h3>{{ achievement.name }}</h3>
-          <p>{{ achievement.description }}</p>
-
-          <div class="achievement-badge" *ngIf="achievement.unlocked">
-            <img class="mini-badge-icon" src="assets/images/unlocked.png" alt="unlocked" />
+          <!-- XP Progress Bar inside Hero -->
+          <div class="hero-xp-box">
+            <div class="xp-labels-row">
+              <span class="xp-title">⚡ نقاط الخبرة (XP):</span>
+              <strong class="xp-values">{{ xp }} / {{ xpToNextLevel }}</strong>
+            </div>
+            <div class="xp-bar-outer">
+              <div class="xp-bar-fill" [style.width.%]="getXpPercentage()"></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Recent Activity -->
-    <div class="recent-activity">
-      <div class="section-header">
-        <img class="section-icon-img" src="assets/images/activity.png" alt="نشاطك" />
-        <h3>نشاطك لخراني</h3>
+    <!-- 3 Key Stats Grid -->
+    <div class="stats-cards-grid">
+      <div class="stat-card lesson-stat">
+        <div class="stat-icon-circle">📚</div>
+        <div class="stat-data">
+          <strong class="stat-count">{{ completedLessons }}</strong>
+          <span class="stat-title">الدروس المنجزة</span>
+        </div>
       </div>
 
-      <div class="activity-list">
-        <div class="activity-item" *ngFor="let activity of recentActivities">
-          <img class="activity-img" [src]="activity.icon" alt="activity icon" />
-          <span class="activity-text">{{ activity.text }}</span>
+      <div class="stat-card quiz-stat">
+        <div class="stat-icon-circle">🏆</div>
+        <div class="stat-data">
+          <strong class="stat-count">{{ completedQuizzes }}</strong>
+          <span class="stat-title">الاختبارات والتحديات</span>
+        </div>
+      </div>
+
+      <div class="stat-card streak-stat">
+        <div class="stat-icon-circle">🔥</div>
+        <div class="stat-data">
+          <strong class="stat-count">{{ highestStreak }}</strong>
+          <span class="stat-title">أعلى تتابع يومي</span>
         </div>
       </div>
     </div>
 
-  </div>
+    <!-- Achievements & Badges Showcase -->
+    <section class="achievements-section">
+      <div class="section-heading">
+        <span class="heading-icon">🎖️</span>
+        <h2>أوسمة وإنجازات البطل</h2>
+      </div>
+
+      <div class="achievements-grid">
+        <div
+          class="achievement-card"
+          *ngFor="let a of achievements"
+          [class.is-locked]="!a.unlocked"
+        >
+          <div class="achievement-icon-frame">
+            <img [src]="a.icon" [alt]="a.name" class="achievement-icon" />
+            <span class="lock-overlay" *ngIf="!a.unlocked">🔒</span>
+          </div>
+          <h3 class="achievement-title">{{ a.name }}</h3>
+          <p class="achievement-desc">{{ a.description }}</p>
+          <span class="unlocked-badge" *ngIf="a.unlocked">تم الفتح! ✨</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Activities Timeline -->
+    <section class="recent-activity-section" *ngIf="recentActivities.length > 0">
+      <div class="section-heading">
+        <span class="heading-icon">⏱️</span>
+        <h2>النشاطات الأخيرة</h2>
+      </div>
+
+      <div class="activity-timeline">
+        <div class="activity-row" *ngFor="let act of recentActivities">
+          <img [src]="act.icon" alt="icon" class="act-icon" />
+          <span class="act-text">{{ act.text }}</span>
+        </div>
+      </div>
+    </section>
+  </main>
 </div>

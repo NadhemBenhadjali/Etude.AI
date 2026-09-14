@@ -25,7 +25,7 @@ public class Achievement {
     private String description;
 
     @Column(nullable = false)
-    private String icon; // Icon name (e.g., "star", "trophy") or URL
+    private String icon;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

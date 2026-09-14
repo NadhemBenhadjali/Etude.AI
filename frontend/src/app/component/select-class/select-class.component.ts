@@ -37,6 +37,18 @@ export class SelectClassComponent {
     this.router.navigate(['/select-subject']);
   }
 
+  getGradeLabel(classNumber: number): string {
+    const labels: { [key: number]: string } = {
+      1: 'الأولى',
+      2: 'الثانية',
+      3: 'الثالثة',
+      4: 'الرابعة',
+      5: 'الخامسة',
+      6: 'السادسة'
+    };
+    return labels[classNumber] || `${classNumber}`;
+  }
+
   goToProfile() {
     this.router.navigate(['/profile']);
   }

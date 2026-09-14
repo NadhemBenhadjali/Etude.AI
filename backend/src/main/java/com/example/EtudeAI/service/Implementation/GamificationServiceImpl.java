@@ -7,6 +7,8 @@ import com.example.EtudeAI.repository.UserRepository;
 
 import com.example.EtudeAI.service.AchievementService;
 import com.example.EtudeAI.service.GamificationService;
+import jakarta.validation.constraints.PositiveOrZero;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -20,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class GamificationServiceImpl implements GamificationService {
 
     private final AchievementService achievementService;
-
     private final UserRepository userRepository;
 
     @Async
@@ -36,20 +37,10 @@ public class GamificationServiceImpl implements GamificationService {
     @Transactional
     @CacheEvict(value = "users", key = "#user.keycloakUserId")
     @Override
-    public void processQuizCompletion(User user, int score) {
-        if (user == null) {
-            log.error("Cannot process quiz completion: user is null");
-            throw new BadRequestException("User cannot be null");
-        }
-
-        if (user.getId() == null) {
-            log.error("Cannot process quiz completion: user ID is null");
-            return;
-        }
-
-        if (score < 0) {
-            log.error("Cannot process quiz completion: score is negative");
-            throw new BadRequestException("Score cannot be negative");
+    public void processQuizCompletion(@NonNull User user, @PositiveOrZero int score) {
+        if (user.getId() == null ) {
+            log.error("Cannot process quiz completion: user id is null");
+            throw new BadRequestException("User ID cannot be null");
         }
 
         User freshUser = userRepository.findById(user.getId()).orElse(user);
@@ -74,10 +65,10 @@ public class GamificationServiceImpl implements GamificationService {
     @Transactional
     @CacheEvict(value = "users", key = "#user.keycloakUserId")
     @Override
-    public void processQnaCompletion(User user) {
-        if (user == null || user.getId() == null) {
-            log.error("Cannot process QnA completion: user is null or has no ID");
-            return;
+    public void processQnaCompletion(@NonNull User user) {
+        if (user.getId() == null) {
+            log.error("Cannot process QnA completion: user id is null");
+            throw new BadRequestException("User ID cannot be null");
         }
 
         User freshUser = userRepository.findById(user.getId()).orElse(user);
@@ -95,10 +86,10 @@ public class GamificationServiceImpl implements GamificationService {
     @Transactional
     @CacheEvict(value = "users", key = "#user.keycloakUserId")
     @Override
-    public void processSummaryCompletion(User user) {
-        if (user == null || user.getId() == null) {
-            log.error("Cannot process summary completion: user is null or has no ID");
-            return;
+    public void processSummaryCompletion(@NonNull User user) {
+        if (user.getId() == null) {
+            log.error("Cannot process summary completion: user id is null");
+            throw new BadRequestException("User ID cannot be null");
         }
 
         User freshUser = userRepository.findById(user.getId()).orElse(user);

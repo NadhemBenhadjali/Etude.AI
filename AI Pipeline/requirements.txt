@@ -55,11 +55,13 @@ sentry-sdk[fastapi]
 
 
 elevenlabs>=0.2.3
+gTTS>=2.5.0
+edge-tts>=6.1.0
 
 # Database Construction (Optional - only needed for setup scripts)
  PyMuPDF
  pytesseract
- sentence-transformers
+
 
 
 

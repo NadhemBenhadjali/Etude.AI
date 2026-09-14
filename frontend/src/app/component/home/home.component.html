@@ -1,57 +1,118 @@
 
-<div class="home-background">
-<nav class="navbar">
-  <ul>
-    <li><a routerLink="/">  الرئيسية </a></li>
-    <li><a routerLink="/about"> شكون احنا؟</a></li>
-    <li><a routerLink="/contact">كلمنا</a></li>
-  </ul>
-</nav>
+<div class="home-page" dir="rtl">
+  <!-- 🌟 Top Navigation Bar -->
+  <header class="home-nav">
+    <div class="brand">
+      <span class="flag-icon">🇹🇳</span>
+      <div class="brand-text">
+        <span class="brand-name">Etude.AI</span>
+        <span class="brand-tag">التعليم الابتدائي الذكي</span>
+      </div>
+    </div>
 
-    <section class="welcome-section">
-      <img src="/assets/images/tunisia.png" alt="Tunisia Flag" class="flag-icon" />
-      <div class="welcome-text">
-        <h1>مرحبا بيك في منصتنا التعليمية التونسية!</h1>
-        <p class="special-font">
-          هنا نآمنو أنّ كل طفل عندو قدرة كبيرة على التعلم والنجاح.
-          نوفروا بيئة داعمة ومصممة باش تساعد طفلك يكتشف إمكانياتو ويتطوّر بثقة وفخر.
-        </p>
-        <p class="highlight">
-          إنضملنا وخلّي رحلة التعلم متاع طفلك تكون مليانة أمل، تحدي، وإنجاز!
-        </p>
+    <nav class="nav-links">
+      <a routerLink="/" class="nav-link active">الرئيسية</a>
+      <a routerLink="/landing" class="nav-link">المميزات</a>
+      <a routerLink="/about" class="nav-link">شكون احنا؟</a>
+      <a routerLink="/contact" class="nav-link">كلمنا</a>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="btn-ghost" (click)="goToSignIn()">تسجيل الدخول</button>
+      <button class="btn-primary" (click)="goToSignUp()">
+        <span>ابدأ الآن 🚀</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 🚀 Main Hero Section -->
+  <main class="hero-section">
+    <div class="hero-content">
+      <div class="badge-pill">
+        <span class="sparkle">✨</span>
+        <span>المنصة التونسية الأولى للتعلم الذكي للأطفال</span>
       </div>
-    </section>
-   
-    <div class="button-group">
-      <div class="voltage-button">
-        <button (click)="goToSignIn()">تسجيل الدخول</button>  
-              <svg viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-          <path class="line-1" d="M0 20 L100 20" stroke-width="2" stroke-linecap="round"/>
-          <path class="line-2" d="M0 10 L100 10" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <div class="dots">
-          <div class="dot dot-1"></div>
-          <div class="dot dot-2"></div>
-          <div class="dot dot-3"></div>
-          <div class="dot dot-4"></div>
-          <div class="dot dot-5"></div>
+
+      <h1 class="hero-title">
+        خلّي طفلك يتعلّم بمتعة،<br>
+        مع <span class="highlight-gradient">معلم ذكاء اصطناعي</span> تونسي!
+      </h1>
+
+      <p class="hero-desc">
+        دروس تفاعلية، تلخيص ذكي للكتب المدرسية التونسية، اختبارات تشجيعية، وصوت مرافق يفهم طفلك ويفسرلو بالتونسي المبسط!
+      </p>
+
+      <div class="hero-ctas">
+        <button class="cta-main" (click)="goToSignUp()">
+          <span class="cta-icon">🎒</span>
+          <span>اصنع حساب مجاني لطفلك</span>
+        </button>
+        <button class="cta-secondary" (click)="goToSignIn()">
+          <span>دخول المسجلين 🔑</span>
+        </button>
+      </div>
+
+      <!-- Quick Feature Pills -->
+      <div class="feature-pills">
+        <div class="pill">
+          <span class="pill-icon">🌿</span>
+          <span>إيقاظ علمي وأحياء</span>
         </div>
-      </div>
-  
-      <div class="voltage-button">
-        <button (click)="goToSignUp()">اعمل حساب</button> 
-                <svg viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-          <path class="line-1" d="M0 20 L100 20" stroke-width="2" stroke-linecap="round"/>
-          <path class="line-2" d="M0 10 L100 10" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-        <div class="dots">
-          <div class="dot dot-1"></div>
-          <div class="dot dot-2"></div>
-          <div class="dot dot-3"></div>
-          <div class="dot dot-4"></div>
-          <div class="dot dot-5"></div>
+        <div class="pill">
+          <span class="pill-icon">🔢</span>
+          <span>رياضيات وفيزياء</span>
+        </div>
+        <div class="pill">
+          <span class="pill-icon">🤖</span>
+          <span>معلم تفاعلي 24/7</span>
+        </div>
+        <div class="pill">
+          <span class="pill-icon">🏆</span>
+          <span>نقاط وتحديات</span>
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- Right Animated Showcase -->
+    <div class="hero-visual">
+      <div class="visual-card-backdrop"></div>
+      
+      <div class="visual-card main-card">
+        <div class="card-mascot">
+          <img src="/assets/images/panda.png" alt="Mascot" class="floating-panda" />
+          <div class="bubble-chat">"عسلامة! أنا رفيقي في القراية 👋"</div>
+        </div>
+
+        <div class="mini-lesson-preview">
+          <div class="preview-header">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="preview-title">سبورة تفاعلية ذكية 🎨</span>
+          </div>
+          <div class="preview-body">
+            <p>💡 <strong>سنة رابعة ابتدائي:</strong> ملخص محور الحواس وأعضاء الحس بالشرح التونسي والرسوم التوضيحية!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating Badges -->
+      <div class="floating-badge badge-top-left">
+        <span class="badge-emoji">⭐</span>
+        <div>
+          <strong>+500 نجمة</strong>
+          <small>تحديات ممتعة</small>
+        </div>
+      </div>
+
+      <div class="floating-badge badge-bottom-right">
+        <span class="badge-emoji">🎙️</span>
+        <div>
+          <strong>شرح صوتي</strong>
+          <small>باللهجة التونسية</small>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
   

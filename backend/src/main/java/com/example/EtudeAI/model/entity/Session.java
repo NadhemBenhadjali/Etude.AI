@@ -9,6 +9,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,27 +61,28 @@ public class Session {
     @Column(nullable = false, updatable = false)
     private ZonedDateTime createdAt;
 
-    @Column(nullable = true, updatable = true)
     private ZonedDateTime startedAt;
 
-    @Column(nullable = true, updatable = true)
     private ZonedDateTime completedAt;
 
     @ElementCollection
     @CollectionTable(name = "session_summary_points", joinColumns = @JoinColumn(name = "session_id"))
     @Column(nullable = false)
     @OrderColumn(name = "idx")
-    private List<String> summaryPointsOfFocus;
+    @Builder.Default
+    private List<String> summaryPointsOfFocus = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "session_quiz_points", joinColumns = @JoinColumn(name = "session_id"))
     @Column(nullable = false)
     @OrderColumn(name = "idx")
-    private List<String> quizPointsOfFocus;
+    @Builder.Default
+    private List<String> quizPointsOfFocus = new ArrayList<>();
 
     @Min(value = 0, message = "Quiz score cannot be negative")
     @Max(value = 100, message = "Quiz score cannot exceed 100")
-    private Integer quizScore;
+    @Builder.Default
+    private Integer quizScore = 0;
 
     @Column(columnDefinition = "TEXT")
     private String summary;
@@ -93,15 +95,18 @@ public class Session {
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderColumn(name = "idx")
-    private List<QuizElement> quizElements;
+    @Builder.Default
+    private List<QuizElement> quizElements = new ArrayList<>();
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderColumn(name = "idx")
-    private List<QnAElement> qnaElements;
+    @Builder.Default
+    private List<QnAElement> qnaElements = new ArrayList<>();
 
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderColumn(name = "idx")
-    private List<SummaryElement> summaryElements;
+    @Builder.Default
+    private List<SummaryElement> summaryElements = new ArrayList<>();
 
     public void addQuizElement(QuizElement element) {
         if (quizElements == null) {

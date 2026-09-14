@@ -1,25 +1,72 @@
-<div class="signin-container">
-  <div class="signin-image">
-    <img src="/assets/images/kiddd.png" alt="أطفال يسجلون الدخول" />
-  </div>
-
-  <form class="signin-form" dir="rtl" lang="ar" aria-label="فورم تسجيل الدخول" (submit)="onSubmit($event)">
-    <h2>🌟 تسجيل الدخول 🌟</h2>
-
-    <label for="username">📧 اسم المستخدم</label>
-    <input type="text" id="username" name="username" [(ngModel)]="username" placeholder="اسم المستخدم" required autocomplete="username" />
-
-    <label for="password">🔒 كلمة السر</label>
-    <input type="password" id="password" name="password" [(ngModel)]="password" placeholder="********" required autocomplete="current-password" />
-
-    <div *ngIf="errorMessage" class="error-message" style="color: red; margin-bottom: 10px;">
-      {{ errorMessage }}
+<div class="auth-page" dir="rtl">
+  <div class="auth-card">
+    
+    <!-- Left Hero Side -->
+    <div class="auth-hero-side">
+      <div class="mascot-box">
+        <img src="/assets/images/kiddd.png" alt="مرحباً بعودتك" class="hero-character" />
+      </div>
+      <h2>عسلامة يا بطل! 👋</h2>
+      <p>اكتب اسم المستخدم وكلمة السر باش تكمل مغامرتك التعليمية وتربح نجوم وأوسمة جديدة!</p>
+      <div class="trust-badge">
+        <span>🔒 تسجيل دخول آمن ومشفر</span>
+      </div>
     </div>
 
-    <button type="submit">🚀 ادخل</button>
+    <!-- Right Form Side -->
+    <div class="auth-form-side">
+      <div class="form-header">
+        <div class="app-logo-badge">🇹🇳 Etude.AI</div>
+        <h3>تسجيل الدخول</h3>
+        <p class="subtitle">مرحباً بك مجدداً في منصتك الذكية</p>
+      </div>
 
-    <p class="signup-link">
-      ماعندكش حساب؟ <a (click)="goToSignUp()" style="cursor:pointer;">✨ اعمل حساب جديد</a>
-    </p>
-  </form>
+      <form class="auth-form" (submit)="onSubmit($event)">
+        <div class="input-group">
+          <label for="username">👤 اسم المستخدم</label>
+          <div class="input-wrapper">
+            <input
+              type="text"
+              id="username"
+              name="username"
+              [(ngModel)]="username"
+              placeholder="مثال: ahmed_2026"
+              required
+              autocomplete="username"
+            />
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="password">🔒 كلمة السر</label>
+          <div class="input-wrapper">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              [(ngModel)]="password"
+              placeholder="••••••••"
+              required
+              autocomplete="current-password"
+            />
+          </div>
+        </div>
+
+        <div *ngIf="errorMessage" class="error-banner">
+          <span>⚠️ {{ errorMessage }}</span>
+        </div>
+
+        <button type="submit" class="submit-btn" [disabled]="loading">
+          <span *ngIf="!loading">انطلق إلى حسابي 🚀</span>
+          <span *ngIf="loading">جاري التحقق... ⏳</span>
+        </button>
+
+        <div class="switch-auth">
+          <span>ماعندكش حساب؟</span>
+          <a (click)="goToSignUp()" class="switch-link">اصنع حساب جديد مجاناً ✨</a>
+        </div>
+      </form>
+    </div>
+
+  </div>
 </div>

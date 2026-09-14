@@ -1,6 +1,7 @@
 import json
 import re
 import math
+import time
 import structlog
 from typing import List
 import threading
@@ -217,56 +218,65 @@ def embed(text: str, use_cache: bool = True) -> List[float]:
 
     # Define the embedding generation function
     def _generate_embedding() -> List[float]:
-        try:
-            # Check explicitly for Mistral to use os.environ key mapping we set up in config.py
-            if "mistral" in model:
+        max_retries = 5
+        for attempt in range(max_retries):
+            try:
+                # Check explicitly for Mistral to use os.environ key mapping we set up in config.py
+                if "mistral" in model:
+                    response = litellm.embedding(
+                        model=model,
+                        input=[text],
+                        api_key=settings.MISTRAL_API_KEY,
+                        timeout=30.0,
+                    )
+                    embedding = response["data"][0]["embedding"]
+                    logger.debug("embedding_generated", model=model, dim=len(embedding))
+                    return embedding
+
+                # Legacy for Google text-embedding-004
+                if model == "gemini/text-embedding-004":
+                    configure_gemini()
+                    res = genai.embed_content(model=model, content=text)
+                    emb = res.get("embedding")
+
+                    # Handle different response formats
+                    if isinstance(emb, dict) and "values" in emb:
+                        embedding = emb["values"]
+                    else:
+                        embedding = emb
+
+                    if not embedding or not isinstance(embedding, list):
+                        raise EmbeddingError(
+                            "Invalid embedding response from Gemini",
+                            details={"response": str(res)[:200]}
+                        )
+
+                    logger.debug("embedding_generated", model=model, dim=len(embedding))
+                    return embedding
+
+                # Default fallback to litellm for any other provider
                 response = litellm.embedding(
                     model=model,
                     input=[text],
-                    api_key=settings.MISTRAL_API_KEY,
-                    timeout=15.0,  # 15 second timeout
+                    timeout=30.0,
                 )
                 embedding = response["data"][0]["embedding"]
                 logger.debug("embedding_generated", model=model, dim=len(embedding))
                 return embedding
 
-            # Legacy for Google text-embedding-004
-            if model == "gemini/text-embedding-004":
-                configure_gemini()
-                res = genai.embed_content(model=model, content=text)
-                emb = res.get("embedding")
-
-                # Handle different response formats
-                if isinstance(emb, dict) and "values" in emb:
-                    embedding = emb["values"]
+            except Exception as e:
+                is_rate_limit = "429" in str(e) or "rate" in str(e).lower()
+                if is_rate_limit and attempt < max_retries - 1:
+                    wait_sec = (attempt + 1) * 3
+                    logger.warning("embedding_rate_limit_retry", wait=wait_sec, attempt=attempt + 1)
+                    time.sleep(wait_sec)
                 else:
-                    embedding = emb
-
-                if not embedding or not isinstance(embedding, list):
-                    raise EmbeddingError(
-                        "Invalid embedding response from Gemini",
-                        details={"response": str(res)[:200]}
-                    )
-
-                logger.debug("embedding_generated", model=model, dim=len(embedding))
-                return embedding
-
-            # Default fallback to litellm for any other provider
-            response = litellm.embedding(
-                model=model,
-                input=[text],
-                timeout=15.0,
-            )
-            embedding = response["data"][0]["embedding"]
-            logger.debug("embedding_generated", model=model, dim=len(embedding))
-            return embedding
-
-        except Exception as e:
-            logger.error("embedding_failed", model=model, error=str(e), text_length=len(text))
-            raise EmbeddingError(
-                f"Failed to generate embedding: {str(e)}",
-                details={"model": model, "error_type": type(e).__name__}
-            )
+                    if attempt == max_retries - 1 or not is_rate_limit:
+                        logger.error("embedding_failed", model=model, error=str(e), text_length=len(text))
+                        raise EmbeddingError(
+                            f"Failed to generate embedding: {str(e)}",
+                            details={"model": model, "error_type": type(e).__name__}
+                        )
 
     # Execute with circuit breaker protection
     try:
@@ -292,3 +302,69 @@ def embed(text: str, use_cache: bool = True) -> List[float]:
                 details={"model": model, "error_type": type(e).__name__}
             )
         raise
+
+
+def embed_batch(texts: List[str], batch_size: int = 16) -> List[List[float]]:
+    """
+    Generate embeddings for a batch of texts to minimize API calls and avoid rate limits.
+    """
+    if not texts:
+        return []
+
+    model = settings.EMBEDDING_MODEL
+    cleaned_texts = [t[:8000] if len(t) > 8000 else t for t in texts]
+    all_embeddings: List[List[float]] = []
+
+    for i in range(0, len(cleaned_texts), batch_size):
+        chunk = cleaned_texts[i : i + batch_size]
+        max_retries = 5
+
+        for attempt in range(max_retries):
+            try:
+                if "mistral" in model:
+                    response = litellm.embedding(
+                        model=model,
+                        input=chunk,
+                        api_key=settings.MISTRAL_API_KEY,
+                        timeout=30.0,
+                    )
+                    embeddings = [item["embedding"] for item in response["data"]]
+                    all_embeddings.extend(embeddings)
+                    break
+                elif model == "gemini/text-embedding-004":
+                    configure_gemini()
+                    chunk_embs = []
+                    for single_text in chunk:
+                        res = genai.embed_content(model=model, content=single_text)
+                        emb = res.get("embedding")
+                        if isinstance(emb, dict) and "values" in emb:
+                            emb = emb["values"]
+                        chunk_embs.append(emb)
+                    all_embeddings.extend(chunk_embs)
+                    break
+                else:
+                    response = litellm.embedding(
+                        model=model,
+                        input=chunk,
+                        timeout=30.0,
+                    )
+                    embeddings = [item["embedding"] for item in response["data"]]
+                    all_embeddings.extend(embeddings)
+                    break
+
+            except Exception as e:
+                is_rate_limit = "429" in str(e) or "rate" in str(e).lower()
+                if is_rate_limit and attempt < max_retries - 1:
+                    wait_time = (attempt + 1) * 3
+                    logger.warning("embedding_batch_rate_limited_sleeping", wait_seconds=wait_time, attempt=attempt + 1)
+                    time.sleep(wait_time)
+                else:
+                    if attempt == max_retries - 1:
+                        logger.error("batch_embedding_failed_after_retries", error=str(e))
+                        raise EmbeddingError(f"Failed to generate batch embedding: {str(e)}")
+                    time.sleep(1)
+
+        # Small courteous delay between batches to respect rate limits
+        time.sleep(0.5)
+
+    return all_embeddings

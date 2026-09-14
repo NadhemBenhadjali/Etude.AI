@@ -1,113 +1,147 @@
-<!-- ✅ NAVBAR SAME DESIGN AS OTHER PAGES -->
-<nav class="navbar">
-  <ul>
-    <li><a routerLink="/"> الرئيسية </a></li>
-    <li><a routerLink="/about"> شكون احنا؟</a></li>
-    <li><a routerLink="/contact"> كلمنا </a></li>
-  </ul>
-</nav>
-
-<app-avatar></app-avatar>
-
-<div class="lesson-container2" dir="rtl">
-
-  <!-- ✅ MAIN GLASS CARD -->
-  <div class="lesson-card">
-
-    <!-- ✅ TOP HEADER -->
-    <div class="lesson-top-bar">
-
-      <button class="exit-button" routerLink="/select-mode">
-        <img src="assets/images/back.png" class="exit-icon" alt="back">
-        <span>العودة</span>
+<div class="lesson-page" dir="rtl">
+  <!-- Top Navigation Bar -->
+  <header class="lesson-top-bar">
+    <div class="brand-group">
+      <button class="back-pill-btn" routerLink="/select-module">
+        <span>◀ رجوع للمحاور</span>
       </button>
-
-      <h2 class="lesson-title">
-        {{ title }} — الشريحة {{ slides[currentSlideIndex].number }}
-      </h2>
-
-      <!-- ✅ progress indicator -->
-      <div class="lesson-progress">
-        {{currentSlideIndex + 1}} / {{slides.length}}
+      <div class="subject-badge-pill">
+        <span class="subject-icon">📚</span>
+        <span>{{ currentSubject || 'الدرس التفاعلي' }}</span>
       </div>
-
     </div>
 
-    <!-- ✅ BOARD PREMIUM FRAME -->
-    <div class="image-wrapper">
+    <div class="lesson-title-box">
+      <h1 class="lesson-main-title">{{ title || 'محتوى الدرس' }}</h1>
+      <span class="slide-indicator" *ngIf="slides.length > 0">
+        الشريحة <strong>{{ slides[currentSlideIndex].number || (currentSlideIndex + 1) }}</strong> من <strong>{{ slides.length }}</strong>
+      </span>
+    </div>
 
-      <img [src]="boardImage" alt="Board" class="board-image" />
+    <div class="top-action-group">
+      <button class="dashboard-link-btn" routerLink="/dashboard">
+        <span>🏠 لوحة التحكم</span>
+      </button>
+    </div>
+  </header>
 
-      <!-- overlay -->
-      <div class="overlay-content">
+  <!-- Main Interactive Chalkboard Studio -->
+  <main class="chalkboard-stage">
+    <!-- Slide Navigation Pills -->
+    <div class="slides-pills-bar" *ngIf="slides.length > 0">
+      <button
+        *ngFor="let s of slides; let i = index"
+        class="slide-step-btn"
+        [class.active]="i === currentSlideIndex"
+        (click)="goToSlide(i)"
+      >
+        <span class="step-num">{{ i + 1 }}</span>
+      </button>
+    </div>
 
-        <img *ngIf="hasPhoto(slides[currentSlideIndex])"
-             [src]="slides[currentSlideIndex].image"
-             [alt]="'Slide photo ' + slides[currentSlideIndex].number"
-             class="slide-img" />
-
-        <div class="slide-text"
-             [ngClass]="hasPhoto(slides[currentSlideIndex]) ? 'has-photo' : 'no-photo'"
-             [innerHTML]="slides[currentSlideIndex].text">
+    <!-- The Chalkboard Display Screen -->
+    <div class="chalkboard-frame" *ngIf="slides.length > 0">
+      <div class="chalkboard-screen">
+        <!-- Slide Image Spotlight (if available) -->
+        <div class="slide-media-box" *ngIf="hasPhoto(slides[currentSlideIndex])">
+          <img
+            [src]="slides[currentSlideIndex].image"
+            [alt]="'صورة ' + title"
+            class="chalkboard-img"
+            (error)="onImageError(slides[currentSlideIndex])"
+          />
         </div>
 
+        <!-- Slide Text Content -->
+        <div class="slide-text-body" [innerHTML]="slides[currentSlideIndex].text"></div>
+
+        <!-- Audio Narration Floating Pill -->
+        <div class="audio-narration-bar">
+          <button
+            class="tts-action-btn"
+            [class.is-speaking]="isPlaying"
+            (click)="playSummary()"
+          >
+            <span class="tts-icon">{{ isPlaying ? '🔇' : '🔊' }}</span>
+            <span class="tts-label">{{ isPlaying ? 'إيقاف الصوت' : 'اسمع الدرس بصوت المعلم الذكي 🇹🇳' }}</span>
+            <div class="sound-wave-anim" *ngIf="isPlaying">
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+              <span class="wave-bar"></span>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- ✅ AUDIO CONTROLS -->
-    <div class="audio-controls">
-
-      <button class="audio-btn play-button"
-              (click)="playSummary()"
-              [disabled]="!slides[currentSlideIndex].text || isPlaying">
-        <img src="assets/images/speaker.png" alt="play">
-        الاستماع
+    <!-- Bottom Navigation Dock -->
+    <footer class="lesson-dock-bar">
+      <button
+        class="dock-nav-btn prev-btn"
+        (click)="prevSlide()"
+        [disabled]="currentSlideIndex === 0"
+      >
+        <span>◀ الشريحة السابقة</span>
       </button>
 
-      <button class="audio-btn stop-button"
-              (click)="stopSummary()"
-              [disabled]="!isPlaying">
-        <img src="assets/images/mute.png" alt="stop">
-        إيقاف الصوت
+      <button class="dock-ask-btn" (click)="onQuestion()">
+        <span class="btn-emoji">🤖</span>
+        <span>اسأل المعلم على هذا الجزء</span>
       </button>
 
-    </div>
+      <button
+        class="dock-nav-btn next-btn"
+        (click)="nextSlide()"
+        *ngIf="currentSlideIndex < slides.length - 1"
+      >
+        <span>اللي بعدو ▶</span>
+      </button>
 
-    <!-- ✅ CONTROLS (NEW PREMIUM STYLE) -->
-    <div class="lesson-controls">
+      <button
+        class="dock-finish-btn"
+        (click)="openCompletionModal()"
+        *ngIf="currentSlideIndex === slides.length - 1"
+      >
+        <span>🏆 كملت الدرس!</span>
+      </button>
+    </footer>
+  </main>
 
-      <!-- ✅ Navigation Row -->
-      <div class="nav-row">
+  <!-- Celebration Modal When Completed -->
+  <div class="celebration-overlay" *ngIf="showCompletionModal">
+    <div class="celebration-card">
+      <div class="celebration-stars">🌟 🎉 🏆 ✨ 🎈</div>
+      <h2 class="celebration-title">يعطيك الصحة يا بطل! كملت الدرس 👏</h2>
+      <p class="celebration-subtitle">احسنت العمل! معلومات هايلة تعلمتها اليوم. شنيّة تحب تعمل توا؟</p>
 
-        <button class="nav-btn back-button"
-                (click)="prevSlide()"
-                [disabled]="currentSlideIndex === 0">
-          ← الرجوع
+      <div class="celebration-actions">
+        <button class="action-card-btn quiz-btn" (click)="launchQuizFromLesson()">
+          <span class="btn-icon">📝</span>
+          <div class="btn-text">
+            <strong>عدي اختبار وتحدي توا! 🏆</strong>
+            <small>اربح نقاط ونجوم إضافية</small>
+          </div>
         </button>
 
-        <button class="question-button"
-                (click)="onQuestion()">
-          <img src="/assets/images/arrow.png" alt="سؤال" class="question-icon" />
+        <button class="action-card-btn chat-btn" (click)="launchChatFromLesson()">
+          <span class="btn-icon">🤖</span>
+          <div class="btn-text">
+            <strong>اسأل المعلم الذكي على الدرس 💬</strong>
+            <small>فسر أي حاجة ما فهمتهاش</small>
+          </div>
         </button>
 
-        <button class="nav-btn next-button"
-                (click)="nextSlide()"
-                *ngIf="currentSlideIndex < slides.length - 1">
-          اللي بعدو →
+        <button class="action-card-btn home-btn" (click)="finishLesson(true)">
+          <span class="btn-icon">🏠</span>
+          <div class="btn-text">
+            <strong>احفظ وارجع للرئيسية 🌟</strong>
+            <small>شوف تقدمك وأوسمتك</small>
+          </div>
         </button>
-
       </div>
 
-      <!-- ✅ FINISH BUTTON ALWAYS VISIBLE -->
-      <button class="finish-button"
-              (click)="finishLesson()"
-              type="button">
-        <img src="assets/images/graduate.png" class="finish-icon" alt="finish">
-        <span>إنهاء الدرس</span>
-      </button>
-
-
+      <button class="modal-close-btn" (click)="closeCompletionModal()">❌ إغلاق ومراجعة الشريحة</button>
     </div>
-
   </div>
 </div>

@@ -1,5 +1,11 @@
 package com.example.EtudeAI.exception;
 
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@Getter
+@ResponseStatus(HttpStatus.BAD_GATEWAY)
 public class AiServiceException extends RuntimeException {
 
     private final String serviceName;
@@ -14,8 +20,5 @@ public class AiServiceException extends RuntimeException {
         this.serviceName = serviceName;
     }
 
-    public String getServiceName() {
-        return serviceName;
-    }
 }
 

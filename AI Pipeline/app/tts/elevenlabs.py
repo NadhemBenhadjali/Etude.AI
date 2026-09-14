@@ -59,6 +59,50 @@ def _call_elevenlabs(
     return resp.content
 
 
+import io
+import asyncio
+
+def _synthesize_edge_or_gtts(text: str) -> bytes:
+    """Fallback TTS using edge-tts or gTTS."""
+    try:
+        import edge_tts
+        async def _run_edge():
+            # High-quality natural Arabic voice (Tunisian / Standard Arabic)
+            communicate = edge_tts.Communicate(text, "ar-TN-ReemNeural")
+            audio_bytes = bytearray()
+            async for chunk in communicate.stream():
+                if chunk["type"] == "audio":
+                    audio_bytes.extend(chunk["data"])
+            if not audio_bytes:
+                # Fallback to Salma or Hamed
+                communicate = edge_tts.Communicate(text, "ar-EG-SalmaNeural")
+                async for chunk in communicate.stream():
+                    if chunk["type"] == "audio":
+                        audio_bytes.extend(chunk["data"])
+            return bytes(audio_bytes)
+        
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                import nest_asyncio
+                nest_asyncio.apply()
+            return loop.run_until_complete(_run_edge())
+        except Exception:
+            return asyncio.run(_run_edge())
+    except Exception as edge_err:
+        logger.warning("edge_tts_fallback_failed", error=str(edge_err))
+        try:
+            from gtts import gTTS
+            tts = gTTS(text=text, lang='ar', slow=False)
+            fp = io.BytesIO()
+            tts.write_to_fp(fp)
+            fp.seek(0)
+            return fp.read()
+        except Exception as gtts_err:
+            logger.error("all_tts_fallbacks_failed", error=str(gtts_err))
+            raise TTSServiceError("TTS failed", {"error": str(gtts_err)})
+
+
 def synthesize_tts_bytes(
     *,
     text: str,
@@ -69,7 +113,8 @@ def synthesize_tts_bytes(
 ) -> bytes:
     api_key = os.getenv("ELEVENLABS_API_KEY")
     if not api_key:
-        raise ValidationError("ELEVENLABS_API_KEY is not configured", {"service": "tts"})
+        logger.info("elevenlabs_not_configured_using_fallback_tts")
+        return _synthesize_edge_or_gtts(text)
 
     timeout_seconds = float(os.getenv("TTS_TIMEOUT_SECONDS", "15"))
 
@@ -86,13 +131,6 @@ def synthesize_tts_bytes(
                 timeout_seconds=timeout_seconds,
             )
         )
-    except CircuitBreakerOpen as e:
-        logger.warning("tts_circuit_open", details=e.details)
-        raise TTSServiceError("TTS circuit breaker is open", e.details)
-    except requests.HTTPError as e:
-        code = e.response.status_code if e.response is not None else None
-        logger.error("tts_provider_http_error", status_code=code)
-        raise TTSServiceError("TTS provider request failed", {"status_code": code})
     except Exception as e:
-        logger.error("tts_unexpected_error", error=str(e))
-        raise TTSServiceError("TTS failed unexpectedly", {"error": str(e)})
+        logger.warning("elevenlabs_call_failed_falling_back", error=str(e))
+        return _synthesize_edge_or_gtts(text)

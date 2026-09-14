@@ -1,18 +1,34 @@
-<div class="welcome-container">
-  <div class="image-section">
-    <div class="glow-box">
-      <img src="/assets/images/panda.png" alt="باندا ترحيبي" class="welcome-image" />
+<div class="welcome-page" dir="rtl">
+  <div class="welcome-card">
+    <div class="mascot-stage">
+      <div class="sparkles-bg">✨ 🌟 🎈 🪄</div>
+      <img src="/assets/images/happyy.png" alt="مرحباً بك" class="welcome-hero-img" />
     </div>
+
+    <span class="welcome-badge">🎉 خطوتك الأولى نحو التميّز</span>
+    <h1 class="welcome-heading">أهلاً بك في عالم <span class="brand-hl">Etude.AI</span>!</h1>
+
+    <p class="welcome-intro">
+      حضر روحك لتجربة استثنائية مليانة إبداع، تحديات، ودروس ذكية معمولة خصيصاً باش تساعدك تكون الأول في قسمك! 🚀
+    </p>
+
+    <div class="perks-row">
+      <div class="perk-item">
+        <span class="perk-icon">📚</span>
+        <span>دروس مبسطة</span>
+      </div>
+      <div class="perk-item">
+        <span class="perk-icon">🤖</span>
+        <span>معلم ذكي</span>
+      </div>
+      <div class="perk-item">
+        <span class="perk-icon">🏆</span>
+        <span>أوسمة وجوائز</span>
+      </div>
+    </div>
+
+    <button class="welcome-cta" (click)="startJourney()">
+      <span>ابدأ المغامرة توا! 🚀</span>
+    </button>
   </div>
-
-  <h2><span class="emoji">!</span> أهلاً بك في مغامرتنا الرقمية</h2>
-  <p class="description">
-حضر روحك لتجربة مليانة إبداع، تحدي، وتعلّم متواصل. هيا بينا نبداو الرحلة!
-
-  </p>
-
-  <div class="start-button">
-  <button (click)="startJourney()">أبدا </button>
-</div>
-
 </div>

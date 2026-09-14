@@ -1,86 +1,138 @@
-.finished-container {
+.finished-page {
   min-height: 100vh;
-  background: linear-gradient(
-    to bottom right,
-    #FFFAB7 0%,
-    #FFD1E3 33%,
-    #7EA1FF 66%,
-    #5BBCFF 100%
-  );
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2.5rem 1.5rem;
+  background: var(--bg-gradient);
+  font-family: var(--app-font);
+}
+
+.celebration-card {
+  background: white;
+  max-width: 650px;
+  width: 100%;
+  border-radius: 40px;
+  padding: 3.5rem 2.5rem;
+  text-align: center;
+  border: 6px solid #fef08a;
+  box-shadow: 0 24px 65px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  text-align: center;
-  font-family: 'El Messiri', sans-serif;
-  gap: 2rem;
-  background-attachment: fixed;
+  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-
-@keyframes animateBG {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.trophy-stage {
+  position: relative;
+  margin-bottom: 1.5rem;
 }
 
-.celebrate-image {
+.floating-stars {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  animation: bounceSlight 2.5s infinite;
+}
+
+.trophy-img {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  animation: floatSlow 3.5s ease-in-out infinite;
+}
+
+.victory-badge {
+  display: inline-block;
+  background: #fef08a;
+  color: #854d0e;
+  font-weight: 900;
+  font-size: 0.95rem;
+  padding: 0.4rem 1.3rem;
+  border-radius: 99px;
+  margin-bottom: 0.8rem;
+}
+
+.victory-title {
+  font-size: 2.3rem;
+  color: #0f172a;
+  font-weight: 900;
+  margin: 0 0 0.8rem;
+}
+
+.victory-desc {
+  color: #475569;
+  font-size: 1.15rem;
+  line-height: 1.65;
+  margin: 0 0 2rem;
+}
+
+.rewards-summary {
   display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
   justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.reward-pill {
+  background: #f8fafc;
+  border: 2px solid #fed7aa;
+  padding: 0.5rem 1.1rem;
+  border-radius: 18px;
+  display: flex;
   align-items: center;
-}
-
-.shine-box {
-  background-color: #ffffff;
-  padding: 1rem;
-  border-radius: 50%;
-  box-shadow: 0 0 30px rgba(126, 161, 255, 0.5);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.shine-box:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 50px rgba(91, 188, 255, 0.9);
-}
-
-.finish-img {
-  width: 220px;
-  height: 220px;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-h2 {
-  font-size: 2rem;
-  color: #00196b;
+  gap: 0.5rem;
   font-weight: bold;
-  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+  color: #334155;
+  font-size: 0.95rem;
 }
 
-.finished-text {
-  max-width: 500px;
-  font-size: 1rem;
-  color: #140101;
-  line-height: 1.6;
-  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+.celebration-actions {
+  display: flex;
+  gap: 1.2rem;
+  width: 100%;
+  max-width: 480px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-.go-home button {
-  background: #FFD1E3;
-  color: #131201;
+.btn-main {
+  flex: 1;
+  min-width: 200px;
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  color: white;
   border: none;
-  padding: 0.8rem 2rem;
-  font-size: 1.1rem;
-  border-radius: 30px;
-  font-weight: bold;
+  font-size: 1.15rem;
+  font-weight: 900;
+  padding: 1rem 1.5rem;
+  border-radius: 20px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: 'El Messiri', sans-serif;
-  font-family: 'FredFredburgerARAHeadBlack', sans-serif;
+  box-shadow: 0 8px 20px rgba(2, 132, 199, 0.35);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.go-home button:hover {
-  background-color: #FFFAB7;
-  transform: scale(1.05);
+.btn-main:hover {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 12px 28px rgba(2, 132, 199, 0.45);
+}
+
+.btn-sub {
+  flex: 1;
+  min-width: 200px;
+  background: white;
+  border: 3px solid #e2e8f0;
+  color: #0f172a;
+  font-size: 1.1rem;
+  font-weight: 900;
+  padding: 0.95rem 1.5rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-sub:hover {
+  background: #f8fafc;
+  border-color: #38bdf8;
+  color: #0284c7;
+  transform: translateY(-2px);
 }

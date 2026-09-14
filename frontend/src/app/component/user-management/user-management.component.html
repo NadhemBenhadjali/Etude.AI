@@ -1,226 +1,209 @@
-<div class="user-management-container" dir="rtl">
-  <div class="user-management-box">
-    <div class="header">
-      <h1>
-        <img class="title-icon" src="assets/images/gear.png" alt="إدارة الحساب" />
-        إدارة الحساب
-      </h1>
-
-      <button class="back-button" routerLink="/profile">
-        ← رجوع للملف الشخصي
+<div class="user-management-page" dir="rtl">
+  <!-- Top Navigation Bar -->
+  <header class="settings-top-bar">
+    <div class="brand-side">
+      <button class="back-pill-btn" routerLink="/profile">
+        <span>◀ رجوع للملف الشخصي</span>
       </button>
+      <div class="page-title-chip">
+        <span>⚙️ إعدادات الحساب والأمان</span>
+      </div>
     </div>
 
-    <!-- ALERTS -->
-    <div *ngIf="error" class="alert alert-error">
-      <img class="alert-icon" src="assets/images/warning.png" alt="error" />
-      {{ error }}
+    <div class="nav-actions">
+      <a class="nav-chip-btn" routerLink="/dashboard">
+        <span>🏠 لوحة التحكم</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="settings-stage">
+    <!-- Feedback Alerts -->
+    <div *ngIf="error" class="feedback-toast error-toast">
+      <span>⚠️ {{ error }}</span>
     </div>
 
-    <div *ngIf="successMessage" class="alert alert-success">
-      <img class="alert-icon" src="assets/images/success.png" alt="success" />
-      {{ successMessage }}
+    <div *ngIf="successMessage" class="feedback-toast success-toast">
+      <span>✅ {{ successMessage }}</span>
     </div>
 
-    <div *ngIf="loading" class="loading-spinner">
+    <div *ngIf="loading" class="loading-state-card">
       <div class="spinner"></div>
-      <p>جاري التحميل...</p>
+      <p>جاري تحميل البيانات...</p>
     </div>
 
-    <!-- PROFILE FORM -->
-    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
-      <div class="form-section">
-        <h2>
-          <img class="section-icon-img" src="assets/images/user.png" alt="المعلومات الشخصية" />
-          المعلومات الشخصية
-        </h2>
-
-        <div class="form-group">
-          <label for="email">البريد الإلكتروني *</label>
-          <input
-            type="email"
-            id="email"
-            formControlName="email"
-            placeholder="example@email.com"
-          />
-          <div
-            class="error-message"
-            *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched"
-          >
-            البريد الإلكتروني غير صالح
+    <div class="settings-cards-stack" *ngIf="!loading">
+      <!-- Personal Info Card -->
+      <section class="settings-card">
+        <div class="card-header">
+          <div class="header-icon-box">👤</div>
+          <div>
+            <h2 class="card-title">المعلومات الشخصية</h2>
+            <p class="card-subtitle">عدّل بياناتك الدراسية وحسابك في منصة Etude.AI</p>
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="firstname">الاسم الأول *</label>
-          <input
-            type="text"
-            id="firstname"
-            formControlName="firstname"
-            placeholder="أدخل اسمك الأول"
-          />
-          <div
-            class="error-message"
-            *ngIf="userForm.get('firstname')?.invalid && userForm.get('firstname')?.touched"
-          >
-            الاسم الأول مطلوب
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="modern-form">
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="firstname">الاسم الأول *</label>
+              <input
+                type="text"
+                id="firstname"
+                formControlName="firstname"
+                placeholder="أدخل اسمك الأول"
+                class="modern-input"
+              />
+              <span class="field-error" *ngIf="userForm.get('firstname')?.invalid && userForm.get('firstname')?.touched">
+                الاسم الأول مطلوب
+              </span>
+            </div>
+
+            <div class="form-field">
+              <label for="lastname">اسم العائلة *</label>
+              <input
+                type="text"
+                id="lastname"
+                formControlName="lastname"
+                placeholder="أدخل اسم عائلتك"
+                class="modern-input"
+              />
+              <span class="field-error" *ngIf="userForm.get('lastname')?.invalid && userForm.get('lastname')?.touched">
+                اسم العائلة مطلوب
+              </span>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="email">البريد الإلكتروني *</label>
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                placeholder="example@email.com"
+                class="modern-input"
+              />
+              <span class="field-error" *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched">
+                البريد الإلكتروني غير صالح
+              </span>
+            </div>
+
+            <div class="form-field">
+              <label for="birthDate">تاريخ الميلاد *</label>
+              <input
+                type="date"
+                id="birthDate"
+                formControlName="birthDate"
+                class="modern-input"
+              />
+              <span class="field-error" *ngIf="userForm.get('birthDate')?.invalid && userForm.get('birthDate')?.touched">
+                تاريخ الميلاد مطلوب
+              </span>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="level">المستوى / السنة الدراسية 🇹🇳</label>
+            <select id="level" formControlName="level" class="modern-select">
+              <option value="FIRST">السنة الأولى ابتدائي</option>
+              <option value="SECOND">السنة الثانية ابتدائي</option>
+              <option value="THIRD">السنة الثالثة ابتدائي</option>
+              <option value="FOURTH">السنة الرابعة ابتدائي</option>
+              <option value="FIFTH">السنة الخامسة ابتدائي</option>
+              <option value="SIXTH">السنة السادسة ابتدائي</option>
+            </select>
+          </div>
+
+          <!-- Account Metadata Stats -->
+          <div class="account-meta-row" *ngIf="currentUser">
+            <div class="meta-item">
+              <span class="meta-label">الدور:</span>
+              <strong class="meta-value">{{ currentUser.role }}</strong>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">نقاط ELO:</span>
+              <strong class="meta-value">{{ currentUser.elo || 0 }} ⭐</strong>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">تاريخ التسجيل:</span>
+              <strong class="meta-value">{{ currentUser.createdAt | date: 'mediumDate' }}</strong>
+            </div>
+          </div>
+
+          <div class="form-actions-row">
+            <button type="submit" class="submit-action-btn" [disabled]="userForm.invalid || loading">
+              <span>💾 حفظ التغييرات</span>
+            </button>
+
+            <button type="button" class="delete-action-btn" (click)="onDelete()" *ngIf="currentUser" [disabled]="loading">
+              <span>🗑️ حذف الحساب</span>
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Password & Security Card -->
+      <section class="settings-card" *ngIf="currentUser">
+        <div class="card-header">
+          <div class="header-icon-box">🔒</div>
+          <div>
+            <h2 class="card-title">تغيير كلمة المرور</h2>
+            <p class="card-subtitle">حافظ على أمان حسابك بكلمة مرور قوية</p>
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="lastname">اسم العائلة *</label>
-          <input
-            type="text"
-            id="lastname"
-            formControlName="lastname"
-            placeholder="أدخل اسم عائلتك"
-          />
-          <div
-            class="error-message"
-            *ngIf="userForm.get('lastname')?.invalid && userForm.get('lastname')?.touched"
-          >
-            اسم العائلة مطلوب
-          </div>
+        <div *ngIf="passwordError" class="feedback-toast error-toast">
+          <span>⚠️ {{ passwordError }}</span>
         </div>
 
-        <div class="form-group">
-          <label for="birthDate">تاريخ الميلاد *</label>
-          <input type="date" id="birthDate" formControlName="birthDate" />
-          <div
-            class="error-message"
-            *ngIf="userForm.get('birthDate')?.invalid && userForm.get('birthDate')?.touched"
-          >
-            تاريخ الميلاد مطلوب
-          </div>
+        <div *ngIf="passwordSuccess" class="feedback-toast success-toast">
+          <span>✅ {{ passwordSuccess }}</span>
         </div>
 
-        <div class="form-group">
-          <label for="level">السنة الدراسية</label>
-          <select id="level" formControlName="level">
-            <option value="FIRST">السنة الاولى</option>
-            <option value="SECOND">السنة الثانية</option>
-            <option value="THIRD">السنة الثالثة</option>
-            <option value="FOURTH">السنة الرابعة</option>
-            <option value="FIFTH">السنة الخامسة</option>
-            <option value="SIXTH">السنة السادسة</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- ✅ INFO SECTION -->
-      <div class="form-section" *ngIf="currentUser">
-        <h2>
-          <img class="section-icon-img" src="assets/images/info.png" alt="معلومات إضافية" />
-          معلومات إضافية
-        </h2>
-
-        <div class="info-grid">
-
-          <div class="info-item">
-            <span class="info-label">
-              <img class="info-icon" src="assets/images/mail.png" alt="email" />
-              البريد الإلكتروني
-            </span>
-            <span class="info-value">{{ currentUser.email }}</span>
+        <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()" class="modern-form">
+          <div class="form-field">
+            <label for="currentPassword">كلمة المرور الحالية *</label>
+            <input
+              type="password"
+              id="currentPassword"
+              formControlName="currentPassword"
+              placeholder="••••••••"
+              class="modern-input"
+            />
           </div>
 
-          <div class="info-item">
-            <span class="info-label">
-              <img class="info-icon" src="assets/images/trophy.png" alt="elo" />
-              نقاط Elo
-            </span>
-            <span class="info-value">{{ currentUser.elo || 0 }}</span>
+          <div class="form-grid-2">
+            <div class="form-field">
+              <label for="newPassword">كلمة المرور الجديدة *</label>
+              <input
+                type="password"
+                id="newPassword"
+                formControlName="newPassword"
+                placeholder="أدخل كلمة مرور جديدة"
+                class="modern-input"
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="confirmPassword">تأكيد كلمة المرور *</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                formControlName="confirmPassword"
+                placeholder="أعد إدخال كلمة المرور"
+                class="modern-input"
+              />
+            </div>
           </div>
 
-          <div class="info-item">
-            <span class="info-label">
-              <img class="info-icon" src="assets/images/user-role.png" alt="role" />
-              الدور
-            </span>
-            <span class="info-value">{{ currentUser.role }}</span>
+          <div class="form-actions-row">
+            <button type="submit" class="submit-action-btn" [disabled]="passwordForm.invalid || loading">
+              <span>🔐 تحديث كلمة المرور</span>
+            </button>
           </div>
-
-          <div class="info-item">
-            <span class="info-label">
-              <img class="info-icon" src="assets/images/calendar.png" alt="created at" />
-              تاريخ الإنشاء
-            </span>
-            <span class="info-value">{{ currentUser.createdAt | date: 'short' }}</span>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- BUTTONS -->
-      <div class="button-group">
-        <button type="submit" class="btn-primary" [disabled]="userForm.invalid || loading">
-          <img class="btn-icon" src="assets/images/save.png" alt="save" />
-          <span>حفظ التغييرات</span>
-        </button>
-
-        <button type="button" class="btn-danger" (click)="onDelete()" *ngIf="currentUser" [disabled]="loading">
-          <img class="btn-icon" src="assets/images/delete.png" alt="delete" />
-          <span>حذف الحساب</span>
-        </button>
-      </div>
-    </form>
-
-    <!-- ✅ PASSWORD FORM -->
-    <div class="form-section" *ngIf="!loading && currentUser">
-      <h2>
-        <img class="section-icon-img" src="assets/images/reset-password.png" alt="تغيير كلمة المرور" />
-        تغيير كلمة المرور
-      </h2>
-
-      <div *ngIf="passwordError" class="alert alert-error">
-        <img class="alert-icon" src="assets/images/warning.png" alt="error" />
-        {{ passwordError }}
-      </div>
-
-      <div *ngIf="passwordSuccess" class="alert alert-success">
-        <img class="alert-icon" src="assets/images/success.png" alt="success" />
-        {{ passwordSuccess }}
-      </div>
-
-      <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
-        <div class="form-group">
-          <label for="currentPassword">كلمة المرور الحالية *</label>
-          <input
-            type="password"
-            id="currentPassword"
-            formControlName="currentPassword"
-            placeholder="أدخل كلمة المرور الحالية"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="newPassword">كلمة المرور الجديدة *</label>
-          <input
-            type="password"
-            id="newPassword"
-            formControlName="newPassword"
-            placeholder="أدخل كلمة مرور جديدة"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="confirmPassword">تأكيد كلمة المرور الجديدة *</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            formControlName="confirmPassword"
-            placeholder="أعد كتابة كلمة المرور الجديدة"
-          />
-        </div>
-
-        <div class="button-group">
-          <button type="submit" class="btn-primary" [disabled]="passwordForm.invalid || loading">
-            <img class="btn-icon" src="assets/images/lock-save.png" alt="save password" />
-            <span>حفظ كلمة المرور الجديدة</span>
-          </button>
-        </div>
-      </form>
+        </form>
+      </section>
     </div>
-
-  </div>
+  </main>
 </div>

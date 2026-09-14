@@ -10,7 +10,7 @@ sys.modules["app.runtime"].QUIZ_AGENT = MagicMock()
 
 import pytest
 import json
-from app.handlers import generate_summary_json, handle_qa
+from app.handlers import generate_summary_json, generate_summary_stream, handle_qa
 
 @pytest.fixture
 def mock_kg():
@@ -52,6 +52,41 @@ def test_generate_summary_json(mock_crew_cls, mock_kg):
     assert len(result["data"]["slides"]) == 1
     # Verify the file path construction
     assert "lessons/" in result["path"]
+
+@patch("app.handlers.build_llm")
+@patch("app.handlers.litellm.completion")
+def test_generate_summary_stream(mock_completion, mock_build_llm, mock_kg, mock_memory):
+    mock_llm = MagicMock()
+    mock_llm.model = "mistral/mistral-large-latest"
+    mock_llm.api_key = "test_key"
+    mock_llm.base_url = "https://openrouter.ai/api/v1"
+    mock_build_llm.return_value = mock_llm
+
+    json_payload = json.dumps({
+        "title": "Lesson on Science",
+        "slides": [
+            {"number": "1", "text": "Slide 1 stream"}
+        ]
+    })
+
+    # Mock streaming chunks
+    mock_chunk1 = MagicMock()
+    mock_chunk1.choices = [MagicMock(delta=MagicMock(content='{"title": "Lesson on Science", '))]
+    mock_chunk2 = MagicMock()
+    mock_chunk2.choices = [MagicMock(delta=MagicMock(content='"slides": [{"number": "1", "text": "Slide 1 stream"}]}'))]
+    mock_completion.return_value = [mock_chunk1, mock_chunk2]
+
+    with patch("app.handlers.summary_task") as mock_summary_task:
+        mock_summary_task.return_value = MagicMock(description="Summary prompt")
+        events = list(generate_summary_stream("Science", mock_kg, session_id="test_session", memory_manager=mock_memory))
+
+    # Assert events were generated
+    event_str = "".join(events)
+    assert "event: status" in event_str
+    assert "event: token" in event_str
+    assert "event: complete" in event_str
+    assert "Lesson on Science" in event_str
+    assert "Slide 1 stream" in event_str
 
 @patch("app.handlers.Crew")
 def test_handle_qa(mock_crew_cls, mock_kg, mock_memory):
